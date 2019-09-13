@@ -1,0 +1,10 @@
+{
+    "coreName": "Yawarakai",
+    "botname": "Bot Display Name",
+    "token": "BotToken",
+    "webhook": {
+        "url": "Webhook Path",
+        "port" : 8000
+    },
+    "language": "zh-CN"
+}
