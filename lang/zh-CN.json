@@ -1,0 +1,19 @@
+{
+    "app": {
+        "startTime": "开始时间：",
+        "coreVersion": "版本",
+        "cliCommandUnknownPrompt": "未知命令，请检查你的拼写或者命令不存在 \n提示：使用 help 命令来获取帮助或是使用 aval 来获取可用命令列表 \n输入 exit 来退出 Yawarakai",
+        "cliAvailiableCommand": "可用命令",
+        "commandExecution": "用户执行命令",
+        "starting": " 启动中..."
+    },
+    "bot": {
+
+    },
+    "core": {
+
+    },
+    "plugin": {
+
+    }
+}
