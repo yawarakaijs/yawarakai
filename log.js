@@ -17,10 +17,10 @@ log4js.configure({
         console: { type: 'console' }
     },
     categories: {
-        Bot: { appenders: ['console', 'Core'], level: 'trace' },
+        Bot: { appenders: [ 'console', 'Core' ], level: 'trace' },
         Message: { appenders: [ 'MessageProc' ], 'level': 'trace'},
         anonymous: {appenders: [ 'Core' ], level: 'trace'},
-        default: { appenders: ['console', 'Core'], level: 'trace' },
+        default: { appenders: [ 'console' ], level: 'trace' },
     }
 });
 
@@ -30,54 +30,54 @@ const anonymousLogger = log4js.getLogger('anonymous')
 
 let Log = {
     info: (text) => {
-        coreLogger.info(text);
+        coreLogger.info(text)
     },
 
     trace: (text) => {
-        coreLogger.trace(text);
+        coreLogger.trace(text)
     },
 
     debug: (text) => {
-        coreLogger.debug(text);
+        coreLogger.debug(text)
     },
 
     warning: (text) => {
-        coreLogger.warn(text);
+        coreLogger.warn(text)
     },
 
     fatal: (text) => {
-        coreLogger.fatal(text);
+        coreLogger.fatal(text)
     }    
 }
 
 let messageStdout = {
     log: (text) => {
-        messageProcLogger.info(text);
+        messageProcLogger.info(text)
     }
 }
 
 let AnonymousLog = {
     info: (text) => {
-        anonymousLogger.info(text);
+        anonymousLogger.info(text)
     },
 
     trace: (text) => {
-        anonymousLogger.trace(text);
+        anonymousLogger.trace(text)
     },
 
     debug: (text) => {
-        anonymousLogger.debug(text);
+        anonymousLogger.debug(text)
     },
 
     warning: (text) => {
-        anonymousLogger.warn(text);
+        anonymousLogger.warn(text)
     },
 
     fatal: (text) => {
-        anonymousLogger.fatal(text);
+        anonymousLogger.fatal(text)
     }
 }
 
-exports.AnonymousLog = AnonymousLog;
-exports.msgLog = messageStdout;
-exports.Log = Log;
+exports.AnonymousLog = AnonymousLog
+exports.msgLog = messageStdout
+exports.Log = Log

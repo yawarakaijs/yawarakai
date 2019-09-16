@@ -1,14 +1,15 @@
 // Dependencies
 
-let readline = require('readline');
+let readline = require('readline')
+let process = require('process')
 
 // Local Packages
 
-
+let Bot = require('./bot')
 
 // Time Control
 
-let SysTime = new Date();
+let SysTime = new Date()
 
 let Time = {
     Date: SysTime,
@@ -17,22 +18,21 @@ let Time = {
 
 // CLI
 
-const rl = readline.createInterface(process.stdin, process.stdout);
+const rl = readline.createInterface(process.stdin, process.stdout)
 
-function promptInput (prompt, handler)
-{
-    rl.question(prompt, input =>
-    {
-        if (handler(input) !== false)
-        {
-            promptInput(prompt, handler);
+function promptInput (prompt, handler) {
+    rl.question(prompt, input => {
+        if (handler(input) !== false) {
+            promptInput(prompt, handler)
         }
-        else
-        {
-            rl.close();
+        else {
+            rl.close()
         }
-    });
+    })
 }
 
-exports.cliInput = promptInput;
-exports.Time = Time;
+// Core Body
+
+exports.Bot = Bot
+exports.cliInput = promptInput
+exports.Time = Time

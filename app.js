@@ -20,90 +20,64 @@
 
 // Dependencies
 
-let Telegraf = require('telegraf');
-
 // Local Packages
 
 let Log = require('./log').Log
-let msgLog = require('./log').msgLog
 let AnonymousLog = require('./log').AnonymousLog
 let Core = require('./core')
-let LangCtl = require('./lang').Lang
+let Bot = require('./bot')
+let Lang = require('./lang').Lang
 let config = require('./config.json')
 let packageInfo = require('./package.json')
 
 // Core Runtime
 
-let Lang = LangCtl.setLang()
+var startInfo = Lang.app.startTime + "：" + Core.Time.logTime + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
+
 console.log("Yawarakai  Copyright (C) 2019  Yuna Hanami")
-console.log("This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; type `show c' for details.")
-Log.info( Lang.app.startTime + "：" + Core.Time.logTime + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version);
-
-// Telegraf
-
-const Bot = new Telegraf(config.token)
+console.log(startInfo)
+AnonymousLog.info(startInfo)
 
 // CLI
 
-Core.cliInput('> ', input =>
-{
-    switch (input)
-    {
-        default:
-            console.log(config.coreName + ": " + input + ": " + Lang.app.cliCommandUnknownPrompt)
-            AnonymousLog.trace( Lang.app.commandExecution + ": " + input)
-            break;
-        case 'telegram start':
-            Log.debug("Telegram Bot: " + config.botname + Lang.app.starting)
-            Bot.telegram.setWebhook(config.webhook.url)
-            Bot.startWebhook('/', null, 8000)
-            break;
-        case 'help':
-            console.log( Lang.app.cliAvailiableCommand + ": telegram | help | exit")
-            break;
-        case 'exit':
-            return false;
-        case '':
-            break;
+Core.cliInput('> ', input => {
+    var command = input.split(' ')[0] // Cut Command and set to First string
+    var isCommand = command.includes("/") && (command.indexOf("/") == 0) // Check command type
+    if(isCommand) {
+        switch (command) {
+            default:
+                console.log(config.coreName + ": " + input + ": " + Lang.app.cliCommandUnknownPrompt)
+                AnonymousLog.trace( Lang.app.commandExecution + ": " + input)
+                break
+            case '/telegram':
+                Bot.telegram.command(input)
+                break
+            case '/help':
+                console.log( Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
+                break
+            case '/stop':
+            case '/exit':
+                return false;
+        }
     }
-});
+    else { // Basic session processing and exception handling
+        switch(input) {
+            default:
+                break
+            case '':
+                break
+        }
+    }
+})
+
+// Processing
+
+Bot.telegram.Bot.on("text", (ctx) => {
+    Bot.message.messagectl.logMsg(ctx)
+})
 
 // Log
 
-Bot.on('text', (ctx) => {
-
-    
-    let groupType = "supergroup"
-    var isGroup = (isGroup == ctx.message.chat.type);
-    
-    // Prefix
-    
-    var output = "来自: ";
-    var chatMessage = "消息: " + ctx.message.text;
-    var fromChatId = " [ ID:" + ctx.message.from.id + " ]";
-
-    if(ctx.message.from.first_name && ctx.message.from.last_name) {
-        if(isGroup) {
-            msgLog.log(output + ctx.message.from.first_name + " " + ctx.message.from.last_name + fromChatId)
-            msgLog.log(chatMessage);
-        }
-        else {
-            msgLog.log(output + ctx.message.from.first_name + " " + ctx.message.from.last_name + fromChatId)
-            msgLog.log(chatMessage);
-        }
-    }
-    else if(ctx.message.from.username) {
-        msgLog.log(output + ctx.message.from.username + fromChatId)
-        msgLog.log(chatMessage);                
-    }
-    else {
-        msgLog.log(output + fromChatId)
-        msgLog.log(chatMessage);
-    }
-    
-    ctx.reply("喵")
-})
-
-Bot.catch((err) => {
-    Log.fatal(err);  
+Bot.telegram.Bot.catch((err) => {
+    Log.fatal(err)
 })
