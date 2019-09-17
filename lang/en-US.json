@@ -10,7 +10,8 @@
     "bot": {
         "message": {
             "from": "From",
-            "text": "Message"
+            "text": "Message",
+            "group": "Group"
         },
         "telegram": {
             "commandInvalid": "Invalid Parameter \nTry to execute /telegram h or /telegram help to get help",

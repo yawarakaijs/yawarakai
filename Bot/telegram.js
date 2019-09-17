@@ -27,10 +27,12 @@ let command = (cmd) => {
         case 'help':
             console.log(Lang.bot.telegram.helpCommand)
             break
+        case 'set':
+            Bot.telegram.setWebhook(config.webhook.url)
+            break
         case 'start':
             Log.Log.debug("Telegram Bot: " + config.botname + Lang.app.starting)
-            Bot.telegram.setWebhook(config.webhook.url)
-            Bot.launch()
+            Bot.startWebhook('/', null, 8000)
             break
         case 'stop':
             Bot.stop()

@@ -24,6 +24,20 @@ log4js.configure({
     }
 });
 
+/*****************************************
+ * Log function name mapping
+ * coreLogger           =>  Log        
+ * messageProcLogger    =>  msgLog
+ * anonymousLogger      =>  AnonymousLog
+ * 
+ * Log functionality
+ *                          File          Screen        No Prompt
+ * console.log              false         true          false
+ * coreLogger               true          true          false
+ * messageProcLogger        true          false         true
+ * anonymousLogger          true          false         true
+ *****************************************/
+
 const coreLogger = log4js.getLogger('Bot');
 const messageProcLogger = log4js.getLogger('Message')
 const anonymousLogger = log4js.getLogger('anonymous')

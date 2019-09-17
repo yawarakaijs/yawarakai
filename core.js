@@ -10,7 +10,6 @@ let Bot = require('./bot')
 // Time Control
 
 let SysTime = new Date()
-
 let Time = {
     Date: SysTime,
     logTime: SysTime.getFullYear() + "-" + ("0"+(SysTime.getMonth()+1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2) + "-" + ("0" + SysTime.getHours()).slice(-2) + "-" + ("0" + SysTime.getMinutes()).slice(-2) + "-" + ("0" + SysTime.getSeconds()).slice(-2)    
@@ -30,8 +29,6 @@ function promptInput (prompt, handler) {
         }
     })
 }
-
-// Core Body
 
 exports.Bot = Bot
 exports.cliInput = promptInput
