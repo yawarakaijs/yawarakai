@@ -1,6 +1,7 @@
 // Dependencies
 
 let Telegraf = require('telegraf')
+const SocksAgent = require('socks5-https-client/lib/Agent');
 
 // Local Packages
 
@@ -8,10 +9,16 @@ let config = require('../config.json')
 let Log = require('../log')
 let Lang = require('../lang').Lang
 
+const socksAgent = new SocksAgent({
+    socksHost: config.proxy.host,
+    socksPort: config.proxy.port
+});
 
 // Creating Bot
 // At this time Single User
-const Bot = new Telegraf(config.token)
+const Bot = new Telegraf(config.token, {
+    telegram: { agent: socksAgent }
+})
 
 let Ctl = {
     
@@ -32,12 +39,13 @@ let command = (cmd) => {
             break
         case 'start':
             Log.Log.debug("Telegram Bot: " + config.botname + Lang.app.starting)
-            Bot.startWebhook('/', null, 8000)
+            Bot.startWebhook('/', null, config.webhook.port)
             break
         case 'stop':
-            Bot.stop()
-            break;
+            Bot.stop(() => Log.Log.info("Shutting down..."))
+            return
     }
+    return
 }
 
 exports.command = command

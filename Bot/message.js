@@ -2,6 +2,7 @@
 
 let Log = require('../log')
 let Lang = require('../lang').Lang
+let what2eat = require('./what2eat')
 
 let messagectl = {
 
@@ -68,11 +69,68 @@ let messagectl = {
         }
 
         return
+    },
+    // Process Context Data
+    process: (ctx) => {
+        Message.hears(ctx);
+    },
+    // Trigger set for special trigger
+    trigger: (text, ctx) => {
+        text
+        ctx
+    },
+    // Send data directly to middleware (Call as Going)
+    addTo: (ctx, controller) => {
+        var procTypes = (name) => {
+            switch(name) {
+                default:
+                    // Redirect data back to processor see if pairs any Pattern
+                    this.messagectl.process(ctx)
+                    break
+            }
+        }
+        // Check if inputed a sets of processors
+        if(typeof(controller) != String) {
+            for(var i = 0; i < controller.length; i++) {
+                procTypes(controller[i])
+            }
+        }
+    },
+    // Send data directly to middleware (Call At Time)
+    sendTo: (ctx, processor) => {
+        var procTypes = (name) => {
+            switch(name) {
+                default:
+                    // Redirect data back to processor see if pairs any Pattern
+                    this.messagectl.process(ctx)
+                    break
+                case "what2eat":
+                    // Send Context to what2eat
+                    what2eat();
+                    break
+            }
+        }
+        // Check if inputed a sets of processors
+        if(typeof(processor) != String) {
+            for(var i = 0; i < processor.length; i++) {
+                procTypes(processor[i])
+            }
+        }
+        
     }
 }
 
 let Message = {
+    trigCtl: () => {
 
+    },
+    hears: (ctx) => {
+        var pattern = /悠月|悠月(酱|喵{1,2}|月{1,2})/gi
+        if(pattern.test(ctx.message.text)) {
+            ctx.reply("在的w")
+            Log.Log.debug("回复至: " + ctx.message.from.id + " - 成功 | 匹配: " + pattern[Symbol.match](ctx.message.text))
+        }
+    }
 }
 
 exports.messagectl = messagectl

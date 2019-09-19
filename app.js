@@ -73,7 +73,10 @@ Core.cliInput('> ', input => {
 // Processing
 
 Bot.telegram.Bot.on("text", (ctx) => {
+    // Send Data to Message Control
     Bot.message.messagectl.logMsg(ctx)
+    // Send Data to Processor
+    Bot.message.messagectl.process(ctx)
 })
 
 // Log
