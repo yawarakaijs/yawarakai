@@ -1,7 +1,7 @@
 // Dependencies
 
 let Telegraf = require('telegraf')
-const SocksAgent = require('socks5-https-client/lib/Agent');
+//const SocksAgent = require('socks5-https-client/lib/Agent');
 
 // Local Packages
 
@@ -9,16 +9,16 @@ let config = require('../config.json')
 let Log = require('../log')
 let Lang = require('../lang').Lang
 
+/*
 const socksAgent = new SocksAgent({
     socksHost: config.proxy.host,
     socksPort: config.proxy.port
-});
+})
+*/
 
 // Creating Bot
 // At this time Single User
-const Bot = new Telegraf(config.token, {
-    telegram: { agent: socksAgent }
-})
+const Bot = new Telegraf(config.token)
 
 let Ctl = {
     
