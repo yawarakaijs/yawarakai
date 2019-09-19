@@ -1,10 +1,15 @@
 {
     "coreName": "Yawarakai",
-    "botname": "Bot Display Name",
-    "token": "BotToken",
+    "botname": "悠月",
+    "token": "Key",
     "webhook": {
-        "url": "Webhook Path",
-        "port" : 8000
+        "url": "https://569fef0a.ngrok.io",
+        "port" : 5000
+    },
+    "proxy": {
+        "enable": false,
+        "host": "127.0.0.1",
+        "port": 1280
     },
     "language": "zh-CN"
 }
