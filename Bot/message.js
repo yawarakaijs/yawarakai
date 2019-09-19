@@ -85,7 +85,7 @@ let messagectl = {
             switch(name) {
                 default:
                     // Redirect data back to processor see if pairs any Pattern
-                    this.messagectl.process(ctx)
+                    messagectl.process(ctx)
                     break
             }
         }
@@ -102,7 +102,7 @@ let messagectl = {
             switch(name) {
                 default:
                     // Redirect data back to processor see if pairs any Pattern
-                    this.messagectl.process(ctx)
+                    messagectl.process(ctx)
                     break
                 case "what2eat":
                     // Send Context to what2eat
@@ -158,46 +158,46 @@ let Message = {
         let yutsukievening = /((悠月酱)|(?:悠月))((?:晚上好)|(?:晚好))/gi
         let enevening = /((?:Good Evening))(\w|((.*)(?:.*)))/gi
 
-        this.reply(ctx, loveneko, "Neko 知道的话会超开心的！")
-        this.reply(ctx, loveyuna, "佑奈知道的话会超开心的！")
-        this.reply(ctx, sadmeow, "喵...怎么了吗...")
-        this.reply(ctx, /(?:咕噜)/g, "咕噜咕噜咕噜")
-        this.reply(ctx, yutsukinotcute, "喵...悠月做错惹什么嘛...（哭哭")
-        this.reply(ctx, yutsukicute, "啊呜啊呜(捂脸)")
-        this.reply(ctx, yutsukiyutsukiyu, "咕噜咕噜~ 要做什么啦！")
-        this.reply(ctx, yutsukiletsplay, "(竖起耳朵) 悠月也想玩呢，可是佑奈说要继续研究新的东西什么的...弄完这些工作才能玩呢。抱歉啦~")
-        this.reply(ctx, hugneeded, "啊呜啊呜，抱紧紧...（顺毛）")
-        this.reply(ctx, tiredforthis, "揉揉...实在太累的话就休息一下呢喵...")
-        this.reply(ctx, meowmeow, "喵~")
-        this.reply(ctx, dumbyouyue, "呜...悠月对不起呢...有什么对不起你的地方吗......而且...明明是主人的错嘛！")
-        this.reply(ctx, hugyouyue, "喵...扑过去抱住 >_<")
-        this.reply(ctx, yutsukihi, "在的w")
+        Message.reply(ctx, loveneko, "Neko 知道的话会超开心的！")
+        Message.reply(ctx, loveyuna, "佑奈知道的话会超开心的！")
+        Message.reply(ctx, sadmeow, "喵...怎么了吗...")
+        Message.reply(ctx, /(?:咕噜)/g, "咕噜咕噜咕噜")
+        Message.reply(ctx, yutsukinotcute, "喵...悠月做错惹什么嘛...（哭哭")
+        Message.reply(ctx, yutsukicute, "啊呜啊呜(捂脸)")
+        Message.reply(ctx, yutsukiyutsukiyu, "咕噜咕噜~ 要做什么啦！")
+        Message.reply(ctx, yutsukiletsplay, "(竖起耳朵) 悠月也想玩呢，可是佑奈说要继续研究新的东西什么的...弄完这些工作才能玩呢。抱歉啦~")
+        Message.reply(ctx, hugneeded, "啊呜啊呜，抱紧紧...（顺毛）")
+        Message.reply(ctx, tiredforthis, "揉揉...实在太累的话就休息一下呢喵...")
+        Message.reply(ctx, meowmeow, "喵~")
+        Message.reply(ctx, dumbyouyue, "呜...悠月对不起呢...有什么对不起你的地方吗......而且...明明是主人的错嘛！")
+        Message.reply(ctx, hugyouyue, "喵...扑过去抱住 >_<")
+        Message.reply(ctx, yutsukihi, "在的w")
 
-        this.reply(ctx, yutsukimorning, "喵~早安")
-        this.reply(ctx, scmorning, "早安喔")
-        this.reply(ctx, enmorning, "Morning!")
+        Message.reply(ctx, yutsukimorning, "喵~早安")
+        Message.reply(ctx, scmorning, "早安喔")
+        Message.reply(ctx, enmorning, "Morning!")
 
-        this.reply(ctx, yutsukiafternoon, "咕噜咕噜，午安安，有闲暇时间的话记得休息放松一下呢~")
-        this.reply(ctx, scafternoon, "已经过去大半天了呢，午安喵")
-        this.reply(ctx, enafternoon, "Good afternoon! Finishing up with all your work?")
+        Message.reply(ctx, yutsukiafternoon, "咕噜咕噜，午安安，有闲暇时间的话记得休息放松一下呢~")
+        Message.reply(ctx, scafternoon, "已经过去大半天了呢，午安喵")
+        Message.reply(ctx, enafternoon, "Good afternoon! Finishing up with all your work?")
 
-        this.reply(ctx, yutsukinight, "嗯喵，晚安。祝你做个好梦呢~")
-        this.reply(ctx, scnight, "晚安喵，好好休息哦")
-        this.reply(ctx, ennight, "Good night! Wish you would have a sweet dream :)")
+        Message.reply(ctx, yutsukinight, "嗯喵，晚安。祝你做个好梦呢~")
+        Message.reply(ctx, scnight, "晚安喵，好好休息哦")
+        Message.reply(ctx, ennight, "Good night! Wish you would have a sweet dream :)")
 
-        this.reply(ctx, yutsukievening, "喵喵，晚上好喔，悠月在研究新奇的东西呢w")
-        this.reply(ctx, scevening, "晚上好，今天过得怎么样呢？")
-        this.reply(ctx, enevening, "Good evening! How's it going today?")
+        Message.reply(ctx, yutsukievening, "喵喵，晚上好喔，悠月在研究新奇的东西呢w")
+        Message.reply(ctx, scevening, "晚上好，今天过得怎么样呢？")
+        Message.reply(ctx, enevening, "Good evening! How's it going today?")
         
     },
     reply(ctx, textPattern, textReply) {
-        if(this.count >= 1) {
-            this.count = 0;
+        if(Message.count >= 1) {
+            Message.count = 0;
             return;
         }
-        else if(this.count == 0) {
+        else if(Message.count == 0) {
             if(textPattern.test(ctx.message.text)) {
-                this.count ++;
+                Message.count ++;
                 ctx.reply(textReply);
                 Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功 | 匹配: ${textPattern[Symbol.match](ctx.message.text)}`);
                 return;
