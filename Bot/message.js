@@ -138,7 +138,6 @@ let Message = {
         let meowmeow = /(喵~)/gi
         let dumbyouyue = /(悠月)(()|(是))((?:笨蛋)|(?:讨厌)|(?:大笨蛋))/gi
         let hugyouyue = /((?:抱抱)|(?:摸摸))(柠檬)/gi
-        let yutsukihi = /悠月|悠月(酱|喵{1,2}|月{1,2})/gi
         let happyemotion = /^开心呢/gi
         let likeu = /^(?:喜欢)|(？:喜欢呢)/gi
 
@@ -173,7 +172,6 @@ let Message = {
         Message.reply(ctx, meowmeow, "喵~")
         Message.reply(ctx, dumbyouyue, "呜...悠月对不起呢...有什么对不起你的地方吗......而且...明明是主人的错嘛！")
         Message.reply(ctx, hugyouyue, "喵...扑过去抱住 >_<")
-        Message.reply(ctx, yutsukihi, "在的w")
         Message.reply(ctx, happyemotion, "开心就好呢w")
         Message.reply(ctx, likeu, "喜欢 /")
 
