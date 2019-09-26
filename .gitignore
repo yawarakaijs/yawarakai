@@ -3,5 +3,6 @@
 
 log/
 node_modules/
+Components/config.json
 
 config.json
