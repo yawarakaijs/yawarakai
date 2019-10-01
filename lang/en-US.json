@@ -14,6 +14,8 @@
             "group": "Group"
         },
         "telegram": {
+            "commandParameterInvalid": "Parameter Invalid",
+            "commandParameterMissing": ["Invalid Parameter: ",", Please check the missing parameter: "],
             "commandInvalid": "Invalid Parameter \nTry to execute /telegram h or /telegram help to get help",
             "helpCommand": "telegram is a command which launches and manages Telegram Bot and Telegram Client \n start     Launch Telegram Bot \n stop      Terminate Telegram Bot"
         }

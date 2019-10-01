@@ -14,6 +14,8 @@
             "group": "群组"
         },
         "telegram": {
+            "commandParameterInvalid": "无效的参数",
+            "commandParameterMissing": ["无效的参数：","，检查是否缺失必要参数："],
             "commandInvalid": "参数命令不正确 \n执行 /telegram h 或者 /telegram help 来获得帮助",
             "helpCommand": "telegram 命令是用于启动和管理 Telegram Bot 和 Telegram Client \n start     启动 Telegram Bot \n stop      停止 Telegram Bot"
         }
