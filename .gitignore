@@ -4,8 +4,8 @@
 .env/
 log/
 node_modules/
-Components/config.json
 
 .eslintrc.json
 yarn.lock
 config.json
+!Components/*/config.json
