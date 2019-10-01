@@ -29,40 +29,26 @@ let command = (cmd) => {
             console.log(Lang.bot.telegram.helpCommand)
             break
         case 'set':
-            var count, err
-            var num = 2
-            args.forEach(element => {
-                if(element === "--l" || element === "--url" && args[count+1]) {
-                    Bot.telegram.setWebhook(args[count+1])
-                }
-                else if(element === "--p" || element === "--port" && args[count+1]) {
-                    webhookPort = args[count+1]
-                }
-                else if(element === "--l" || element === "--url" && !args[count+1]) {
-                    num = count + 1
-                    err = true
-                }
-                else if(element === "--p" || element === "--port" && !args[count+1]) {
-                    num = count + 1
-                    err = true
-                }
-                else if(args[2]) {
-                    num = count + 1
-                    err = true
-                }
-                else if(config.webhook.url){
+            for(var i = 0; i < args.length; i++) {
+                if(!args[2]) {
                     console.log("Using default settings")
                     webhookPort = config.webhook.port != undefined ? config.webhook.port : 8000
                     Bot.telegram.setWebhook(config.webhook.url)
                 }
-                count++
-            })
-            if(err) {
-                // Display error if  option is invalid
-                console.log(num)
-                console.log(Lang.bot.telegram.commandParameterMissing[0] + args[num] + Lang.bot.telegram.commandParameterMissing[1])
-                Log.AnonymousLog.trace( Lang.app.commandExecution + ": " + cmd)
-            }      
+                if(args[i] === "--l" && args[i+1] != undefined) {
+                    console.log("Webhook [OK]")
+                    Bot.telegram.setWebhook(args[i+1])
+                }
+                if(args[i] === "--p" && args[i+1] != undefined) {
+                    console.log("Webhook Port [OK]")
+                    webhookPort = args[i+1]
+                }
+                if((args[i] === "--l" && args[i+1] == undefined) || (args[i] === "--p" && args[i+1] == undefined)) {
+                    // Display error if  option is invalid
+                    console.log(Lang.bot.telegram.commandParameterMissing[0] + args[2] + Lang.bot.telegram.commandParameterMissing[1])
+                    Log.AnonymousLog.trace( Lang.app.commandExecution + ": " + cmd)
+                }
+            }
             break
         case 'start':
             Log.Log.debug("Telegram Bot: " + config.botname + Lang.app.starting)
