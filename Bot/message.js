@@ -103,10 +103,6 @@ let messagectl = {
                     // Redirect data back to processor see if pairs any Pattern
                     messagectl.process(ctx)
                     break
-                case "what2eat":
-                    // Send Context to what2eat
-                    what2eat()
-                    break
             }
         }
         // Check if inputed a sets of processors

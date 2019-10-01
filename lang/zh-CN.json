@@ -24,7 +24,12 @@
     "core": {
 
     },
-    "plugin": {
-
+    "component": {
+        "readIn": "已读取 ",
+        "loaded": ["已挂载组件 ", " 来自 "],
+        "enabled": "已激活 ",
+        "disabled": "已禁用 ",
+        "reloaded": "已重载 ",
+        "configFileInvalid": ["ConfigFileInvalidError: \n", " 配置文件不正确或是无效"]
     }
 }

@@ -28,15 +28,22 @@ let Core = require('./core')
 let Bot = require('./bot')
 let Lang = require('./lang').Lang
 let config = require('./config.json')
+let Component = require('./component')
 let packageInfo = require('./package.json')
 
 // Core Runtime
 
-var startInfo = Lang.app.startTime + "：" + Core.Time.logTime + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
+var startInfo = Lang.app.startTime + "：" + Date() + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
 
 console.log("Yawarakai  Copyright (C) 2019  Yuna Hanami")
 console.log(startInfo)
 AnonymousLog.info(startInfo)
+
+// Debug block
+
+if(config.debugmode) {
+    Component.ComponentControl.load()
+}
 
 // CLI
 
@@ -55,6 +62,12 @@ Core.cliInput('> ', input => {
             case '/help':
                 console.log( Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
                 break
+            case '/scan':
+                Component.ComponentControl.scan()
+                break
+            case '/load':
+                Component.ComponentControl.load()
+                break
             case '/stop':
             case '/exit':
                 return false;
@@ -70,13 +83,12 @@ Core.cliInput('> ', input => {
     }
 })
 
+
+
 // Processing
 
 Bot.telegram.Bot.on("text", (ctx) => {
-    // Send Data to Message Control
     Bot.message.messagectl.logMsg(ctx)
-    // Send Data to Processor
-    Bot.message.messagectl.process(ctx)
 })
 
 // Log

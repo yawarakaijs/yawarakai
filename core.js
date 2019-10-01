@@ -12,7 +12,8 @@ let Bot = require('./bot')
 let SysTime = new Date()
 let Time = {
     Date: SysTime,
-    logTime: SysTime.getFullYear() + "-" + ("0"+(SysTime.getMonth()+1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2) + "-" + ("0" + SysTime.getHours()).slice(-2) + "-" + ("0" + SysTime.getMinutes()).slice(-2) + "-" + ("0" + SysTime.getSeconds()).slice(-2)    
+    runningTime: SysTime.getFullYear() + "-" + ("0"+(SysTime.getMonth()+1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2) + "-" + ("0" + SysTime.getHours()).slice(-2) + "-" + ("0" + SysTime.getMinutes()).slice(-2) + "-" + ("0" + SysTime.getSeconds()).slice(-2),
+    logTime: SysTime.getFullYear() + "-" + ("0"+(SysTime.getMonth()+1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2)
 }
 
 // CLI

@@ -23,7 +23,11 @@
     "core": {
 
     },
-    "plugin": {
-
+    "component": {
+        "loaded": ["Loaded component ", " from "],
+        "enabled": "Enabled ",
+        "disabled": "Disabled ",
+        "reloaded": "Reloaded ",
+        "configFileInvalid": ["ConfigFileInvalidError: \n", " 配置文件不正确或是无效"]
     }
 }
