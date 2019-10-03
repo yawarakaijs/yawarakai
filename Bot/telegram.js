@@ -12,13 +12,13 @@ let Lang = require('../lang').Lang
 // Creating Bot
 // At this time Single User
 const Bot = new Telegraf(config.token)
-
 let Ctl = {
     
 }
 
 let command = (cmd) => {
     var webhookPort
+    var webhookUrl
     var args = cmd.split(" ")
     switch (args[1]) {
         default:
@@ -32,21 +32,25 @@ let command = (cmd) => {
             for(var i = 0; i < args.length; i++) {
                 if(!args[2]) {
                     console.log("Using default settings")
+                    webhookUrl = config.webhook.url
                     webhookPort = config.webhook.port != undefined ? config.webhook.port : 8000
                     Bot.telegram.setWebhook(config.webhook.url)
                 }
                 if(args[i] === "--l" && args[i+1] != undefined) {
-                    console.log("Webhook [OK]")
+                    console.log(`webhook set to ${webhookUrl}`)
                     Bot.telegram.setWebhook(args[i+1])
                 }
                 if(args[i] === "--p" && args[i+1] != undefined) {
-                    console.log("Webhook Port [OK]")
+                    console.log(`webhook set to ${webhookPort}`)
                     webhookPort = args[i+1]
                 }
                 if((args[i] === "--l" && args[i+1] == undefined) || (args[i] === "--p" && args[i+1] == undefined)) {
                     // Display error if  option is invalid
                     console.log(Lang.bot.telegram.commandParameterMissing[0] + args[2] + Lang.bot.telegram.commandParameterMissing[1])
                     Log.AnonymousLog.trace( Lang.app.commandExecution + ": " + cmd)
+                }
+                if(args[i] === "--n") {
+                    console.log(`current on ${webhookUrl}:${webhookPort}`)
                 }
             }
             break
