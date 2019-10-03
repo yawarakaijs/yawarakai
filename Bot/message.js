@@ -1,6 +1,7 @@
 // Local Packages
 
 let Log = require('../log')
+let Core = require('../core')
 let Lang = require('../lang').Lang
 
 let messagectl = {
@@ -12,7 +13,6 @@ let messagectl = {
         var isGroup = (groupType == ctx.message.chat.type)
     
         // Prefix
-    
         var output = `${Lang.bot.message.from}: `
         var outputGroup = Lang.bot.message.group
         var chatMessage = `${Lang.bot.message.text} : ${ctx.message.text}`
@@ -66,7 +66,6 @@ let messagectl = {
                 Log.msgLog.log(chatMessage)
             }
         }
-
         return
     },
     // Process Context Data
@@ -120,27 +119,28 @@ let Message = {
         
     },
     hears: (ctx) => {
-        let meowmeow = /(喵~)/gi
-        Message.reply(ctx, meowmeow, "喵~")
-        
+        let meowmeow = /(喵～)/gi
+        let startnlp = /((悠月，)|())打开分析模式/gi
+        let restart = /((悠月，)|())重新启动/gi
+        Message.reply(ctx, meowmeow, ["喵~"],)
+        Message.reply(ctx, startnlp, ["好的","接下来乃说的话都可以得到一个 NLP 的分析"],)
+        Message.reply(ctx, restart, ["好的","5 秒后重新启动"])
     },
     reply(ctx, textPattern, textReply) {
-        if(Message.count >= 1) {
-            Message.count = 0;
-            return;
+        if(Message.count == 0 && textPattern.test(ctx.message.text)) {
+            Message.count ++
+            console.log(ctx.message.chat.id)
+            setTimeout(() => {
+                textReply.forEach(element => {
+                    ctx.replyWithChatAction(ctx.message.chat.id, "typing")
+                    ctx.reply(element)
+                })    
+            }, 1000)
+            // `回复至: ${ctx.message.from.id} - 成功`
+            Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功 | 匹配: ${textPattern[Symbol.match](ctx.message.text)}`)
         }
-        else if(Message.count == 0) {
-            if(textPattern.test(ctx.message.text)) {
-                Message.count ++;
-                ctx.reply(textReply);
-                Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功 | 匹配: ${textPattern[Symbol.match](ctx.message.text)}`);
-                return;
-            }
-            else{
-                return;
-            }
-        }
-        
+        Message.count = Message.count >= 1 ? 0 : Message.count
+        return
     },
     count: 0
 }

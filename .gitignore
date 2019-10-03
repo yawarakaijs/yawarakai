@@ -1,10 +1,11 @@
 .idea
-.vs
+.vscode/
 
 .env/
 log/
 node_modules/
 
+yarn*
 .eslintrc.json
 yarn.lock
 config.json

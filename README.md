@@ -1,5 +1,7 @@
 # Yawarakai Core
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fhanamiyuna%2Fyawarakai.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fhanamiyuna%2Fyawarakai?ref=badge_large)
+
 A running core that support many neural network models which works for NLP or providing solution
 Based on Telegram Bot API and CLI for the main interfaces
 
