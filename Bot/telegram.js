@@ -29,19 +29,19 @@ let command = (cmd) => {
             console.log(Lang.bot.telegram.helpCommand)
             break
         case 'set':
-            for(var i = 0; i < args.length; i++) {
+            for(var i = 1; i < args.length; i++) {
                 if(!args[2]) {
                     console.log("Using default settings")
                     webhookUrl = config.webhook.url
                     webhookPort = config.webhook.port != undefined ? config.webhook.port : 8000
-                    Bot.telegram.setWebhook(config.webhook.url)
+                    // Bot.telegram.setWebhook(config.webhook.url).catch(err => Log.Log.fatal(err))
                 }
                 if(args[i] === "--l" && args[i+1] != undefined) {
-                    console.log(`webhook set to ${webhookUrl}`)
-                    Bot.telegram.setWebhook(args[i+1])
+                    console.log(`webhook set to ${webhookUrl}`).catch(err => Log.Log.fatal(err))
+                    // Bot.telegram.setWebhook(args[i+1])
                 }
                 if(args[i] === "--p" && args[i+1] != undefined) {
-                    console.log(`webhook set to ${webhookPort}`)
+                    console.log(`webhook set to ${webhookPort}`).catch(err => Log.Log.fatal(err))
                     webhookPort = args[i+1]
                 }
                 if((args[i] === "--l" && args[i+1] == undefined) || (args[i] === "--p" && args[i+1] == undefined)) {
