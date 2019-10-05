@@ -6,7 +6,7 @@ let Inline = require('../../component').Interface.Inline
 // Component Method
 
 let config = require('./config.json')
-let hujiang = require('./hujiang')
+let hujiang = require('./dictlib')
 
 // Header
 
