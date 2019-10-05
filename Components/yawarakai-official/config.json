@@ -1,12 +1,13 @@
 {
     "groupname": "yawarakai-official",
     "components": {
-        "what2eat": {
-            "name": "what2eat",
-            "displayNam": "what2eat",
+        "dictionary": {
+            "name": "dictionary",
+            "displayNam": "Dictionary for Simplified Chinese",
             "groupNam": "yawarakai-official",
             "version": "v1.0.0",
-            "description": "Randomly give a choice for what to eat"
+            "authort": ["Yawarakai Devs"],
+            "description": "Find the foreign language words and Give the defination of it"
         }
     }
 }

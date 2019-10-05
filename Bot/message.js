@@ -119,12 +119,11 @@ let Message = {
         
     },
     hears: (ctx) => {
-        let meowmeow = /(喵～)/gi
-        let startnlp = /((悠月，)|())打开分析模式/gi
-        let restart = /((悠月，)|())重新启动/gi
+        let meowmeow = /(喵～)/gui
+        let startnlp = /((悠月，)|())打开分析模式/gui
+        let stopnlp = /关闭分析模式/gui
         Message.reply(ctx, meowmeow, ["喵~"],)
-        Message.reply(ctx, startnlp, ["好的","接下来乃说的话都可以得到一个 NLP 的分析"],)
-        Message.reply(ctx, restart, ["好的","5 秒后重新启动"])
+        Message.reply(ctx, startnlp, ["好的","接下来乃说的话都可以得到一个 NLP 的分析"])
     },
     reply(ctx, textPattern, textReply) {
         if(Message.count == 0 && textPattern.test(ctx.message.text)) {
@@ -136,7 +135,6 @@ let Message = {
                     ctx.reply(element)
                 })    
             }, 1000)
-            // `回复至: ${ctx.message.from.id} - 成功`
             Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功 | 匹配: ${textPattern[Symbol.match](ctx.message.text)}`)
         }
         Message.count = Message.count >= 1 ? 0 : Message.count

@@ -1,74 +1,86 @@
 // Dependencies
 
 let fs = require('fs')
+let path = require('path')
 
 // Local Files
 
 let Log = require('./log')
 let Core = require('./core')
 let Lang = require('./lang').Lang
+let Bot = require('./bot')
+let Command
+let Inline = require('./Bot/inline')
+let Message = require('./Bot/message')
 
 // Body
 
-class Component {
-    constructor(path) {
-        console.log(path)
-        this.compObj = require(path)
-    }
-    get() {
-        return this.compObj
-    }
-}
-
-let ComponentInterface = {
-    Core: Core,
-    Log: Log
-}
-
-let ComponentControl = {
-    scan: () => {
-        let baseDir = __dirname + "/Components/"
-        var baseDirList = fs.readdirSync(baseDir)
-        var childDirMap = new Map()
-        baseDirList.forEach(element => {
-            childDirMap.set([fs.readdirSync(baseDir + element + "/", {withFileTypes: true}).filter(dirent => !dirent.isDirectory()).map(dirent => dirent.name)], { "name": element, "path": baseDir + element})
-        })
-        return childDirMap
-    },
-    load: () => {
-        let getPath = (key) => {
-            var compConfig
-            if(fs.existsSync(key.path + "/config.json")) {
-                compConfig = require(key.path + "/config.json")
-                if(compConfig.components) {
-                    for (let [configKey, configValue] of Object.entries(compConfig.components)) {
-                        var component = new Component(key.path + "/" + configValue.name)
-                        ComponentList.append(component)
+let Register = {
+    load: (extension_dir = __dirname + '/Components/') => {
+        try {
+            let Compo = { command: [], inline: [], message: [] }
+            var files = fs.readdirSync(extension_dir)
+            files.forEach((value, index) => {
+                let folder = path.join(extension_dir, value)
+                var stats = fs.statSync(folder)
+                if (fs.existsSync(folder + "/config.json")) {
+                    var compConfig = require(folder + "/config.json")
+                    if (compConfig.components) {
+                        if (stats.isDirectory()) {
+                            for (let [configKey, configValue] of Object.entries(compConfig.components)) {
+                                let compoPath = extension_dir + value + "/" + configValue.name + ".js"
+                                Compo = { command: [], inline: [], message: [] }
+                                let core_exists = fs.statSync(compoPath)
+                                if (core_exists) {
+                                    let compo = require(compoPath)
+                                    if (compo.register.commands) {
+                                        compo.register.commands.map(cmd => {
+                                            cmd.instance = compo.commands[cmd.cmdReg]
+                                            cmd.meta = compo.meta
+                                            Compo.command.push(cmd)
+                                        })
+                                    }
+                                    if (compo.register.inlines) {
+                                        compo.register.inlines.map(iln => {
+                                            iln.instance = compo.inlines[iln.ilnReg]
+                                            iln.meta = compo.meta
+                                            Compo.inline.push(iln)
+                                        })
+                                    }
+                                    if (compo.register.message) {
+                                        compo.register.message.map(msg => {
+                                            msg.instance = compo.message[msg.msgReg]
+                                            msg.meta = compo.meta
+                                            Compo.message.push(msg)
+                                        })
+                                    }
+                                    console.log(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
+                                }
+                                else {
+                                    Log.Log.info(Lang.component.readIn + compConfig.groupname + Lang.component.loaded[1] + value)
+                                    return
+                                }
+                            }
+                        }
                     }
+                    else { Log.Log.fatal(Lang.component.configFileInvalid + folder + "/config.json") }
                 }
-                else { Log.Log.fatal(Lang.component.configFileInvalid + key.path + "/config.json") }
-                Log.Log.debug(Lang.component.readIn + compConfig.groupname + Lang.component.loaded[1] + key.name)
-            }
+            })
+            return Compo
+        } catch (error) {
+            console.log(error)
         }
-        ComponentControl.scan().forEach(getPath)
-       //delete require.cache
     }
 }
 
-let ComponentList = {
-    append: (component) => {
-
-        Log.Log.debug(Lang.component.loaded[0] + component.get().the.name + "@" + component.get().the.version + Lang.component.loaded[1] + component.get().the.groupNam)
-    },
-    enable: () => {
-
-    },
-    disable: () => {
-
-    }
+let Interface = {
+    Log: Log,
+    Inline: Inline,
+    Message: Message,
+    Bot: Bot
 }
 
 // Exports
 
-exports.ComponentControl = ComponentControl
-exports.ComponentInterface = ComponentInterface
+exports.Interface = Interface
+exports.Register = Register

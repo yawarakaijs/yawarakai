@@ -8,6 +8,7 @@ let process = require('process')
 
 let Log = require('./log')
 let Bot = require('./bot')
+let Component = require('./component')
 
 // Time Control
 

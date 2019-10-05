@@ -18,8 +18,6 @@
 
  *************************************************************************/
 
-// Dependencies
-
 // Local Packages
 
 let Log = require('./log').Log
@@ -41,8 +39,56 @@ AnonymousLog.info(startInfo)
 
 // Debug block
 
-if(config.debugmode) {
-    Component.ComponentControl.load()
+if (config.debugmode) {
+    Bot.Telegram.command("/telegram start")
+}
+
+// Initialization
+
+var compoData = Component.Register.load()
+
+function commandParse(ctx, callback) {
+    let commandArgs = ctx.message.text.split(" ");
+    let command = commandArgs[0].substr(1);
+    let args = [];
+    commandArgs.forEach((value, index) => {
+        if (index > 0 && value !== "") {
+            args.push(value);
+        }
+    })
+    callback({
+        cmd: command,
+        args: args,
+        ctx: ctx
+    });
+}
+
+async function inlineDistributor(ctx) {
+    let args = []
+    args.push(ctx)
+    var method = compoData.inline
+    for (let i of method) {
+        let detail = []
+        const idx = method.indexOf(i)
+        try {
+            const res = await Reflect.apply(method[idx].instance, undefined, args)
+            detail.push(res)
+        } catch (err) {
+            Log.fatal(err)
+        }
+        return detail
+    }
+}
+function commandDistributor(ctx) {
+    commandParse(ctx, (result) => {
+        const chatID = ctx.from.id
+        let cmd = compoData.command.find(command => {
+            // console.log(command.command === result.cmd)
+            return command.command === result.cmd
+        })
+        if (!cmd) { return 404 }
+        Reflect.apply(cmd.instance, { chat: ctx.message.text, bot: "bot", chatID }, result.args)
+    })
 }
 
 // CLI
@@ -50,17 +96,17 @@ if(config.debugmode) {
 Core.cliInput('> ', input => {
     var command = input.split(' ')[0] // Cut Command and set to First string
     var isCommand = command.includes("/") && (command.indexOf("/") == 0) // Check command type
-    if(isCommand) {
+    if (isCommand) {
         switch (command) {
             default:
                 console.log(config.coreName + ": " + input + ": " + Lang.app.cliCommandUnknownPrompt)
-                AnonymousLog.trace( Lang.app.commandExecution + ": " + input)
+                AnonymousLog.trace(Lang.app.commandExecution + ": " + input)
                 break
             case '/telegram':
-                Bot.telegram.command(input)
+                Bot.Telegram.command(input)
                 break
             case '/help':
-                console.log( Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
+                console.log(Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
                 break
             case '/scan':
                 Component.ComponentControl.scan()
@@ -74,7 +120,7 @@ Core.cliInput('> ', input => {
         }
     }
     else { // Basic session processing and exception handling
-        switch(input) {
+        switch (input) {
             default:
                 break
             case '':
@@ -83,16 +129,26 @@ Core.cliInput('> ', input => {
     }
 })
 
+// Essentials
 
+Bot.Telegram.Bot.on("inline_query", async ctx => {
+    console.log(ctx.from)
+    let data = await inlineDistributor(ctx)
+    ctx.answerInlineQuery(data, { cache_time: 10})
+})
 
-// Processing
+Bot.Telegram.Bot.on("command", async ctx => {
+    commandDistributor(ctx)
+})
 
-Bot.telegram.Bot.on("text", (ctx) => {
-    Bot.message.messagectl.logMsg(ctx)
+Bot.Telegram.Bot.on("text", (ctx) => {
+    Bot.Message.messagectl.logMsg(ctx)
+    Bot.Message.messagectl.process(ctx)
 })
 
 // Log
 
-Bot.telegram.Bot.catch((err) => {
+Bot.Telegram.Bot.catch((err) => {
     Log.fatal(err)
+    throw err
 })
