@@ -11,7 +11,9 @@ let Lang = require('../lang').Lang
 
 // Creating Bot
 // At this time Single User
-const Bot = new Telegraf(config.token)
+const Bot = new Telegraf(config.token).catch(err => {
+    Log.Log.fatal(err)
+})
 let Ctl = {
     
 }
@@ -34,14 +36,16 @@ let command = (cmd) => {
                     console.log("Using default settings")
                     webhookUrl = config.webhook.url
                     webhookPort = config.webhook.port != undefined ? config.webhook.port : 8000
-                    // Bot.telegram.setWebhook(config.webhook.url).catch(err => Log.Log.fatal(err))
+                    Bot.telegram.setWebhook(config.webhook.url).catch(err => Log.Log.fatal(err))
                 }
                 if(args[i] === "--l" && args[i+1] != undefined) {
-                    console.log(`webhook set to ${webhookUrl}`).catch(err => Log.Log.fatal(err))
-                    // Bot.telegram.setWebhook(args[i+1])
+                    webhookUrl = args[i+1]
+                    console.log(`webhook set to ${webhookUrl}`)
+                    Bot.telegram.setWebhook(args[i+1])
                 }
                 if(args[i] === "--p" && args[i+1] != undefined) {
-                    console.log(`webhook set to ${webhookPort}`).catch(err => Log.Log.fatal(err))
+                    webhookPort = args[i+1]
+                    console.log(`webhook set to ${webhookPort}`)
                     webhookPort = args[i+1]
                 }
                 if((args[i] === "--l" && args[i+1] == undefined) || (args[i] === "--p" && args[i+1] == undefined)) {

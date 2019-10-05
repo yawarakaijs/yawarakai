@@ -129,12 +129,14 @@ let Message = {
     reply(ctx, textPattern, textReply, extra) {
         if (Message.count == 0 && textPattern.test(ctx.message.text)) {
             Message.count++
-            textReply.forEach(element => {
-                //ctx.replyWithChatAction(ctx.message.chat.id, "typing")
-                ctx.reply(element).then(res => {
+            for(let i of textReply) {
+                ctx.replyWithChatAction(ctx.message.chat.id, "typing")
+                ctx.reply(i).then(res => {
                     Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功 | 匹配: ${textPattern[Symbol.match](ctx.message.text)}`)
+                }).catch(err => {
+                    Log.Log.fatal(err)
                 })
-            })
+            }
         }
         Message.count = Message.count >= 1 ? 0 : Message.count
         return
