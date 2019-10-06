@@ -4,6 +4,7 @@ let Log = require('../log')
 let Core = require('../core')
 let Lang = require('../lang').Lang
 let nodejieba = require('nodejieba')
+let Bayes = require('zh-classify').Bayes
 
 let messagectl = {
 
@@ -110,15 +111,15 @@ let messagectl = {
 }
 
 let Message = {
-    hears: (ctx) => {
+    async hears(ctx) {
         let meowmeow = /(喵～)/gui
         let startnlp = /((悠月，)|())打开分析模式/gui
         let stopnlp = /关闭分析模式/gui
-        Message.replyWithPattern(ctx, meowmeow, ["喵~"])
-        Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"])
-        Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"])
+        await Message.replyWithPattern(ctx, meowmeow, ["喵~"])
+        await Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"])
+        await Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"])
     },
-    replyWithPattern(ctx, textPattern, textReply, extra) {
+    async replyWithPattern(ctx, textPattern, textReply, extra) {
         if (Message.count == 0 && textPattern.test(ctx.message.text)) {
             Message.count++
             if (/((悠月，)|())打开分析模式/gui.test(ctx.message.text)) {
@@ -128,7 +129,6 @@ let Message = {
                 NlpControl.stop()
             }
             for (let i of textReply) {
-                let waitTime = i.length * 200
                 ctx.replyWithChatAction("typing")
                 setTimeout(() => {
                     ctx.reply(i).then(res => {
@@ -136,24 +136,32 @@ let Message = {
                     }).catch(err => {
                         Log.Log.fatal(err)
                     })
-                }, waitTime)
+                    this.todo(ctx, i.length)
+                }, i.length * 200)
             }
         }
         Message.count = Message.count >= 1 ? 0 : Message.count
         return
     },
-    reply(ctx, textReply, extra) {
+    todo(ctx, length) {
+        let thetimer = length * 200
+        ctx.replyWithChatAction("typing")
+    },
+    async reply(ctx, textReply, extra) {
         if (Message.count == 0) {
             Message.count++
-            let waitTime = textReply.length * 200
+            for (let i of textReply) {
+                ctx.replyWithChatAction("typing")
+                setTimeout(() => {
+                    ctx.reply(textReply).then(res => {
+                        Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功`)
+                    }).catch(err => {
+                        Log.Log.fatal(err)
+                    })
+                    this.todo(ctx, i.length)
+                }, i.length * 200)
+            }
             ctx.replyWithChatAction("typing")
-            setTimeout(() => {
-                ctx.reply(textReply).then(res => {
-                    Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功`)
-                }).catch(err => {
-                    Log.Log.fatal(err)
-                })
-            }, waitTime)
         }
         Message.count = Message.count >= 1 ? 0 : Message.count
         return
@@ -162,14 +170,13 @@ let Message = {
 }
 
 let Nlp = {
-    reply: (ctx, result) => {
-        ctx.reply(result)
-    },
     tag: async (ctx, text) => {
-        await Core.getKey("nlpfeedback").then(res => {
+        return await Core.getKey("nlpfeedback").then(res => {
             let status = JSON.parse(res)
             if (status) {
                 let stepone = nodejieba.tag(text)
+                const sentiment = new Bayes()
+                let senti = sentiment.clf(text)
 
                 // References to the following websites
                 // ICTCLAS 汉语词性标注集 https://www.cnblogs.com/chenbjin/p/4341930.html
@@ -198,15 +205,23 @@ let Nlp = {
                     let types = Object.keys(tagTypes)
                     for (let i = 0; i < types.length; i++) {
                         if (types[i] === tag) {
-                            let result = tag + " " + tagTypes[types[i]]
-                            let tagData = `${word} | ${result}`
+                            let result = "( " + tagTypes[types[i]] + " " + tag + ". )"
+                            let tagData = `${word}${result}`
                             steptwo.push(tagData)
                         }
                     }
-                    // Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${steptwo}`)
                 }
+
+                let plainText = JSON.stringify(steptwo)
+                let newText = plainText.replace(/"/g, " ")
+                newText = newText.replace(/'/g, "")
+                newText = newText.replace(/\[/g, "")
+                newText = newText.replace(/\]/g, "")
+                newText = newText.slice(1)
+                let data = "原句: " + text + "\n \n" + newText + "\n \n" + `负面： ${senti.neg} \n正面： ${senti.pos}`
+
                 Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${steptwo}`)
-                return steptwo
+                return data
             }
         })
     }

@@ -41,13 +41,18 @@ AnonymousLog.info(startInfo)
 
 if (config.debugmode) {
     Bot.Telegram.command("/telegram start")
-    Core.setKey("nlpfeedback", false)
+    Core.setKey("nlpfeedback", true)
     Core.getKey("nlpfeedback").then(res => {
         Log.debug(`NLP set to ${res}`)
     })
 }
 
 // Initialization
+
+Core.setKey("nlpfeedback", false)
+Core.getKey("nlpfeedback").then(res => {
+    Log.debug(`NLP set to ${res}`)
+})
 
 var compoData = Component.Register.load()
 
@@ -137,7 +142,7 @@ Core.cliInput('> ', input => {
 
 Bot.Telegram.Bot.on("inline_query", async ctx => {
     let data = await inlineDistributor(ctx)
-    ctx.answerInlineQuery(data, { cache_time: 10})
+    ctx.answerInlineQuery(data, { cache_time: 10 })
 })
 
 Bot.Telegram.Bot.on("command", async ctx => {
@@ -145,11 +150,19 @@ Bot.Telegram.Bot.on("command", async ctx => {
 })
 
 Bot.Telegram.Bot.on("text", async (ctx) => {
+    ctx.replyWithChatAction("typing")
+    Bot.Message.Nlp.tag(ctx, ctx.message.text).then(res => {
+        let text = res
+        if (text != undefined) {
+            ctx.reply(text).then(res => {
+                Log.debug("Message replied")
+            }).catch(err => {
+                Log.fatal(err)
+            })
+        }
+    })
     Bot.Message.messagectl.logMsg(ctx)
     Bot.Message.Message.hears(ctx)
-    Bot.Message.Nlp.tag(ctx, ctx.message.text).then(res => {
-        ctx.reply(JSON.stringify(res))
-    })
 })
 
 // Log
