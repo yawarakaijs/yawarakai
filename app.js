@@ -142,6 +142,7 @@ Bot.Telegram.Bot.on("command", async ctx => {
 })
 
 Bot.Telegram.Bot.on("text", (ctx) => {
+    Bot.Message.Nlp.tag(ctx, ctx.message.text)
     Bot.Message.messagectl.logMsg(ctx)
     Bot.Message.messagectl.process(ctx)
 })

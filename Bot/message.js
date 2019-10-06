@@ -15,33 +15,28 @@ let messagectl = {
 
         // Prefix
         var output = `${Lang.bot.message.from}: `
-        var outputGroup = Lang.bot.message.group
-        var chatMessage = `${Lang.bot.message.text} : ${ctx.message.text}`
-        var fromChatId = ` [ ID: ${ctx.message.from.id} ]`
-        var groupInfo = ` | ${outputGroup} : [ ${ctx.message.chat.title} ] ID: ${ctx.message.chat.id}`
+        var chatMessage = `: ${ctx.message.text}`
+        var fromChatId = ` [${ctx.message.from.id}]`
+        var groupInfo = ` | ${Lang.bot.message.group}: ${ctx.message.chat.title} [${ctx.message.chat.id}]`
 
         // Case of User had their FIRSTNAME and LAST NAME set
         if ((ctx.message.from.first_name && ctx.message.from.last_name)) {
             var infoFullId = output + ctx.message.from.first_name + " " + ctx.message.from.last_name + fromChatId
             if (isGroup) {
-                Log.msgLog.log(infoFullId + groupInfo)
-                Log.msgLog.log(chatMessage)
+                Log.msgLog.log(infoFullId + groupInfo + chatMessage)
             }
             else {
-                Log.msgLog.log(infoFullId)
-                Log.msgLog.log(chatMessage)
+                Log.msgLog.log(infoFullId + chatMessage)
             }
         }
         // Case of User had their FIRSTNAME set only
         else if (ctx.message.from.first_name) {
             var infoNameOnly = output + ctx.message.from.first_name + fromChatId
             if (isGroup) {
-                Log.msgLog.log(infoNameOnly + groupInfo)
-                Log.msgLog.log(chatMessage)
+                Log.msgLog.log(infoNameOnly + groupInfo + chatMessage)
             }
             else {
-                Log.msgLog.log(infoNameOnly)
-                Log.msgLog.log(chatMessage)
+                Log.msgLog.log(infoNameOnly + chatMessage)
             }
         }
         // Case of User had their USERNAME set only or perhaps incorrectly set FIRSTNAME in LASTNAME
@@ -72,8 +67,6 @@ let messagectl = {
     // Process Context Data
     process: (ctx) => {
         Message.hears(ctx)
-        let data = Nlp.tag(ctx.message.text)
-        Nlp.reply(ctx, data)
     },
     // Trigger set for special trigger
     trigger: (text, ctx) => {
@@ -122,21 +115,40 @@ let Message = {
         let meowmeow = /(喵～)/gui
         let startnlp = /((悠月，)|())打开分析模式/gui
         let stopnlp = /关闭分析模式/gui
-        Message.reply(ctx, meowmeow, ["喵~"])
-        Message.reply(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"], Nlp.start())
-        Message.reply(ctx, stopnlp, ["关闭了呢"], Nlp.stop())
+        Message.replyWithPattern(ctx, meowmeow, ["喵~"])
+        Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"], Nlp.start())
+        Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"], Nlp.stop())
     },
-    reply(ctx, textPattern, textReply, extra) {
+    replyWithPattern(ctx, textPattern, textReply, extra) {
         if (Message.count == 0 && textPattern.test(ctx.message.text)) {
             Message.count++
-            for(let i of textReply) {
-                ctx.replyWithChatAction(ctx.message.chat.id, "typing")
-                ctx.reply(i).then(res => {
-                    Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功 | 匹配: ${textPattern[Symbol.match](ctx.message.text)}`)
+            for (let i of textReply) {
+                let waitTime = i.length * 200
+                ctx.replyWithChatAction("typing")
+                setTimeout(() => {
+                    ctx.reply(i).then(res => {
+                        Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功 | 匹配: ${textPattern[Symbol.match](ctx.message.text)}`)
+                    }).catch(err => {
+                        Log.Log.fatal(err)
+                    })
+                }, waitTime)
+            }
+        }
+        Message.count = Message.count >= 1 ? 0 : Message.count
+        return
+    },
+    reply(ctx, textReply, extra) {
+        if (Message.count == 0) {
+            Message.count++
+            let waitTime = textReply.length * 200
+            ctx.replyWithChatAction("typing")
+            setTimeout(() => {
+                ctx.reply(textReply).then(res => {
+                    Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功`)
                 }).catch(err => {
                     Log.Log.fatal(err)
                 })
-            }
+            }, waitTime)
         }
         Message.count = Message.count >= 1 ? 0 : Message.count
         return
@@ -144,19 +156,25 @@ let Message = {
     count: 0
 }
 
+var _NlpOn = new Array()
+
 let Nlp = {
     reply: (ctx, result) => {
         ctx.reply(result)
     },
-    on: false,
     start: () => {
-        this.on = true
+        console.log(_NlpOn)
+        _NlpOn = []
+        _NlpOn.push(1)
+        console.log(_NlpOn[0])
     },
     stop: () => {
-        this.on = false
+        _NlpOn = []
+        _NlpOn.push(0)
     },
-    tag: (text) => {
-        if (this.on) {
+    tag: (ctx, text) => {
+        console.log(_NlpOn[0])
+        if (_NlpOn[0] === 1) {
             let stepone = nodejieba.tag(text)
 
             // References to the following websites
@@ -194,6 +212,8 @@ let Nlp = {
             }
             let num = stepone.length >= 5 ? 5 : stepone.length
             let stepthree = nodejieba.extractWithWords(nodejieba.tagWordsToStr(stepone), num)
+            ctx.reply(steptwo)
+            Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${steptwo}` )
             return [steptwo]
         }
     }
