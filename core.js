@@ -3,23 +3,36 @@
 var spawn = require('child_process').spawn;
 let readline = require('readline')
 let process = require('process')
+let redis = require('redis')
+let { promisify } = require('util')
 
 // Local Packages
 
 let Log = require('./log')
 let Bot = require('./bot')
 let Component = require('./component')
+let config = require('./config.json')
 
 // Time Control
 
 let SysTime = new Date()
 let Time = {
-    Date: SysTime,
-    runningTime: SysTime.getFullYear() + "-" + ("0"+(SysTime.getMonth()+1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2) + "-" + ("0" + SysTime.getHours()).slice(-2) + "-" + ("0" + SysTime.getMinutes()).slice(-2) + "-" + ("0" + SysTime.getSeconds()).slice(-2),
-    logTime: SysTime.getFullYear() + "-" + ("0"+(SysTime.getMonth()+1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2)
+  Date: SysTime,
+  runningTime: SysTime.getFullYear() + "-" + ("0" + (SysTime.getMonth() + 1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2) + "-" + ("0" + SysTime.getHours()).slice(-2) + "-" + ("0" + SysTime.getMinutes()).slice(-2) + "-" + ("0" + SysTime.getSeconds()).slice(-2),
+  logTime: SysTime.getFullYear() + "-" + ("0" + (SysTime.getMonth() + 1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2)
 }
 
-let restart = () =>  {
+// Redis
+
+let client = redis.createClient(config.redis.port, config.redis.host)
+client.auth(config.redis.auth, () => {
+  Log.Log.trace("Redis Authentication Successful and Connected")
+})
+
+let getKeyAsync = promisify(client.get).bind(client)
+let setKeyAsync = promisify(client.set).bind(client)
+
+let restart = () => {
   if (process.env.process_restarting) {
     delete process.env.process_restarting;
     // Give old process one second to shut down before continuing ...
@@ -39,18 +52,20 @@ let restart = () =>  {
 
 const rl = readline.createInterface(process.stdin, process.stdout)
 
-function promptInput (prompt, handler) {
-    rl.question(prompt, input => {
-        if (handler(input) !== false) {
-            promptInput(prompt, handler)
-        }
-        else {
-            rl.close()
-        }
-    })
+function promptInput(prompt, handler) {
+  rl.question(prompt, input => {
+    if (handler(input) !== false) {
+      promptInput(prompt, handler)
+    }
+    else {
+      rl.close()
+    }
+  })
 }
 
 exports.restart = restart
 exports.Bot = Bot
 exports.cliInput = promptInput
 exports.Time = Time
+exports.getKey = getKeyAsync
+exports.setKey = setKeyAsync

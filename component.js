@@ -10,7 +10,6 @@ let Core = require('./core')
 let Lang = require('./lang').Lang
 let Bot = require('./bot')
 let Command
-let Inline = require('./Bot/inline')
 let Message = require('./Bot/message')
 
 // Body
@@ -54,7 +53,7 @@ let Register = {
                                             Compo.message.push(msg)
                                         })
                                     }
-                                    console.log(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
+                                    Log.Log.info(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
                                 else {
                                     Log.Log.info(Lang.component.readIn + compConfig.groupname + Lang.component.loaded[1] + value)
@@ -68,14 +67,13 @@ let Register = {
             })
             return Compo
         } catch (error) {
-            console.log(error)
+            Log.Log.fatal(error)
         }
     }
 }
 
 let Interface = {
     Log: Log,
-    Inline: Inline,
     Message: Message,
     Bot: Bot
 }

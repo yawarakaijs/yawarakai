@@ -41,6 +41,10 @@ AnonymousLog.info(startInfo)
 
 if (config.debugmode) {
     Bot.Telegram.command("/telegram start")
+    Core.setKey("nlpfeedback", false)
+    Core.getKey("nlpfeedback").then(res => {
+        Log.debug(`NLP set to ${res}`)
+    })
 }
 
 // Initialization
@@ -132,7 +136,6 @@ Core.cliInput('> ', input => {
 // Essentials
 
 Bot.Telegram.Bot.on("inline_query", async ctx => {
-    console.log(ctx.from)
     let data = await inlineDistributor(ctx)
     ctx.answerInlineQuery(data, { cache_time: 10})
 })
@@ -141,10 +144,12 @@ Bot.Telegram.Bot.on("command", async ctx => {
     commandDistributor(ctx)
 })
 
-Bot.Telegram.Bot.on("text", (ctx) => {
-    Bot.Message.Nlp.tag(ctx, ctx.message.text)
+Bot.Telegram.Bot.on("text", async (ctx) => {
     Bot.Message.messagectl.logMsg(ctx)
-    Bot.Message.messagectl.process(ctx)
+    Bot.Message.Message.hears(ctx)
+    Bot.Message.Nlp.tag(ctx, ctx.message.text).then(res => {
+        ctx.reply(JSON.stringify(res))
+    })
 })
 
 // Log

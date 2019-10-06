@@ -1,7 +1,6 @@
 // Dependecies
 
 let Compo = require('../../component')
-let Inline = require('../../component').Interface.Inline
 
 // Component Method
 
@@ -32,8 +31,6 @@ let main = {
         })
     },
     answer: (ctx, query, result, middleWord) => {
-        // var final = Inline.article(ctx.inlineQuery.id, `${query} 释义`, result, thumb, `${query} 的${middleWord}是 ${result}`)
-        // Inline.finished(ctx)
         var data = {
             type: "article",
             id: ctx.inlineQuery.id,
@@ -77,7 +74,6 @@ exports.inlines = {
                 })
                 var result = defs.join(" | ")
                 any = main.answer(ctx, steptwo, result, "日语")
-                console.log(any)
                 return any
             }).catch(err => {
                 Compo.Interface.Log.Log.fatal(err)
@@ -96,7 +92,6 @@ exports.inlines = {
                 })
                 var result = defs.join(" | ")
                 any = main.answer(ctx, steptwo, result, "中文")
-                console.log(any)
                 return any
             }).catch(err => {
                 Compo.Interface.Log.Log.fatal(err)
@@ -104,11 +99,6 @@ exports.inlines = {
 
         }
     }
-    // second: async function (ctx) {
-    //     var data = Inline.article(ctx.inlineQuery.id, "test", "just a test", thumb, "just a a a a a a a test")
-    //     console.log(data)
-    //     return data
-    // }
 }
 
 exports.register = {

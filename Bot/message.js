@@ -66,7 +66,6 @@ let messagectl = {
     },
     // Process Context Data
     process: (ctx) => {
-        Message.hears(ctx)
     },
     // Trigger set for special trigger
     trigger: (text, ctx) => {
@@ -116,12 +115,18 @@ let Message = {
         let startnlp = /((悠月，)|())打开分析模式/gui
         let stopnlp = /关闭分析模式/gui
         Message.replyWithPattern(ctx, meowmeow, ["喵~"])
-        Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"], Nlp.start())
-        Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"], Nlp.stop())
+        Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"])
+        Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"])
     },
     replyWithPattern(ctx, textPattern, textReply, extra) {
         if (Message.count == 0 && textPattern.test(ctx.message.text)) {
             Message.count++
+            if (/((悠月，)|())打开分析模式/gui.test(ctx.message.text)) {
+                NlpControl.start()
+            }
+            if (/关闭分析模式/gui.test(ctx.message.text)) {
+                NlpControl.stop()
+            }
             for (let i of textReply) {
                 let waitTime = i.length * 200
                 ctx.replyWithChatAction("typing")
@@ -156,66 +161,69 @@ let Message = {
     count: 0
 }
 
-var _NlpOn = new Array()
-
 let Nlp = {
     reply: (ctx, result) => {
         ctx.reply(result)
     },
+    tag: async (ctx, text) => {
+        await Core.getKey("nlpfeedback").then(res => {
+            let status = JSON.parse(res)
+            if (status) {
+                let stepone = nodejieba.tag(text)
+
+                // References to the following websites
+                // ICTCLAS 汉语词性标注集 https://www.cnblogs.com/chenbjin/p/4341930.html
+                // 汉语分词标准汇总 https://blog.csdn.net/baobao3456810/article/details/53490067
+                // 中科院ICTCLAS分词汉语词性标记集 https://blog.csdn.net/u010454729/article/details/40045815
+
+                // Types of tags
+                let tagTypes = {
+                    Ag: "形语素", a: "形容词", ad: "副形词", an: "名形词",
+                    b: "区别词", c: "连词", Dg: "副语素", d: "副词",
+                    e: "叹词", f: "方位词", g: "语素", h: "前接成分",
+                    i: "成语", j: "简称略语", k: "后接成分", l: "习用语",
+                    m: "数词", Ng: "名语素", n: "名词", nr: "人名",
+                    ns: "地名", nt: "机构团体", nz: "其他专名", o: "拟声词",
+                    p: "介词", q: "量词", r: "代词", s: "处所词",
+                    Tg: "时语素", t: "时间词", u: "助词", Vg: "动语素",
+                    v: "动词", vd: "副动词", vn: "名动词", w: "标点符号",
+                    x: "非语素字", y: "语气词", z: "状态词",
+                }
+
+                let steptwo = []
+                for (let i = 0; i < stepone.length; i++) {
+                    let wordobj = stepone[i]
+                    let word = wordobj.word
+                    let tag = wordobj.tag
+                    let types = Object.keys(tagTypes)
+                    for (let i = 0; i < types.length; i++) {
+                        if (types[i] === tag) {
+                            let result = tag + " " + tagTypes[types[i]]
+                            let tagData = `${word} | ${result}`
+                            steptwo.push(tagData)
+                        }
+                    }
+                    // Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${steptwo}`)
+                }
+                Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${steptwo}`)
+                return steptwo
+            }
+        })
+    }
+}
+
+let NlpControl = {
     start: () => {
-        console.log(_NlpOn)
-        _NlpOn = []
-        _NlpOn.push(1)
-        console.log(_NlpOn[0])
+        Core.setKey("nlpfeedback", true)
+        Core.getKey("nlpfeedback").then(res => {
+            Log.Log.debug(`NLP set to ${res} [OK]`)
+        })
     },
     stop: () => {
-        _NlpOn = []
-        _NlpOn.push(0)
-    },
-    tag: (ctx, text) => {
-        console.log(_NlpOn[0])
-        if (_NlpOn[0] === 1) {
-            let stepone = nodejieba.tag(text)
-
-            // References to the following websites
-            // ICTCLAS 汉语词性标注集 https://www.cnblogs.com/chenbjin/p/4341930.html
-            // 汉语分词标准汇总 https://blog.csdn.net/baobao3456810/article/details/53490067
-            // 中科院ICTCLAS分词汉语词性标记集 https://blog.csdn.net/u010454729/article/details/40045815
-
-            // Types of tags
-            let tagTypes = {
-                Ag: "形语素", a: "形容词", ad: "副形词", an: "名形词",
-                b: "区别词", c: "连词", Dg: "副语素", d: "副词",
-                e: "叹词", f: "方位词", g: "语素", h: "前接成分",
-                i: "成语", j: "简称略语", k: "后接成分", l: "习用语",
-                m: "数词", Ng: "名语素", n: "名词", nr: "人名",
-                ns: "地名", nt: "机构团体", nz: "其他专名", o: "拟声词",
-                p: "介词", q: "量词", r: "代词", s: "处所词",
-                Tg: "时语素", t: "时间词", u: "助词", Vg: "动语素",
-                v: "动词", vd: "副动词", vn: "名动词", w: "标点符号",
-                x: "非语素字", y: "语气词", z: "状态词",
-            }
-
-            let steptwo = []
-            for (let i = 0; i < stepone.length; i++) {
-                let wordobj = stepone[i]
-                let word = wordobj.word
-                let tag = wordobj.tag
-                let types = Object.keys(tagTypes)
-                for (let i = 0; i < types.length; i++) {
-                    if (types[i] === tag) {
-                        tag.concat(" ", tagTypes[types[i]])
-                        let tagData = `${word} | ${tag}`
-                        steptwo.push(tagData)
-                    }
-                }
-            }
-            let num = stepone.length >= 5 ? 5 : stepone.length
-            let stepthree = nodejieba.extractWithWords(nodejieba.tagWordsToStr(stepone), num)
-            ctx.reply(steptwo)
-            Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${steptwo}` )
-            return [steptwo]
-        }
+        Core.setKey("nlpfeedback", false)
+        Core.getKey("nlpfeedback").then(res => {
+            Log.Log.debug(`NLP set to ${res} [OK]`)
+        })
     }
 }
 
