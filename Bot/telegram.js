@@ -14,9 +14,6 @@ let Lang = require('../lang').Lang
 const Bot = new Telegraf(config.token).catch(err => {
     Log.Log.fatal(err)
 })
-let Ctl = {
-    
-}
 
 let command = (cmd) => {
     var webhookPort
@@ -70,5 +67,4 @@ let command = (cmd) => {
 }
 
 exports.command = command
-exports.Ctl = Ctl
 exports.Bot = Bot

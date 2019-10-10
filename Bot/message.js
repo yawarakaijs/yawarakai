@@ -9,7 +9,7 @@ let Bayes = require('zh-classify').Bayes
 let messagectl = {
 
     //Log out the message on Message Log File
-    logMsg: (ctx) => {
+    log: (ctx) => {
 
         let groupType = "supergroup"
         var isGroup = (groupType == ctx.message.chat.type)
@@ -64,49 +64,6 @@ let messagectl = {
             }
         }
         return
-    },
-    // Process Context Data
-    process: (ctx) => {
-    },
-    // Trigger set for special trigger
-    trigger: (text, ctx) => {
-        text
-        ctx
-    },
-    // Send data directly to middleware (Call as Going)
-    addTo: (ctx, controller) => {
-        var procTypes = (name) => {
-            switch (name) {
-                default:
-                    // Redirect data back to processor see if pairs any Pattern
-                    messagectl.process(ctx)
-                    break
-            }
-        }
-        // Check if inputed a sets of processors
-        if (typeof (controller) != String) {
-            for (var i = 0; i < controller.length; i++) {
-                procTypes(controller[i])
-            }
-        }
-    },
-    // Send data directly to middleware (Call At Time)
-    sendTo: (ctx, processor) => {
-        var procTypes = (name) => {
-            switch (name) {
-                default:
-                    // Redirect data back to processor see if pairs any Pattern
-                    messagectl.process(ctx)
-                    break
-            }
-        }
-        // Check if inputed a sets of processors
-        if (typeof (processor) != String) {
-            for (var i = 0; i < processor.length; i++) {
-                procTypes(processor[i])
-            }
-        }
-
     }
 }
 
@@ -245,8 +202,3 @@ let NlpControl = {
 exports.Nlp = Nlp
 exports.messagectl = messagectl
 exports.Message = Message
-
-/*
-
-
- */

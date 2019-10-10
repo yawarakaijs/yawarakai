@@ -6,10 +6,8 @@ let path = require('path')
 // Local Files
 
 let Log = require('./log')
-let Core = require('./core')
 let Lang = require('./lang').Lang
 let Bot = require('./bot')
-let Command
 let Message = require('./Bot/message')
 
 // Body

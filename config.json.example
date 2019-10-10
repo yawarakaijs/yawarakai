@@ -1,15 +1,16 @@
 {
+    "debugmode": false,
     "coreName": "Yawarakai",
-    "botname": "悠月",
-    "token": "Key",
+    "botname": "Bot Display Name",
+    "token": "Bot API Token",
     "webhook": {
-        "url": "https://569fef0a.ngrok.io",
-        "port" : 5000
+        "url": "",
+        "port" : 8000
     },
-    "proxy": {
-        "enable": false,
-        "host": "127.0.0.1",
-        "port": 1280
+    "redis": {
+        "host": "Redis Hostname",
+        "port": "6379",
+        "auth": "Password of redis"
     },
-    "language": "zh-CN"
+    "language": "en-US"
 }

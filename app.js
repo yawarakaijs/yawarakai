@@ -46,13 +46,14 @@ if (config.debugmode) {
         Log.debug(`NLP set to ${res}`)
     })
 }
+else {
+    Core.setKey("nlpfeedback", false)
+    Core.getKey("nlpfeedback").then(res => {
+        Log.debug(`NLP set to ${res}`)
+    })
+}
 
 // Initialization
-
-Core.setKey("nlpfeedback", false)
-Core.getKey("nlpfeedback").then(res => {
-    Log.debug(`NLP set to ${res}`)
-})
 
 var compoData = Component.Register.load()
 
@@ -150,18 +151,37 @@ Bot.Telegram.Bot.on("command", async ctx => {
 })
 
 Bot.Telegram.Bot.on("text", async (ctx) => {
-    ctx.replyWithChatAction("typing")
+
+    // As for the message sending system, there is a better
+    // design that might fits inside of this system
+    // And somehow, those message only got one unique
+    // ChatAction at here, so we need to loop for those
+    // messages and sign a chat action along.
+
+    // Distributor is required, we gather the information
+    // from different middlewares and push them into an
+    // key array to pending on send.
+    // Which will require react here.
+
+    // Each message processing module push their data in
+    // Record the id that requires to reply
+    // Send both of these values into the array as long as
+    // the message to finish their job
+    // Next, we will go here to send the pending messages here
+
+    // This may create a better processing system to process
+    // the data, and esier management and value calling.
+
     Bot.Message.Nlp.tag(ctx, ctx.message.text).then(res => {
+        ctx.replyWithChatAction("typing")
         let text = res
         if (text != undefined) {
-            ctx.reply(text).then(res => {
-                Log.debug("Message replied")
-            }).catch(err => {
+            ctx.reply(text).catch(err => {
                 Log.fatal(err)
             })
         }
     })
-    Bot.Message.messagectl.logMsg(ctx)
+    Bot.Message.messagectl.log(ctx)
     Bot.Message.Message.hears(ctx)
 })
 
