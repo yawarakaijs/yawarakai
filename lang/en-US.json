@@ -17,11 +17,14 @@
             "commandParameterInvalid": "Parameter Invalid",
             "commandParameterMissing": ["Invalid Parameter: ",", Please check the missing parameter: "],
             "commandInvalid": "Invalid Parameter \nTry to execute /telegram h or /telegram help to get help",
-            "helpCommand": "telegram is a command which launches and manages Telegram Bot and Telegram Client \n start     Launch Telegram Bot \n stop      Terminate Telegram Bot"
+            "helpCommand": "telegram is a command which launches and manages Telegram Bot and Telegram Client \n start     Launch Telegram Bot \n stop      Terminate Telegram Bot",
+            "webhookSettingsWarning": "The webhook url that displayed here may not be accurate if you are using the internel shell command to set the webhook"
         }
     },
     "core": {
-
+        "redisAuthSuccess": "Redis Authentication Successful and Connected",
+        "redisAuthFail": "Redis Authentication Failed",
+        "redisCausedShutdown": "Exiting Yawarakai due to the failure of redis server authentication"
     },
     "component": {
         "loaded": ["Loaded component ", " from "],

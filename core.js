@@ -10,6 +10,7 @@ let { promisify } = require('util')
 
 let Log = require('./log')
 let Bot = require('./bot')
+let Lang = require('./lang').Lang
 let Component = require('./component')
 let config = require('./config.json')
 
@@ -25,8 +26,15 @@ let Time = {
 // Redis
 
 let client = redis.createClient(config.redis.port, config.redis.host)
+
+client.on('error', function (err) {
+  Log.Log.fatal(`${Lang.core.redisAuthFail}`)
+  Log.Log.fatal(`${Lang.core.redisCausedShutdown}`)
+  return
+})
+
 client.auth(config.redis.auth, () => {
-  Log.Log.trace("Redis Authentication Successful and Connected")
+  Log.Log.trace(`${Lang.core.redisAuthSuccess}`)
 })
 
 let getKeyAsync = promisify(client.get).bind(client)

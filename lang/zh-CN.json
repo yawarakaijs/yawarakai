@@ -17,12 +17,15 @@
             "commandParameterInvalid": "无效的参数",
             "commandParameterMissing": ["无效的参数：","，检查是否缺失必要参数："],
             "commandInvalid": "参数命令不正确 \n执行 /telegram h 或者 /telegram help 来获得帮助",
-            "helpCommand": "telegram 命令是用于启动和管理 Telegram Bot 和 Telegram Client \n start     启动 Telegram Bot \n stop      停止 Telegram Bot"
+            "helpCommand": "telegram 命令是用于启动和管理 Telegram Bot 和 Telegram Client \n start     启动 Telegram Bot \n stop      停止 Telegram Bot",
+            "webhookSettingsWarning": "如果你使用了外部服务器的命令行模式来设定 Webhook，这里显示的 Webhook 可能不是登记在 Telegram 服务器的 Webhook 地址"
         }
 
     },
     "core": {
-
+        "redisAuthSuccess": "Redis 服务器验证成功并且已连接",
+        "redisAuthFail": "Redis 服务器验证失败",
+        "redisCausedShutdown": "因为 Redis 连接失败正在退出 Yawarakai..."
     },
     "component": {
         "readIn": "已读取 ",

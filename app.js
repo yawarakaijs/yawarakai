@@ -24,6 +24,7 @@ let Log = require('./log').Log
 let AnonymousLog = require('./log').AnonymousLog
 let Core = require('./core')
 let Bot = require('./bot')
+let Nlp = require('./Bot/nlp').Nlp
 let Lang = require('./lang').Lang
 let config = require('./config.json')
 let Component = require('./component')
@@ -152,27 +153,10 @@ Bot.Telegram.Bot.on("command", async ctx => {
 
 Bot.Telegram.Bot.on("text", async (ctx) => {
 
-    // As for the message sending system, there is a better
-    // design that might fits inside of this system
-    // And somehow, those message only got one unique
-    // ChatAction at here, so we need to loop for those
-    // messages and sign a chat action along.
-
-    // Distributor is required, we gather the information
-    // from different middlewares and push them into an
-    // key array to pending on send.
-    // Which will require react here.
-
-    // Each message processing module push their data in
-    // Record the id that requires to reply
-    // Send both of these values into the array as long as
-    // the message to finish their job
-    // Next, we will go here to send the pending messages here
-
-    // This may create a better processing system to process
-    // the data, and esier management and value calling.
-
-    Bot.Message.Nlp.tag(ctx, ctx.message.text).then(res => {
+    Core.setKey("telegramMessageText", ctx.message.text)
+    Core.setKey("telegramMessageFromId", ctx.from.id)
+    
+    Nlp.tag(ctx, ctx.message.text).then(res => {
         ctx.replyWithChatAction("typing")
         let text = res
         if (text != undefined) {
