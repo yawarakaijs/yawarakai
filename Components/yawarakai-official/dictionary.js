@@ -5,7 +5,7 @@ let Compo = require('../../component')
 // Component Method
 
 let config = require('./config.json')
-let hujiang = require('./dictlib')
+let hujiang = require('./lib/dictlib')
 
 // Header
 
