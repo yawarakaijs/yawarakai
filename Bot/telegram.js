@@ -57,7 +57,8 @@ let command = (cmd) => {
             break
         case 'start':
             Log.Log.info("Telegram Bot: " + config.botname + Lang.app.starting)
-            Log.Log.info(`Webhook: ${webhookUrl}:${webhookPort}`)
+            Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.webhook.url == '' ? "127.0.0.1" : config.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.webhook.port}`)
+            Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
             Bot.startWebhook('/', null, webhookPort != undefined ? webhookPort : 8000)
             break
         case 'stop':
