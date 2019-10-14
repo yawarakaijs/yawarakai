@@ -5,10 +5,10 @@ let path = require('path')
 
 // Local Files
 
-let Log = require('./log')
-let Lang = require('./lang').Lang
-let Bot = require('./bot')
-let Message = require('./Bot/message')
+let Log = require('./Core/log')
+let Lang = require('./Core/lang').Lang
+let Bot = require('./Core/bot')
+let Message = require('./Core/Bot/message')
 
 // Body
 
