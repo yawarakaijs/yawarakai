@@ -4,8 +4,8 @@ let log4js = require('log4js')
 
 // Local Packages
 
-let core = require('./core')
-let config = require('./config.json')
+let core = require('../core')
+let config = require('../config.json')
 
 let coreLogFileName = "./log/" + config.botname + "-" + "Core-Log" + "-" + core.Time.logTime + ".log"
 let messageLogFileName = "./log/" + config.botname + "-" + "Message-Log" + "-" + core.Time.logTime + ".log"

@@ -20,12 +20,12 @@
 
 // Local Packages
 
-let Log = require('./log').Log
-let AnonymousLog = require('./log').AnonymousLog
+let Log = require('./Core/log').Log
+let AnonymousLog = require('./Core/log').AnonymousLog
 let Core = require('./core')
-let Bot = require('./bot')
-let Nlp = require('./Bot/nlp').Nlp
-let Lang = require('./lang').Lang
+let Bot = require('./Core/bot')
+let Nlp = require('./Core/Bot/nlp').Nlp
+let Lang = require('./Core/lang').Lang
 let config = require('./config.json')
 let Component = require('./component')
 let packageInfo = require('./package.json')
@@ -98,7 +98,13 @@ function commandDistributor(ctx) {
             return command.command === result.cmd
         })
         if (!cmd) { return 404 }
-        Reflect.apply(cmd.instance, { chat: ctx.message.text, bot: "bot", chatID }, result.args)
+        return Reflect.apply(cmd.instance, { chat: ctx.message.text, bot: "bot", chatID }, result.args)
+    })
+}
+
+function staticCommandDistributor(ctx) {
+    commandParse(ctx, (result) => {
+        
     })
 }
 
@@ -148,6 +154,7 @@ Bot.Telegram.Bot.on("inline_query", async ctx => {
 })
 
 Bot.Telegram.Bot.on("command", async ctx => {
+    staticCommandDistributor(ctx)
     commandDistributor(ctx)
 })
 

@@ -4,7 +4,7 @@ let Telegraf = require('telegraf')
 
 // Local Packages
 
-let config = require('../config.json')
+let config = require('../../config.json')
 let Log = require('../log')
 let Lang = require('../lang').Lang
 

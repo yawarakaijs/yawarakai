@@ -8,9 +8,9 @@ let { promisify } = require('util')
 
 // Local Packages
 
-let Log = require('./log')
-let Bot = require('./bot')
-let Lang = require('./lang').Lang
+let Log = require('./Core/log')
+let Bot = require('./Core/bot')
+let Lang = require('./Core/lang').Lang
 let Component = require('./component')
 let config = require('./config.json')
 
@@ -40,22 +40,6 @@ client.auth(config.redis.auth, () => {
 let getKeyAsync = promisify(client.get).bind(client)
 let setKeyAsync = promisify(client.set).bind(client)
 
-let restart = () => {
-  if (process.env.process_restarting) {
-    delete process.env.process_restarting;
-    // Give old process one second to shut down before continuing ...
-    setTimeout(restart, 1000);
-    return;
-  }
-
-  Log.Log.info("即将重新启动 Yawarakai...")
-  // Restart process ...
-  spawn(process.argv[0], process.argv.slice(1), {
-    env: { process_restarting: 1 },
-    stdio: 'ignore'
-  }).unref();
-}
-
 // CLI
 
 const rl = readline.createInterface(process.stdin, process.stdout)
@@ -71,7 +55,6 @@ function promptInput(prompt, handler) {
   })
 }
 
-exports.restart = restart
 exports.Bot = Bot
 exports.cliInput = promptInput
 exports.Time = Time

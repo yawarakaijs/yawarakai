@@ -7,7 +7,7 @@ var fnv = require('fnv-plus')
 // Local Packages
 
 let Log = require('../log')
-let Core = require('../core')
+let Core = require('../../core')
 
 // Nlp
 
