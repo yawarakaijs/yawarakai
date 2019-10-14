@@ -82,6 +82,7 @@ async function inlineDistributor(ctx) {
         let detail = []
         const idx = method.indexOf(i)
         try {
+            console.log(method[idx])
             const res = await Reflect.apply(method[idx].instance, undefined, args)
             detail.push(res)
         } catch (err) {
@@ -167,7 +168,7 @@ Bot.Telegram.Bot.on("text", async (ctx) => {
         ctx.replyWithChatAction("typing")
         let text = res
         if (text != undefined) {
-            ctx.reply(text).catch(err => {
+            ctx.reply(text, {parse_mode: "Markdown"}).catch(err => {
                 Log.fatal(err)
             })
         }

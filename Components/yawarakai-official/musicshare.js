@@ -28,7 +28,7 @@ exports.register = {
     ],
     inlines: [
         {
-            ilnReg: 'main'
+            // ilnReg: 'main'
         }
     ],
     messages: [

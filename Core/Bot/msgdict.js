@@ -28,7 +28,13 @@ let tryMatch = (text) => {
 }
 
 let callFunc = (context) => {
-    Reflect.apply(Dictionary[context[0]].func[0], undefined, "null")
+    for(let i of Dictionary[context[0]].func) {
+        i.call()
+    }
+}
+
+let test = () => {
+    console.log("Hey")
 }
 
 let Dictionary = [
@@ -43,5 +49,13 @@ let Dictionary = [
         reply: [],
         func: [],
         callback: ""
+    },
+    {
+        match: [{reg: "上一篇文本的相似度", mode: "gui"}],
+        reply: [],
+        func: [],
+        callback: ""
     }
 ]
+
+let result = tryMatch("上一篇文本的相似度")

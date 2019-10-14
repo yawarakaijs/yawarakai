@@ -24,12 +24,12 @@ exports.register = {
     // As the example to Yawarakai Compos
     commands: [
         {
-            cmdReg: 'main'
+            // cmdReg: 'main'
         }
     ],
     inlines: [
         {
-            ilnReg: "main"
+            // ilnReg: "main"
         }
     ],
     messages: [

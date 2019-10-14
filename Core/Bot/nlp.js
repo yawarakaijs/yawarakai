@@ -53,7 +53,7 @@ let Nlp = {
                     let types = Object.keys(tagTypes)
                     for (let i = 0; i < types.length; i++) {
                         if (types[i] === tag) {
-                            let result = "( " + tagTypes[types[i]] + " " + tag + ". )"
+                            let result = `( _${tagTypes[types[i]]}_ _${tag}._ )`
                             let tagData = `${word}${result}`
                             steptwo.push(tagData)
                         }
@@ -61,14 +61,15 @@ let Nlp = {
                 }
 
                 let plainText = JSON.stringify(steptwo)
+                console.log(steptwo)
                 let newText = plainText.replace(/"/g, " ")
                 newText = newText.replace(/'/g, "")
                 newText = newText.replace(/\[/g, "")
                 newText = newText.replace(/\]/g, "")
                 newText = newText.slice(1)
-                let data = "原句: " + text + "\n \n" + newText + "\n \n" + `负面： ${senti.neg} \n正面： ${senti.pos}`
+                let data = `原句: *${text}*` + "\n \n" + newText + "\n \n" + `\`正面： ${senti.pos} \n负面： ${senti.neg}\``
 
-                Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${steptwo}`)
+                Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${newText.replace(/_/g, "")}`)
                 return data
             }
         })
