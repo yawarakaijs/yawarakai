@@ -6,6 +6,8 @@ let Log = require('../log')
 let Lang = require('../lang').Lang
 let Core = require('../../core')
 let NlpControl = require('./nlp').NlpControl
+let MessageDictionary = require('./msgprocessor').MessageDictionary
+let MessageDictionaryControl = require('./msgprocessor').MessageDictionaryControl
 
 let messagectl = {
 
@@ -70,48 +72,53 @@ let messagectl = {
 
 let Message = {
     async hears(ctx) {
-        let meowmeow = /(喵～)/gui
-        let startnlp = /((悠月，)|())打开分析模式/gui
-        let stopnlp = /关闭分析模式/gui
-        await Message.replyWithPattern(ctx, meowmeow, ["喵~"])
-        await Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"])
-        await Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"])
-    },
-    async replyWithPattern(ctx, textPattern, textReply, extra) {
-        if (Message.count == 0 && textPattern.test(ctx.message.text)) {
-            Message.count++
-            if (/((悠月，)|())打开分析模式/gui.test(ctx.message.text)) {
-                NlpControl.analyzeModeMan(ctx.from.id, "add")
-            }
-            if (/关闭分析模式/gui.test(ctx.message.text)) {
-                NlpControl.analyzeModeMan(ctx.from.id, "remove")
-            }
-            for (let i of textReply) {
-                ctx.replyWithChatAction("typing")
-                setTimeout(() => {
-                    ctx.reply(i).then(res => {
-                        Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功 | 匹配: ${textPattern[Symbol.match](ctx.message.text)}`)
-                    }).catch(err => {
-                        Log.Log.fatal(err)
-                    })
-                    this.todo(ctx, i.length)
-                }, i.length * 200)
-            }
+        // let meowmeow = /(喵～)/gui
+        // let startnlp = /((悠月，)|())打开分析模式/gui
+        // let stopnlp = /关闭分析模式/gui
+        // await Message.replyWithPattern(ctx, meowmeow, ["喵~"])
+        // await Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"])
+        // await Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"])
+
+        let meowmeow = new MessageDictionary(
+            [{reg: "(喵～)|(喵~)", mode: "gui"}],
+            ["喵～"]
+        ).push()
+        let startnlp = new MessageDictionary(
+            [{reg: "((悠月，)|())打开分析模式", mode: "gui"}],
+            ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"],
+            [NlpControl.analyzeModeMan],
+            true,
+            [[ctx.from.id, "add"]]
+        ).push()
+        let stopnlp = new MessageDictionary(
+            [{reg: "((悠月)|())关闭分析模式", mode: "gui"}],
+            ["关闭了呢"],
+            [NlpControl.analyzeModeMan],
+            true,
+            [[ctx.from.id, "remove"]]
+        ).push()
+        
+        let matchResult = MessageDictionaryControl.tryMatch(ctx.message.text)
+        if(matchResult.reply.length != 0) {
+            this.reply(ctx, matchResult)
         }
-        Message.count = Message.count >= 1 ? 0 : Message.count
-        return
+        if(matchResult.hasFunc) {
+            MessageDictionaryControl.callFunc(matchResult)
+        }
     },
     todo(ctx, length) {
         let thetimer = length * 200
         ctx.replyWithChatAction("typing")
     },
-    async reply(ctx, textReply, extra) {
+    //ctx, textReply, extra
+    async reply(ctx, context) {
+        let textReply = context.reply
         if (Message.count == 0) {
             Message.count++
             for (let i of textReply) {
                 ctx.replyWithChatAction("typing")
                 setTimeout(() => {
-                    ctx.reply(textReply).then(res => {
+                    ctx.reply(i).then(res => {
                         Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功`)
                     }).catch(err => {
                         Log.Log.fatal(err)

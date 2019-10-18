@@ -47,7 +47,7 @@ AnonymousLog.info(startInfo)
 
 if (config.debugmode) {
     Bot.Telegram.command("/telegram start")
-    Core.setKey("nlpfeedback", true)
+    Core.setKey("nlpfeedback", false)
     Core.getKey("nlpfeedback").then(res => {
         Log.debug(`NLP set to ${res}`)
     })
@@ -61,6 +61,11 @@ else {
     Core.setKey("nlpfeedback", false)
     Core.getKey("nlpfeedback").then(res => {
         Log.debug(`NLP set to ${res}`)
+    })
+    Core.getKey("nlpAnalyzeIds").then(res => {
+        Log.debug(`NLP Analyzer List: ${res}`)
+    }).catch(err => {
+        Core.setKey("nlpAnalyzeIds", "[]")
     })
 }
 

@@ -203,7 +203,7 @@ let NlpControl = {
                 }
                 currentAdd.map(item => {
                     if (item != userId) {
-                        console.log(JSON.stringify(currentAdd.filter(item => item != userId)))
+                        currentAdd = currentAdd.filter(item => item != userId)
                         currentAdd.push(userId)
                         Core.setKey("nlpAnalyzeIds", JSON.stringify(currentAdd))
                         Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
@@ -218,14 +218,15 @@ let NlpControl = {
                 let currentRmv = JSON.parse(res)
                 currentRmv.map(item => {
                     if (item != userId) {
-                        console.log(JSON.stringify(currentRmv.filter(item => item != userId)))
-                        currentRmv.push(userId)
+                        currentRmv = currentRmv.filter(item => item != userId)
                         Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
                         Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
                     }
                     if (item == userId) {
-                        NlpControl.stop()
+                        currentRmv = currentRmv.filter(item => item != userId)
+                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
                         Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                        NlpControl.stop()
                     }
                 })
                 
