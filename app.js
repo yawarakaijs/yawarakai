@@ -18,6 +18,11 @@
 
  *************************************************************************/
 
+/**
+ * @author Hanami Yuna
+ * @copyright
+ */
+
 // Local Packages
 
 let Log = require('./Core/log').Log
@@ -45,6 +50,11 @@ if (config.debugmode) {
     Core.setKey("nlpfeedback", true)
     Core.getKey("nlpfeedback").then(res => {
         Log.debug(`NLP set to ${res}`)
+    })
+    Core.getKey("nlpAnalyzeIds").then(res => {
+        Log.debug(`NLP Analyzer List: ${res}`)
+    }).catch(err => {
+        Core.setKey("nlpAnalyzeIds", "[]")
     })
 }
 else {

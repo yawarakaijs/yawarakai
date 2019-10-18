@@ -15,16 +15,32 @@ let Message = require('./Core/Bot/message')
 let Register = {
     load: (extension_dir = __dirname + '/Components/') => {
         try {
+            // Init object for later storage
+            /**
+             * The object that contains the components reflaction function,
+             * this Object is loaded by component.js once the app starts up,
+             * the later changes can be done through bot command
+             * @property {Array} command - Imported from exports.register.commands
+             * @property {Array} inline - Imported from exports.register.inline
+             * @property {Array} message - Imported from exports.register.message
+             */
             let Compo = { command: [], inline: [], message: [] }
+            // Read all folders inside the components folder
             var files = fs.readdirSync(extension_dir)
+            // Iterial all folders to find the config.json under it
             files.forEach((value, index) => {
                 let folder = path.join(extension_dir, value)
                 var stats = fs.statSync(folder)
+                // Check if folder has config.json
                 if (fs.existsSync(folder + "/config.json")) {
+                    // Load config.json
                     var compConfig = require(folder + "/config.json")
-                    Compo = { command: [], inline: [], message: [] }
+                    // Check if config has the components key
                     if (compConfig.components) {
+                        // Check if this folder is exist
                         if (stats.isDirectory()) {
+                            // Iterial each key inside the components config
+                            // configValue represents each component name
                             for (let [configKey, configValue] of Object.entries(compConfig.components)) {
                                 let compoPath = extension_dir + value + "/" + configValue.name + ".js"
                                 let core_exists = fs.statSync(compoPath)

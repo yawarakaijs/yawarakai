@@ -187,6 +187,56 @@ let NlpControl = {
         Core.getKey("nlpfeedback").then(res => {
             Log.Log.debug(`NLP set to ${res} [OK]`)
         })
+    },
+    analyzeModeMan: (userId, action) => {
+        Core.getKey("nlpAnalyzeIds").then(res => {
+            if (action == "add") {
+                let currentAdd = JSON.parse(res)
+                if(!currentAdd[0]) {
+                    currentAdd.push(userId)
+                    let resultData = JSON.stringify(currentAdd)
+                    Core.setKey("nlpAnalyzeIds", resultData).then(updated => {
+                        console.log(updated)
+                    })
+                    NlpControl.start()
+                    Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                }
+                currentAdd.map(item => {
+                    if (item != userId) {
+                        console.log(JSON.stringify(currentAdd.filter(item => item != userId)))
+                        currentAdd.push(userId)
+                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentAdd))
+                        Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                    }
+                    if (item == userId) {
+                        NlpControl.start()
+                        Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                    }
+                })
+            }
+            if(action == "remove") {
+                let currentRmv = JSON.parse(res)
+                currentRmv.map(item => {
+                    if (item != userId) {
+                        console.log(JSON.stringify(currentRmv.filter(item => item != userId)))
+                        currentRmv.push(userId)
+                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
+                        Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                    }
+                    if (item == userId) {
+                        NlpControl.stop()
+                        Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                    }
+                })
+                
+            }
+        }).catch(err => {
+            // Recreate the array if undefined
+            Log.Log.fatal(err)
+            Log.Log.info("Init data not found, re-creating...")
+            Core.setKey("nlpAnalyzeIds", `[]`).catch(err => Log.Log.fatal(err))
+            this.NlpControl.analyzeModeMan(userId)
+        })
     }
 }
 
