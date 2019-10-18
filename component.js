@@ -22,21 +22,24 @@ let Register = {
                 var stats = fs.statSync(folder)
                 if (fs.existsSync(folder + "/config.json")) {
                     var compConfig = require(folder + "/config.json")
+                    Compo = { command: [], inline: [], message: [] }
                     if (compConfig.components) {
                         if (stats.isDirectory()) {
                             for (let [configKey, configValue] of Object.entries(compConfig.components)) {
                                 let compoPath = extension_dir + value + "/" + configValue.name + ".js"
-                                Compo = { command: [], inline: [], message: [] }
                                 let core_exists = fs.statSync(compoPath)
                                 if (core_exists) {
                                     let compo = require(compoPath)
+                                    // Check if register commands exist
                                     if (compo.register.commands) {
+
                                         compo.register.commands.map(cmd => {
                                             cmd.instance = compo.commands[cmd.cmdReg]
                                             cmd.meta = compo.meta
                                             Compo.command.push(cmd)
                                         })
                                     }
+                                    // Check if register inlines exist
                                     if (compo.register.inlines) {
                                         compo.register.inlines.map(iln => {
                                             iln.instance = compo.inlines[iln.ilnReg]
@@ -44,6 +47,7 @@ let Register = {
                                             Compo.inline.push(iln)
                                         })
                                     }
+                                    // Check if register inline exist
                                     if (compo.register.message) {
                                         compo.register.message.map(msg => {
                                             msg.instance = compo.message[msg.msgReg]

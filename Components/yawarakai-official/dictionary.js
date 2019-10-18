@@ -57,7 +57,6 @@ exports.inlines = {
         var queryPlain = ctx.inlineQuery.query
         var defination
         var defs = []
-        console.log("Get to here")
 
         // let global = /((^(中文|日语|日文|汉语)((的)|()))(.*)|(^(.*)((的)|()))(中文|日语|汉语|日文)((是什么呢|是什么|是什么意思|怎么说)|()))$/gum
         let c2jpattern = /((^(日文|日语)((的)|()))(.*)|(^(.*)((的)|()))(日文|日语)((是什么呢|是什么|是什么意思|怎么说)|()))$/gum

@@ -82,7 +82,6 @@ async function inlineDistributor(ctx) {
         let detail = []
         const idx = method.indexOf(i)
         try {
-            console.log(method[idx])
             const res = await Reflect.apply(method[idx].instance, undefined, args)
             detail.push(res)
         } catch (err) {
@@ -163,18 +162,24 @@ Bot.Telegram.Bot.on("text", async (ctx) => {
 
     Core.setKey("telegramMessageText", ctx.message.text)
     Core.setKey("telegramMessageFromId", ctx.from.id)
-    
+    Bot.Message.Message.hears(ctx)
     Nlp.tag(ctx, ctx.message.text).then(res => {
         ctx.replyWithChatAction("typing")
         let text = res
         if (text != undefined) {
-            ctx.reply(text, {parse_mode: "Markdown"}).catch(err => {
-                Log.fatal(err)
+            Core.getKey("nlpAnalyzeIds").then(ids => {
+                let current = JSON.parse(ids)
+                current.map(item => {
+                    if(item == ctx.from.id) {
+                        ctx.reply(text, {parse_mode: "Markdown"}).catch(err => {
+                            Log.fatal(err)
+                        })
+                    }
+                })
             })
         }
     })
     Bot.Message.messagectl.log(ctx)
-    Bot.Message.Message.hears(ctx)
 })
 
 // Log

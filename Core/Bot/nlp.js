@@ -61,7 +61,6 @@ let Nlp = {
                 }
 
                 let plainText = JSON.stringify(steptwo)
-                console.log(steptwo)
                 let newText = plainText.replace(/"/g, " ")
                 newText = newText.replace(/'/g, "")
                 newText = newText.replace(/\[/g, "")
@@ -82,9 +81,6 @@ let Nlp = {
      * @param {string} input2 - The second sentence that await for match
      */
     Simhash(input, input2) {
-        // Cut the sentences and sign values
-        // let one = nodejieba.cutHMM(input)
-        // let two = nodejieba.cutHMM(input2)
         // Extract the words into arrays along with the weights
         let oneWithWeight = nodejieba.extract(input, 10)
         let twoWithWeight = nodejieba.extract(input2, 10)
@@ -163,7 +159,6 @@ let Nlp = {
         let result2 = nodejieba.cutHMM(input2)
         let palette = NlpLib.merge(result, result2)
         let table = NlpLib.count(result, result2, palette)
-        console.log(table)
         let numerator = 0
         let srcSq = 0
         let desSq = 0
@@ -171,7 +166,6 @@ let Nlp = {
         table.a.map((srcCount, index) => {
             let desCount = table.b[index]
             numerator = numerator + srcCount * desCount
-            console.log(numerator)
             srcSq = srcSq + srcCount * srcCount
             desSq = desSq + desCount * desCount
         })

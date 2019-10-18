@@ -4,6 +4,7 @@
 
 let Log = require('../log')
 let Lang = require('../lang').Lang
+let Core = require('../../core')
 let NlpControl = require('./nlp').NlpControl
 
 let messagectl = {
@@ -80,9 +81,36 @@ let Message = {
         if (Message.count == 0 && textPattern.test(ctx.message.text)) {
             Message.count++
             if (/((悠月，)|())打开分析模式/gui.test(ctx.message.text)) {
+                Core.getKey("nlpAnalyzeIds").then(res => {
+                    let current = JSON.parse(res)
+                    let thenew = current.push(210921092)
+                    console.log(JSON.parse(thenew))
+                    JSON.parse(res).map(item => {
+                        if(item != ctx.from.id) {
+                            Core.setKey("nlpAnalyzeIds", JSON.stringify())
+                        }
+                    })
+                }).catch(err => {
+                    Log.Log.fatal(err)
+                    Log.Log.info("Init data not found, re-creating...")
+                    Core.setKey("nlpAnalyzeIds", `[${ctx.from.id}]`).catch(err => Log.Log.fatal(err))
+                })
                 NlpControl.start()
             }
             if (/关闭分析模式/gui.test(ctx.message.text)) {
+                Core.getKey("nlpAnalyzeIds").then(res => {
+                    let current = JSON.parse(res)
+                    JSON.parse(res).map(item => {
+                        if(item != ctx.from.id) {
+                            console.log(JSON.stringify(current.filter(item => item != ctx.from.id)))
+                            Core.setKey("nlpAnalyzeIds", JSON.stringify(current.filter(item => item != ctx.from.id)))
+                        }
+                    })
+                }).catch(err => {
+                    Log.Log.fatal(err)
+                    Log.Log.info("Init data not found, re-creating...")
+                    Core.setKey("nlpAnalyzeIds", `[${ctx.from.id}]`).catch(err => Log.Log.fatal(err))
+                })
                 NlpControl.stop()
             }
             for (let i of textReply) {
