@@ -44,7 +44,7 @@ let Register = {
                             for (let [configKey, configValue] of Object.entries(compConfig.components)) {
                                 let compoPath = extension_dir + value + "/" + configValue.name + ".js"
                                 let core_exists = fs.statSync(compoPath)
-                                if (core_exists) {
+                                if (core_exists && configValue.enable) {
                                     let compo = require(compoPath)
                                     // Check if register commands exist
                                     if (compo.register.commands) {

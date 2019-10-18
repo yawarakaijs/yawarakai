@@ -104,22 +104,13 @@ exports.inlines = {
 exports.register = {
     // As the example to Yawarakai Compos
     commands: [
-        {
-            cmdReg: 'c2j'
-        },
-        {
-            cmdReg: "j2c"
-
-        }
+        { cmdReg: 'c2j' },
+        { cmdReg: "j2c" }
     ],
     inlines: [
-        {
-            ilnReg: "dictionary"
-        }
+        { ilnReg: "dictionary" }
     ],
     messages: [
-        {
-
-        }
+        // { }
     ]
 }
