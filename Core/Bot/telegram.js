@@ -12,7 +12,7 @@ let Lang = require('../lang').Lang
 // Creating Bot
 // At this time Single User
 const Bot = new Telegraf(config.token).catch(err => {
-    Log.Log.fatal(err)
+    Log.DiagnosticLog.fatal(err)
 })
 
 let command = (cmd) => {

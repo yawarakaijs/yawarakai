@@ -71,6 +71,7 @@ let Register = {
                                             Compo.message.push(msg)
                                         })
                                     }
+                                    loadedPlugins.push(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                     Log.Log.info(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
                                 else {
@@ -90,6 +91,8 @@ let Register = {
     }
 }
 
+let loadedPlugins = new Array()
+
 let Interface = {
     Log: Log,
     Message: Message,
@@ -98,5 +101,6 @@ let Interface = {
 
 // Exports
 
+exports.loadedPlugins = loadedPlugins
 exports.Interface = Interface
 exports.Register = Register

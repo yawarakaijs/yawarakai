@@ -121,7 +121,7 @@ let Message = {
                     ctx.reply(i).then(res => {
                         Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功`)
                     }).catch(err => {
-                        Log.Log.fatal(err)
+                        Log.DiagnosticLog.fatal(err)
                     })
                     this.todo(ctx, i.length)
                 }, i.length * 200)

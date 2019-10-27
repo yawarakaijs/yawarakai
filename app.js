@@ -27,6 +27,7 @@
 
 let Log = require('./Core/log').Log
 let AnonymousLog = require('./Core/log').AnonymousLog
+let DiagnosticLog = require('./Core/log').DiagnosticLog
 let Core = require('./core')
 let Bot = require('./Core/bot')
 let Nlp = require('./Core/Bot/nlp').Nlp
@@ -37,11 +38,17 @@ let packageInfo = require('./package.json')
 
 // Core Runtime
 
-var startInfo = Lang.app.startTime + "：" + Date() + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
+let timeOption = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+let startInfo = Lang.app.startTime + "：" + Date() + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
+let channelTime = new Date()
 
 console.log("Yawarakai  Copyright (C) 2019  Yuna Hanami")
 console.log(startInfo)
 AnonymousLog.info(startInfo)
+
+// Initialization
+
+var compoData = Component.Register.load()
 
 // Debug block
 
@@ -58,6 +65,7 @@ if (config.debugmode) {
     })
 }
 else {
+    DiagnosticLog.info(`${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.loadedPlugins.join("\n")}`)
     Core.setKey("nlpfeedback", false)
     Core.getKey("nlpfeedback").then(res => {
         Log.debug(`NLP set to ${res}`)
@@ -69,9 +77,7 @@ else {
     })
 }
 
-// Initialization
-
-var compoData = Component.Register.load()
+// Common Functions
 
 function commandParse(ctx, callback) {
     let commandArgs = ctx.message.text.split(" ");
@@ -93,17 +99,18 @@ async function inlineDistributor(ctx) {
     let args = []
     args.push(ctx)
     var method = compoData.inline
+    let detail
     for (let i of method) {
-        let detail = []
+        detail = new Array()
         const idx = method.indexOf(i)
         try {
             const res = await Reflect.apply(method[idx].instance, undefined, args)
             detail.push(res)
         } catch (err) {
-            Log.fatal(err)
+            DiagnosticLog.fatal(err)
         }
-        return detail
     }
+    return detail
 }
 function commandDistributor(ctx) {
     commandParse(ctx, (result) => {
@@ -174,7 +181,6 @@ Bot.Telegram.Bot.on("command", async ctx => {
 })
 
 Bot.Telegram.Bot.on("text", async (ctx) => {
-
     Core.setKey("telegramMessageText", ctx.message.text)
     Core.setKey("telegramMessageFromId", ctx.from.id)
     Bot.Message.Message.hears(ctx)
@@ -187,7 +193,7 @@ Bot.Telegram.Bot.on("text", async (ctx) => {
                 current.map(item => {
                     if(item == ctx.from.id) {
                         ctx.reply(text, {parse_mode: "Markdown"}).catch(err => {
-                            Log.fatal(err)
+                            DiagnosticLog.fatal(err)
                         })
                     }
                 })
@@ -197,9 +203,13 @@ Bot.Telegram.Bot.on("text", async (ctx) => {
     Bot.Message.messagectl.log(ctx)
 })
 
+// Bot.Telegram.Bot.on("voice", async (ctx) => {
+//     console.log(JSON.stringify(ctx.message))
+// })
+
 // Log
 
 Bot.Telegram.Bot.catch((err) => {
-    Log.fatal(err)
+    DiagnosticLog.fatal(err)
     throw err
 })

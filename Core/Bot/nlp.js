@@ -233,9 +233,9 @@ let NlpControl = {
             }
         }).catch(err => {
             // Recreate the array if undefined
-            Log.Log.fatal(err)
+            Log.DiagnosticLog.fatal(err)
             Log.Log.info("Init data not found, re-creating...")
-            Core.setKey("nlpAnalyzeIds", `[]`).catch(err => Log.Log.fatal(err))
+            Core.setKey("nlpAnalyzeIds", `[]`).catch(err => Log.DiagnosticLog.fatal(err))
             this.NlpControl.analyzeModeMan(userId)
         })
     }
