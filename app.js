@@ -53,6 +53,7 @@ var compoData = Component.Register.load()
 // Debug block
 
 if (config.debugmode) {
+    Core.setKey("logtext", "")
     Bot.Telegram.command("/telegram start")
     Core.setKey("nlpfeedback", false)
     Core.getKey("nlpfeedback").then(res => {
@@ -126,7 +127,7 @@ function commandDistributor(ctx) {
 
 function staticCommandDistributor(ctx) {
     commandParse(ctx, (result) => {
-        
+
     })
 }
 
@@ -191,8 +192,8 @@ Bot.Telegram.Bot.on("text", async (ctx) => {
             Core.getKey("nlpAnalyzeIds").then(ids => {
                 let current = JSON.parse(ids)
                 current.map(item => {
-                    if(item == ctx.from.id) {
-                        ctx.reply(text, {parse_mode: "Markdown"}).catch(err => {
+                    if (item == ctx.from.id) {
+                        ctx.reply(text, { parse_mode: "Markdown" }).catch(err => {
                             DiagnosticLog.fatal(err)
                         })
                     }

@@ -196,21 +196,21 @@ let NlpControl = {
                     currentAdd.push(userId)
                     let resultData = JSON.stringify(currentAdd)
                     Core.setKey("nlpAnalyzeIds", resultData).then(updated => {
-                        console.log(updated)
+                        Log.Log.debug(updated)
                     })
                     NlpControl.start()
-                    Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                    Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
                 }
                 currentAdd.map(item => {
                     if (item != userId) {
                         currentAdd = currentAdd.filter(item => item != userId)
                         currentAdd.push(userId)
                         Core.setKey("nlpAnalyzeIds", JSON.stringify(currentAdd))
-                        Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
                     }
                     if (item == userId) {
                         NlpControl.start()
-                        Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
                     }
                 })
             }
@@ -220,12 +220,12 @@ let NlpControl = {
                     if (item != userId) {
                         currentRmv = currentRmv.filter(item => item != userId)
                         Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
-                        Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
                     }
                     if (item == userId) {
                         currentRmv = currentRmv.filter(item => item != userId)
                         Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
-                        Core.getKey("nlpAnalyzeIds").then(res => console.log(res))
+                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
                         NlpControl.stop()
                     }
                 })

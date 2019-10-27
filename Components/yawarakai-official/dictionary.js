@@ -37,7 +37,7 @@ let main = {
             title: `${query} 释义`,
             description: result,
             thumb_url: thumb,
-            input_message_content: { message_text: `${query} 的${middleWord}是 ${result}`}
+            input_message_content: { message_text: `${query} 的${middleWord}是 ${result}` }
         }
         return data
     }

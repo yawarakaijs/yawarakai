@@ -1,36 +1,50 @@
 // Dependencies
 
-let log4js = require('log4js')
+let log4js = require("log4js")
 
 // Local Packages
 
-let Core = require('../core')
-let Bot = require('../Core/bot').Telegram.Bot
-let config = require('../config.json')
+let Core = require("../core")
+let Bot = require("../Core/bot").Telegram.Bot
+let config = require("../config.json")
 
-let coreLogFileName = "./log/" + config.botname + "-" + "Core-Log" + "-" + Core.Time.logTime + ".log"
-let messageLogFileName = "./log/" + config.botname + "-" + "Message-Log" + "-" + Core.Time.logTime + ".log"
+let coreLogFileName =
+    "./log/" +
+    config.botname +
+    "-" +
+    "Core-Log" +
+    "-" +
+    Core.Time.logTime +
+    ".log"
+let messageLogFileName =
+    "./log/" +
+    config.botname +
+    "-" +
+    "Message-Log" +
+    "-" +
+    Core.Time.logTime +
+    ".log"
 
 log4js.configure({
     appenders: {
-        Core: { type: 'file', filename: coreLogFileName },
+        Core: { type: "file", filename: coreLogFileName },
         MessageProc: { type: "file", filename: messageLogFileName },
-        console: { type: 'console' }
+        console: { type: "console" }
     },
     categories: {
-        Bot: { appenders: [ 'console', 'Core' ], level: 'trace' },
-        Message: { appenders: [ 'MessageProc' ], 'level': 'trace'},
-        anonymous: {appenders: [ 'Core' ], level: 'trace'},
-        default: { appenders: [ 'console' ], level: 'trace' },
+        Bot: { appenders: ["console", "Core"], level: "trace" },
+        Message: { appenders: ["MessageProc"], level: "trace" },
+        anonymous: { appenders: ["Core"], level: "trace" },
+        default: { appenders: ["console"], level: "trace" }
     }
-});
+})
 
 /*****************************************
  * Log function name mapping
- * coreLogger           =>  Log        
+ * coreLogger           =>  Log
  * messageProcLogger    =>  msgLog
  * anonymousLogger      =>  AnonymousLog
- * 
+ *
  * Log functionality
  *                          File          Screen        No Prompt
  * console.log              false         true          false
@@ -39,26 +53,53 @@ log4js.configure({
  * anonymousLogger          true          false         true
  *****************************************/
 
-const coreLogger = log4js.getLogger('Bot');
-const messageProcLogger = log4js.getLogger('Message')
-const anonymousLogger = log4js.getLogger('anonymous')
+const coreLogger = log4js.getLogger("Bot")
+const messageProcLogger = log4js.getLogger("Message")
+const anonymousLogger = log4js.getLogger("anonymous")
 
 let DiagnosticLog = {
     info: (text) => {
-        if(config.diagnosticChannel.enable) { Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "Info\n" + text) }
+        DiagnosticLog.counter(text)
+        if (config.diagnosticChannel.enable) { 
+            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "🗎 Info\n" + text)
+        }
     },
     debug: (text) => {
-        if(config.diagnosticChannel.enable) { Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "Debug\n" + text) }
+        DiagnosticLog.counter(text)
+        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
+            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚙️ Debug\n" + text)
+        }
         Log.debug(text)
     },
     warning: (text) => {
-        if(config.diagnosticChannel.enable) { Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "Warning\n" + text) }
+        DiagnosticLog.counter(text)
+        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
+            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚠️ Warning\n" + text)
+        }
         Log.warning(text)
     },
     fatal: (text) => {
-        if(config.diagnosticChannel.enable) { Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "Fatal\n" + text) }
+        DiagnosticLog.counter(text)
+        console.log("1 ", config.diagnosticChannel.enable && DiagnosticLog.count == 0)
+        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
+            let trimmer = new RegExp(__dirname.replace(/\/Core/gu, ""), "gu")
+            let stack = JSON.stringify(text.stack).replace(trimmer, ".")
+            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
+        }
         Log.fatal(text)
-    }
+    },
+    counter: (text) => {
+        Core.getKey("logtext").then(res => {
+            if(text.message == res) {
+                DiagnosticLog.count++
+            }
+            if(text.message != res) {
+                DiagnosticLog.count = 0
+            }
+            Core.setKey("logtext", text.message, 'EX', 1 * 60)
+        })
+    },
+    count: 0
 }
 
 let Log = {
@@ -80,7 +121,7 @@ let Log = {
 
     fatal: (text) => {
         coreLogger.fatal(text)
-    }    
+    }
 }
 
 let messageStdout = {
