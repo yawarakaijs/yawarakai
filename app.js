@@ -67,6 +67,7 @@ if (config.debugmode) {
 }
 else {
     DiagnosticLog.info(`${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.loadedPlugins.join("\n")}`)
+    Core.setKey("logtext", "")
     Core.setKey("nlpfeedback", false)
     Core.getKey("nlpfeedback").then(res => {
         Log.debug(`NLP set to ${res}`)

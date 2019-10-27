@@ -96,7 +96,7 @@ let DiagnosticLog = {
             if(text.message != res) {
                 DiagnosticLog.count = 0
             }
-            Core.setKey("logtext", text.message, 'EX', 1 * 60)
+            Core.setKey("logtext", text.message ? text.message : "", 'EX', 1 * 60)
         })
     },
     count: 0
