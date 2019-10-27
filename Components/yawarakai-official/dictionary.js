@@ -76,7 +76,7 @@ exports.inlines = {
                 any = main.answer(ctx, steptwo, result, "日语")
                 return any
             }).catch(err => {
-                Compo.Interface.Log.Log.fatal(err)
+                Compo.Interface.Log.DiagnosticLog.fatal(err)
             })
         }
 
@@ -94,7 +94,7 @@ exports.inlines = {
                 any = main.answer(ctx, steptwo, result, "中文")
                 return any
             }).catch(err => {
-                Compo.Interface.Log.Log.fatal(err)
+                Compo.Interface.Log.DiagnosticLog.fatal(err)
             })
 
         }
