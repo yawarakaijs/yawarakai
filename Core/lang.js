@@ -2,7 +2,7 @@
 
 // Local Packages
 
-let config = require('./config.json')
+let config = require('../config.json')
 
 // Use-Ready Lang Files
 

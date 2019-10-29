@@ -18,42 +18,140 @@
 
  *************************************************************************/
 
-// Dependencies
+/**
+ * @author Hanami Yuna
+ * @copyright
+ */
 
 // Local Packages
 
-let Log = require('./log').Log
-let AnonymousLog = require('./log').AnonymousLog
+let Log = require('./Core/log').Log
+let AnonymousLog = require('./Core/log').AnonymousLog
+let DiagnosticLog = require('./Core/log').DiagnosticLog
 let Core = require('./core')
-let Bot = require('./bot')
-let Lang = require('./lang').Lang
+let Bot = require('./Core/bot')
+let Nlp = require('./Core/Bot/nlp').Nlp
+let Lang = require('./Core/lang').Lang
 let config = require('./config.json')
+let Component = require('./component')
 let packageInfo = require('./package.json')
 
 // Core Runtime
 
-var startInfo = Lang.app.startTime + "：" + Core.Time.logTime + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
+let startInfo = Lang.app.startTime + "：" + Date() + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
 
 console.log("Yawarakai  Copyright (C) 2019  Yuna Hanami")
 console.log(startInfo)
 AnonymousLog.info(startInfo)
+
+// Initialization
+
+var compoData = Component.Register.load()
+
+// Debug block
+
+if (config.debugmode) {
+    Core.setKey("logtext", "")
+    Bot.Telegram.command("/telegram start")
+    Core.setKey("nlpfeedback", false)
+    Core.getKey("nlpfeedback").then(res => {
+        Log.debug(`NLP set to ${res}`)
+    })
+    Core.getKey("nlpAnalyzeIds").then(res => {
+        Log.debug(`NLP Analyzer List: ${res}`)
+    }).catch(err => {
+        Core.setKey("nlpAnalyzeIds", "[]")
+    })
+}
+else {
+    Core.setKey("logtext", "")
+    Core.setKey("nlpfeedback", false)
+    Core.getKey("nlpfeedback").then(res => {
+        Log.debug(`NLP set to ${res}`)
+    })
+    Core.getKey("nlpAnalyzeIds").then(res => {
+        Log.debug(`NLP Analyzer List: ${res}`)
+    }).catch(err => {
+        Core.setKey("nlpAnalyzeIds", "[]")
+    })
+}
+
+// Common Functions
+
+function commandParse(ctx, callback) {
+    let commandArgs = ctx.message.text.split(" ");
+    let command = commandArgs[0].substr(1);
+    let args = [];
+    commandArgs.forEach((value, index) => {
+        if (index > 0 && value !== "") {
+            args.push(value);
+        }
+    })
+    callback({
+        cmd: command,
+        args: args,
+        ctx: ctx
+    });
+}
+
+async function inlineDistributor(ctx) {
+    let args = []
+    args.push(ctx)
+    var method = compoData.inline
+    let detail = new Array()
+    for (let i of method) {
+        const idx = method.indexOf(i)
+        try {
+            const res = await Reflect.apply(method[idx].instance, undefined, args)
+            if(res != undefined) {
+                detail.push(res)
+            }
+        } catch (err) {
+            DiagnosticLog.fatal(err)
+        }
+    }
+    return detail
+}
+function commandDistributor(ctx) {
+    commandParse(ctx, (result) => {
+        const chatID = ctx.from.id
+        let cmd = compoData.command.find(command => {
+            // console.log(command.command === result.cmd)
+            return command.command === result.cmd
+        })
+        if (!cmd) { return 404 }
+        return Reflect.apply(cmd.instance, { chat: ctx.message.text, bot: "bot", chatID }, result.args)
+    })
+}
+
+function staticCommandDistributor(ctx) {
+    commandParse(ctx, (result) => {
+
+    })
+}
 
 // CLI
 
 Core.cliInput('> ', input => {
     var command = input.split(' ')[0] // Cut Command and set to First string
     var isCommand = command.includes("/") && (command.indexOf("/") == 0) // Check command type
-    if(isCommand) {
+    if (isCommand) {
         switch (command) {
             default:
                 console.log(config.coreName + ": " + input + ": " + Lang.app.cliCommandUnknownPrompt)
-                AnonymousLog.trace( Lang.app.commandExecution + ": " + input)
+                AnonymousLog.trace(Lang.app.commandExecution + ": " + input)
                 break
             case '/telegram':
-                Bot.telegram.command(input)
+                Bot.Telegram.command(input)
                 break
             case '/help':
-                console.log( Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
+                console.log(Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
+                break
+            case '/scan':
+                Component.ComponentControl.scan()
+                break
+            case '/load':
+                Component.ComponentControl.load()
                 break
             case '/stop':
             case '/exit':
@@ -61,7 +159,7 @@ Core.cliInput('> ', input => {
         }
     }
     else { // Basic session processing and exception handling
-        switch(input) {
+        switch (input) {
             default:
                 break
             case '':
@@ -70,14 +168,48 @@ Core.cliInput('> ', input => {
     }
 })
 
-// Processing
+// Essentials
 
-Bot.telegram.Bot.on("text", (ctx) => {
-    Bot.message.messagectl.logMsg(ctx)
+Bot.Telegram.Bot.on("inline_query", async ctx => {
+    let data = await inlineDistributor(ctx)
+    ctx.answerInlineQuery(data, { cache_time: 10 })
 })
+
+Bot.Telegram.Bot.on("command", async ctx => {
+    staticCommandDistributor(ctx)
+    commandDistributor(ctx)
+})
+
+Bot.Telegram.Bot.on("text", async (ctx) => {
+    Core.setKey("telegramMessageText", ctx.message.text)
+    Core.setKey("telegramMessageFromId", ctx.from.id)
+    Bot.Message.Message.hears(ctx)
+    Nlp.tag(ctx, ctx.message.text).then(res => {
+        ctx.replyWithChatAction("typing")
+        let text = res
+        if (text != undefined) {
+            Core.getKey("nlpAnalyzeIds").then(ids => {
+                let current = JSON.parse(ids)
+                current.map(item => {
+                    if (item == ctx.from.id) {
+                        ctx.reply(text, { parse_mode: "Markdown" }).catch(err => {
+                            DiagnosticLog.fatal(err)
+                        })
+                    }
+                })
+            })
+        }
+    })
+    Bot.Message.messagectl.log(ctx)
+})
+
+// Bot.Telegram.Bot.on("voice", async (ctx) => {
+//     console.log(JSON.stringify(ctx.message))
+// })
 
 // Log
 
-Bot.telegram.Bot.catch((err) => {
-    Log.fatal(err)
+Bot.Telegram.Bot.catch((err) => {
+    DiagnosticLog.fatal(err)
+    throw err
 })

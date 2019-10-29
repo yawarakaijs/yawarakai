@@ -1,10 +1,20 @@
 {
+    "debugmode": false,
     "coreName": "Yawarakai",
     "botname": "Bot Display Name",
-    "token": "BotToken",
+    "token": "Bot API Token",
     "webhook": {
-        "url": "Webhook Path",
+        "url": "",
         "port" : 8000
     },
-    "language": "zh-CN"
+    "diagnosticChannel": {
+        "enable": false,
+        "channel": "Channel Username or Channel ID"
+    },
+    "redis": {
+        "host": "Redis Hostname",
+        "port": "6379",
+        "auth": "Password of redis"
+    },
+    "language": "en-US"
 }

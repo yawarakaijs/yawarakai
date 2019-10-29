@@ -1,0 +1,38 @@
+{
+    "app": {
+        "startTime": "开始时间",
+        "coreVersion": "版本",
+        "cliCommandUnknownPrompt": "未知命令，请检查你的拼写或者命令不存在 \n提示：使用 /help 命令来获取帮助或是使用 /aval 来获取可用命令列表 \n输入 /exit 来退出 Yawarakai",
+        "cliAvailiableCommand": "可用命令",
+        "commandExecution": "用户执行命令",
+        "starting": " 启动中..."
+    },
+    "bot": {
+        "message": {
+            "from": "来自",
+            "text": "消息",
+            "group": "群组"
+        },
+        "telegram": {
+            "commandParameterInvalid": "无效的参数",
+            "commandParameterMissing": ["无效的参数：","，检查是否缺失必要参数："],
+            "commandInvalid": "参数命令不正确 \n执行 /telegram h 或者 /telegram help 来获得帮助",
+            "helpCommand": "telegram 命令是用于启动和管理 Telegram Bot 和 Telegram Client \n start     启动 Telegram Bot \n stop      停止 Telegram Bot",
+            "webhookSettingsWarning": "如果你使用了外部服务器的命令行模式来设定 Webhook，这里显示的 Webhook 可能不是登记在 Telegram 服务器的 Webhook 地址"
+        }
+
+    },
+    "core": {
+        "redisAuthSuccess": "Redis 服务器验证成功并且已连接",
+        "redisAuthFail": "Redis 服务器验证失败",
+        "redisCausedShutdown": "因为 Redis 连接失败正在退出 Yawarakai..."
+    },
+    "component": {
+        "readIn": "已读取 ",
+        "loaded": ["已挂载组件 ", " 来自 "],
+        "enabled": "已激活 ",
+        "disabled": "已禁用 ",
+        "reloaded": "已重载 ",
+        "configFileInvalid": ["ConfigFileInvalidError: \n", " 配置文件不正确或是无效"]
+    }
+}
