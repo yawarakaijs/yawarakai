@@ -38,9 +38,7 @@ let packageInfo = require('./package.json')
 
 // Core Runtime
 
-let timeOption = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
 let startInfo = Lang.app.startTime + "：" + Date() + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
-let channelTime = new Date()
 
 console.log("Yawarakai  Copyright (C) 2019  Yuna Hanami")
 console.log(startInfo)
@@ -66,7 +64,6 @@ if (config.debugmode) {
     })
 }
 else {
-    DiagnosticLog.info(`${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.loadedPlugins.join("\n")}`)
     Core.setKey("logtext", "")
     Core.setKey("nlpfeedback", false)
     Core.getKey("nlpfeedback").then(res => {
@@ -101,13 +98,14 @@ async function inlineDistributor(ctx) {
     let args = []
     args.push(ctx)
     var method = compoData.inline
-    let detail
+    let detail = new Array()
     for (let i of method) {
-        detail = new Array()
         const idx = method.indexOf(i)
         try {
             const res = await Reflect.apply(method[idx].instance, undefined, args)
-            detail.push(res)
+            if(res != undefined) {
+                detail.push(res)
+            }
         } catch (err) {
             DiagnosticLog.fatal(err)
         }

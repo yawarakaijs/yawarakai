@@ -61,7 +61,7 @@ let DiagnosticLog = {
     info: (text) => {
         DiagnosticLog.counter(text)
         if (config.diagnosticChannel.enable) { 
-            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "🗎 Info\n" + text)
+            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "📄 Info\n" + text)
         }
     },
     debug: (text) => {
@@ -80,7 +80,6 @@ let DiagnosticLog = {
     },
     fatal: (text) => {
         DiagnosticLog.counter(text)
-        console.log("1 ", config.diagnosticChannel.enable && DiagnosticLog.count == 0)
         if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
             let trimmer = new RegExp(__dirname.replace(/\/Core/gu, ""), "gu")
             let stack = JSON.stringify(text.stack).replace(trimmer, ".")
