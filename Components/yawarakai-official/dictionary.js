@@ -17,7 +17,12 @@ let thumb = "https://i.loli.net/2019/10/04/eNxTQaftWrh7Lsd.jpg"
 let main = {
     c2j: async (query) => {
         return hujiang.search(query, 'cn', 'jp').then(res => {
-            return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
+            if (res.wordEntries) {
+                return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
+            }
+            if (res.networkEntry) {
+                return res.networkEntry
+            }
         }).catch(err => {
             Compo.Interface.Log.Log.fatal(err)
         })
@@ -25,7 +30,13 @@ let main = {
 
     j2c: async (query) => {
         return hujiang.search(query, 'jp', 'cn').then(res => {
-            return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
+            if (res.wordEntries) {
+                return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
+            }
+            if (res.networkEntry) {
+                let result = [{ value: res.networkEntry.content }]
+                return result
+            }
         }).catch(err => {
             Compo.Interface.Log.Log.fatal(err)
         })
@@ -84,7 +95,6 @@ exports.inlines = {
             var steptwo = stepone.replace(/(是什么|是什么呢|怎么说|怎么写|怎么翻译|)(\?|)$/gu, "")
             Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了单词查询 (日文至中文)：${steptwo}`)
             return main.j2c(steptwo).then(res => {
-                console.log(res)
                 defination = res
                 defination.map(element => {
                     defs.push(main.answer(ctx, steptwo, element.value, "中文"))

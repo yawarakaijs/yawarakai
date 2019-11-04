@@ -168,7 +168,6 @@ Core.cliInput('> ', input => {
 
 Bot.Telegram.Bot.on("inline_query", async ctx => {
     let data = await inlineDistributor(ctx)
-
     if (data != undefined) {
         // Exchange all id of inline result to the system registered id
         data.map(item => {
@@ -180,8 +179,7 @@ Bot.Telegram.Bot.on("inline_query", async ctx => {
         })
         Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, data, { cache_time: 10 }).catch(err => DiagnosticLog.fatal(err))
     }
-
-    if (data == undefined) {
+    else if (data == undefined) {
         Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, [
             {
                 type: "article",
@@ -193,25 +191,25 @@ Bot.Telegram.Bot.on("inline_query", async ctx => {
         ], { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
     }
 
-    if (ctx.inlineQuery.query == "" || ctx.inlineQuery.query == undefined) {
+    // if (ctx.inlineQuery.query == "" || ctx.inlineQuery.query == undefined) {
 
-        let results = new Array()
+    //     let results = new Array()
 
-        ctx["inlineQuery"]["query"] = "日语的手机"
-        let data = await inlineDistributor(ctx)
+    //     ctx["inlineQuery"]["query"] = "日语的手机"
+    //     let data = await inlineDistributor(ctx)
 
-        results = data
-        results.map(item => {
-            let id = new Array()
-            for (let i = 0; i < 8; i++) {
-                id.push(Math.floor(Math.random() * Math.floor(9)))
-            }
-            item["id"] = id.join("")
-            item["title"] = `试试看搜索 ${ctx.inlineQuery.query}`
-        })
+    //     results = data
+    //     results.map(item => {
+    //         let id = new Array()
+    //         for (let i = 0; i < 8; i++) {
+    //             id.push(Math.floor(Math.random() * Math.floor(9)))
+    //         }
+    //         item["id"] = id.join("")
+    //         item["title"] = `试试看搜索 ${ctx.inlineQuery.query}`
+    //     })
 
-        Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, results, { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
-    }
+    //     Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, results, { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
+    // }
 })
 
 Bot.Telegram.Bot.on("command", async ctx => {

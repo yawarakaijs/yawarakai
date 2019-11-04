@@ -4,15 +4,15 @@ const Compo = require("../../component")
 
 let main = {
     answer: (ctx, query, result, middleWord) => {
-        var data = {
+        var data = [{
             type: "audio",
             id: ctx.inlineQuery.id,
             title: `${query}`,
-            audio_url: "https://source.yutsuki.moe/cloudmusic/music/test.mp3",
+            audio_url: "https://tts.hjapi.com/jp/8C59EF4A0807373BCD744E967B07B580",
             description: result,
             caption: "Music Requested",
             thumb_url: "https://i.loli.net/2019/10/04/eNxTQaftWrh7Lsd.jpg"
-        }
+        }]
         return data
     }
 }
