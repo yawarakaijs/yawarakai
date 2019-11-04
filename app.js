@@ -178,7 +178,7 @@ Bot.Telegram.Bot.on("inline_query", async ctx => {
             }
             item["id"] = id.join("")
         })
-        Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, data, { cache_time: 10 }).catch(err => DiagnosticLog(err))
+        Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, data, { cache_time: 10 }).catch(err => DiagnosticLog.fatal(err))
     }
 
     if (data == undefined) {
@@ -190,7 +190,7 @@ Bot.Telegram.Bot.on("inline_query", async ctx => {
                 description: "Didn't find what you need",
                 input_message_content: { message_text: `没有你需要的结果` }
             }
-        ], { cache_time: 1 }).catch(err => DiagnosticLog(err))
+        ], { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
     }
 
     if (ctx.inlineQuery.query == "" || ctx.inlineQuery.query == undefined) {
@@ -210,7 +210,7 @@ Bot.Telegram.Bot.on("inline_query", async ctx => {
             item["title"] = `试试看搜索 ${ctx.inlineQuery.query}`
         })
 
-        Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, results, { cache_time: 1 }).catch(err => DiagnosticLog(err))
+        Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, results, { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
     }
 })
 
