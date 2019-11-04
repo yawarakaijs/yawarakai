@@ -29,8 +29,10 @@ let client = redis.createClient(config.redis.port, config.redis.host)
 
 client.on('error', function (err) {
   Log.Log.fatal(`${Lang.core.redisAuthFail}`)
-  Log.Log.fatal(`${Lang.core.redisCausedShutdown}`)
-  return 1
+  return setTimeout(() => {
+    Log.Log.fatal(`${Lang.core.redisCausedShutdown}`)
+    process.exit(1)
+  }, 5000)
 })
 
 client.auth(config.redis.auth, () => {

@@ -34,7 +34,7 @@ let main = {
         var data = {
             type: "article",
             id: ctx.inlineQuery.id,
-            title: `${query} 释义`,
+            title: `${query} 的${middleWord}释义`,
             description: result,
             thumb_url: thumb,
             input_message_content: { message_text: `${query} 的${middleWord}是 ${result}` }
@@ -56,7 +56,7 @@ exports.inlines = {
         // Send in
         var queryPlain = ctx.inlineQuery.query
         var defination
-        var defs = []
+        var defs = new Array()
 
         // let global = /((^(中文|日语|日文|汉语)((的)|()))(.*)|(^(.*)((的)|()))(中文|日语|汉语|日文)((是什么呢|是什么|是什么意思|怎么说)|()))$/gum
         let c2jpattern = /((^(日文|日语)((的)|()))(.*)|(^(.*)((的)|()))(日文|日语)((是什么呢|是什么|是什么意思|怎么说)|()))$/gum
@@ -70,11 +70,9 @@ exports.inlines = {
             return main.c2j(steptwo).then(res => {
                 defination = res
                 defination.map(element => {
-                    defs.push(element.value)
+                    defs.push(main.answer(ctx, steptwo, element.value, "日语"))
                 })
-                var result = defs.join(" | ")
-                any = main.answer(ctx, steptwo, result, "日语")
-                return any
+                return defs
             }).catch(err => {
                 Compo.Interface.Log.DiagnosticLog.fatal(new Error("Component Process Error: Cannot get the information of given query"))
             })
@@ -86,13 +84,12 @@ exports.inlines = {
             var steptwo = stepone.replace(/(是什么|是什么呢|怎么说|怎么写|怎么翻译|)(\?|)$/gu, "")
             Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了单词查询 (日文至中文)：${steptwo}`)
             return main.j2c(steptwo).then(res => {
+                console.log(res)
                 defination = res
                 defination.map(element => {
-                    defs.push(element.value)
+                    defs.push(main.answer(ctx, steptwo, element.value, "中文"))
                 })
-                var result = defs.join(" | ")
-                any = main.answer(ctx, steptwo, result, "中文")
-                return any
+                return defs
             }).catch(err => {
                 Compo.Interface.Log.DiagnosticLog.fatal(new Error("Component Process Error: Cannot get the information of given query"))
             })

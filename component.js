@@ -13,7 +13,7 @@ let Message = require('./Core/Bot/message')
 // Body
 
 let Register = {
-    load: (extension_dir = __dirname + '/Components/') => {
+    load: (extension_dir = path.join(__dirname, '/Components/')) => {
         try {
             // Init object for later storage
             /**

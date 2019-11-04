@@ -6,7 +6,7 @@
             "name": "dictionary",
             "displayNam": "Dictionary for Simplified Chinese",
             "groupNam": "yawarakai-official",
-            "version": "v1.0.7",
+            "version": "v1.0.8",
             "authort": ["Yawarakai Devs"],
             "description": "Find the foreign language words and Give the defination of it"
         },
