@@ -6,6 +6,10 @@ let Compo = require('../../component')
 
 let config = require('./config.json')
 
+// Change the Component Name according to the config.json
+
+exports.meta = config.components.componentName
+
 // Inner
 
 exports.commands = {
@@ -20,26 +24,40 @@ exports.inlines = {
     }
 }
 
+exports.message = {
+    main: async function () {
+
+    }
+}
+
+exports.callbackQuery = {
+    main: async function () {
+
+    }
+}
+
+// Register
+
 exports.register = {
     // As the example to Yawarakai Compos
     commands: [
         {
-            // cmdReg: 'main'
+            // function: 'main'
         }
     ],
     inlines: [
         {
-            // ilnReg: "main"
+            // function: "main"
         }
     ],
     messages: [
         {
-            // msgReg: 'main'
+            // function: 'main'
         }
     ],
     callbackQuery: [
         // {
-        //     cbqReg: 'main'
+        //     function: 'main'
         // }
     ]
 }
