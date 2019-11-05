@@ -60,7 +60,7 @@ const anonymousLogger = log4js.getLogger("anonymous")
 let DiagnosticLog = {
     info: (text) => {
         DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable) { 
+        if (config.diagnosticChannel.enable) {
             Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "📄 Info\n" + text)
         }
     },
@@ -81,18 +81,27 @@ let DiagnosticLog = {
     fatal: (text) => {
         DiagnosticLog.counter(text)
         if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
-            let trimmer = new RegExp(__dirname.replace(/\/Core/gu, ""), "gu")
-            let stack = JSON.stringify(text.stack).replace(trimmer, ".")
+            let stack
+            if (__dirname.includes(":\\")) {
+                let trimmer = __dirname.replace(/\\Core/gu, "")
+                trimmer = trimmer.replace(/\\/gmui, `\\\\\\\\`)
+                trimmer = new RegExp(trimmer, "gu")
+                stack = JSON.stringify(text.stack).replace(trimmer, ".")
+            }
+            else {
+                let trimmer = new RegExp(__dirname.replace(/\/Core/gu, ""), "gu")
+                stack = JSON.stringify(text.stack).replace(trimmer, ".")
+            }
             Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
         }
         Log.fatal(text)
     },
     counter: (text) => {
         Core.getKey("logtext").then(res => {
-            if(text.message == res) {
+            if (text.message == res) {
                 DiagnosticLog.count++
             }
-            if(text.message != res) {
+            if (text.message != res) {
                 DiagnosticLog.count = 0
             }
             Core.setKey("logtext", text.message ? text.message : "", 'EX', 1 * 60)
