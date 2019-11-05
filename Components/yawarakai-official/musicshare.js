@@ -7,7 +7,7 @@ const NodeID3 = require('node-id3')
 const http = require('http')
 const https = require('https')
 
-let baseDir = __dirname.replace(/((\/)|(\\))(Components)((\/)|(\\)(yawarakai-official))/gu, "")
+let baseDir = __dirname.replace(/((\/)|(\\))(Components)(((\/)|(\\))(yawarakai-official))/gu, "")
 console.log(baseDir)
 // io.js
 let cacheDir = path.join(baseDir, "/cache")
