@@ -1,8 +1,9 @@
 .idea
-.vscode/
 yawarakai.code-workspace
 
 .env/
+.vscode/
+cache/
 log/
 node_modules/
 
