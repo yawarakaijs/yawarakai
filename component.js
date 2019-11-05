@@ -24,7 +24,7 @@ let Register = {
              * @property {Array} inline - Imported from exports.register.inline
              * @property {Array} message - Imported from exports.register.message
              */
-            let Compo = { command: [], inline: [], message: [] }
+            let Compo = { command: [], inline: [], message: [], callbackQuery: [] }
             // Read all folders inside the components folder
             var files = fs.readdirSync(extension_dir)
             // Iterial all folders to find the config.json under it
@@ -50,7 +50,7 @@ let Register = {
                                     if (compo.register.commands) {
 
                                         compo.register.commands.map(cmd => {
-                                            cmd.instance = compo.commands[cmd.cmdReg]
+                                            cmd.instance = compo.commands[cmd.function]
                                             cmd.meta = compo.meta
                                             Compo.command.push(cmd)
                                         })
@@ -58,19 +58,28 @@ let Register = {
                                     // Check if register inlines exist
                                     if (compo.register.inlines) {
                                         compo.register.inlines.map(iln => {
-                                            iln.instance = compo.inlines[iln.ilnReg]
+                                            iln.instance = compo.inlines[iln.function]
                                             iln.meta = compo.meta
                                             Compo.inline.push(iln)
                                         })
                                     }
-                                    // Check if register inline exist
+                                    // Check if register message exist
                                     if (compo.register.message) {
                                         compo.register.message.map(msg => {
-                                            msg.instance = compo.message[msg.msgReg]
+                                            msg.instance = compo.message[msg.function]
                                             msg.meta = compo.meta
                                             Compo.message.push(msg)
                                         })
                                     }
+                                    // Check if register callback Query exist
+                                    if (compo.register.callbackQuery) {
+                                        compo.register.callbackQuery.map(cbq => {
+                                            cbq.instance = compo.callbackQuery[cbq.function]
+                                            cbq.meta = compo.meta
+                                            Compo.callbackQuery.push(cbq)
+                                        })
+                                    }
+
                                     loadedPlugins.push(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                     Log.Log.info(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }

@@ -34,7 +34,12 @@ exports.register = {
     ],
     messages: [
         {
-
+            // msgReg: 'main'
         }
+    ],
+    callbackQuery: [
+        // {
+        //     cbqReg: 'main'
+        // }
     ]
 }

@@ -5,10 +5,10 @@ const Compo = require("../../component")
 let main = {
     answer: (ctx, query, result, middleWord) => {
         var data = [{
-            type: "audio",
+            type: "voice",
             id: ctx.inlineQuery.id,
             title: `${query}`,
-            audio_url: "https://tts.hjapi.com/jp/8C59EF4A0807373BCD744E967B07B580",
+            voice_url: "https://tts.hjapi.com/jp/8C59EF4A0807373BCD744E967B07B580",
             description: result,
             caption: "Music Requested",
             thumb_url: "https://i.loli.net/2019/10/04/eNxTQaftWrh7Lsd.jpg"
@@ -37,21 +37,31 @@ exports.messages = {
     main: async function (ctx) { }
 }
 
+exports.callbackQuery = {
+    main: async function (ctx) {
+    }
+}
+
 exports.register = {
     // As the example to Yawarakai Compos
     commands: [
         // {
-        //     cmdReg: 'main'
+        //     function: 'main'
         // }
     ],
     inlines: [
-        {
-            ilnReg: "main"
-        }
+        // {
+        //     function: "main"
+        // }
     ],
     messages: [
         // {
-        //     msgReg: 'main'
+        //     function: 'main'
+        // }
+    ],
+    callbackQuery: [
+        // {
+        //     function: 'main'
         // }
     ]
 }
