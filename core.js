@@ -9,9 +9,7 @@ let { promisify } = require('util')
 // Local Packages
 
 let Log = require('./Core/log')
-let Bot = require('./Core/bot')
 let Lang = require('./Core/lang').Lang
-let Component = require('./component')
 let config = require('./config.json')
 
 // Time Control
@@ -57,7 +55,6 @@ function promptInput(prompt, handler) {
   })
 }
 
-exports.Bot = Bot
 exports.cliInput = promptInput
 exports.Time = Time
 exports.getKey = getKeyAsync

@@ -4,10 +4,8 @@ let fs = require('fs')
 let path = require('path')
 
 // Local Files
-
 let Log = require('./Core/log')
 let Lang = require('./Core/lang').Lang
-let Bot = require('./Core/bot')
 let Message = require('./Core/Bot/message')
 
 // Body
@@ -104,8 +102,7 @@ let loadedPlugins = new Array()
 
 let Interface = {
     Log: Log,
-    Message: Message,
-    Bot: Bot
+    Message: Message
 }
 
 // Exports
