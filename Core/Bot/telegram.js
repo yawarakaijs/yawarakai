@@ -31,29 +31,29 @@ let command = (cmd) => {
             console.log(Lang.bot.telegram.helpCommand)
             break
         case 'set':
-            for(var i = 1; i < args.length; i++) {
-                if(!args[2]) {
+            for (var i = 1; i < args.length; i++) {
+                if (!args[2]) {
                     console.log("Using default settings")
                     webhookUrl = config.webhook.url
                     webhookPort = config.webhook.port != undefined ? config.webhook.port : 8000
                     Bot.telegram.setWebhook(config.webhook.url).catch(err => Log.Log.fatal(err))
                 }
-                if(args[i] === "--l" && args[i+1] != undefined) {
-                    webhookUrl = args[i+1]
+                if (args[i] === "--l" && args[i + 1] != undefined) {
+                    webhookUrl = args[i + 1]
                     console.log(`webhook set to ${webhookUrl}`)
-                    Bot.telegram.setWebhook(args[i+1])
+                    Bot.telegram.setWebhook(args[i + 1])
                 }
-                if(args[i] === "--p" && args[i+1] != undefined) {
-                    webhookPort = args[i+1]
+                if (args[i] === "--p" && args[i + 1] != undefined) {
+                    webhookPort = args[i + 1]
                     console.log(`webhook set to ${webhookPort}`)
-                    webhookPort = args[i+1]
+                    webhookPort = args[i + 1]
                 }
-                if((args[i] === "--l" && args[i+1] == undefined) || (args[i] === "--p" && args[i+1] == undefined)) {
+                if ((args[i] === "--l" && args[i + 1] == undefined) || (args[i] === "--p" && args[i + 1] == undefined)) {
                     // Display error if  option is invalid
                     console.log(Lang.bot.telegram.commandParameterMissing[0] + args[2] + Lang.bot.telegram.commandParameterMissing[1])
-                    Log.AnonymousLog.trace( Lang.app.commandExecution + ": " + cmd)
+                    Log.AnonymousLog.trace(Lang.app.commandExecution + ": " + cmd)
                 }
-                if(args[i] === "--n") {
+                if (args[i] === "--n") {
                     console.log(`current on ${webhookUrl}:${webhookPort}`)
                 }
             }
@@ -63,6 +63,12 @@ let command = (cmd) => {
             Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.webhook.url == '' ? "127.0.0.1" : config.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.webhook.port}`)
             Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
             Log.DiagnosticLog.info(`${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.loadedPlugins.join("\n")}`)
+            Bot.startWebhook('/', null, webhookPort != undefined ? webhookPort : 8000)
+            break
+        case 'debug':
+            Log.Log.info("Telegram Bot: " + config.botname + Lang.app.starting)
+            Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.webhook.url == '' ? "127.0.0.1" : config.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.webhook.port}`)
+            Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
             Bot.startWebhook('/', null, webhookPort != undefined ? webhookPort : 8000)
             break
         case 'stop':

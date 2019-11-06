@@ -83,6 +83,7 @@ let Message = {
             [{reg: "(喵～)|(喵~)", mode: "gui"}],
             ["喵～"]
         ).push()
+
         let startnlp = new MessageDictionary(
             [{reg: "((悠月，)|())打开分析模式", mode: "gui"}],
             ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"],
@@ -90,6 +91,7 @@ let Message = {
             true,
             [[ctx.from.id, "add"]]
         ).push()
+        
         let stopnlp = new MessageDictionary(
             [{reg: "((悠月)|())关闭分析模式", mode: "gui"}],
             ["关闭了呢"],
@@ -97,7 +99,7 @@ let Message = {
             true,
             [[ctx.from.id, "remove"]]
         ).push()
-        
+
         let matchResult = MessageDictionaryControl.tryMatch(ctx.message.text)
         if(matchResult.reply.length != 0) {
             this.reply(ctx, matchResult)

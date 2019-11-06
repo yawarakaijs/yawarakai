@@ -1,12 +1,21 @@
 {
     "groupname": "yawarakai-official",
     "components": {
+        "wiki": {
+            "enable": true,
+            "name": "wiki",
+            "displayNam": "Wikipedia",
+            "groupNam": "yawarakai-official",
+            "version": "v1.0.0",
+            "author": ["Yawarakai Devs"],
+            "description": "Search keywords on Wikipedia"
+        },
         "dictionary": {
             "enable": true,
             "name": "dictionary",
             "displayNam": "Dictionary for Simplified Chinese",
             "groupNam": "yawarakai-official",
-            "version": "v1.0.7",
+            "version": "v1.0.8",
             "authort": ["Yawarakai Devs"],
             "description": "Find the foreign language words and Give the defination of it"
         },
@@ -15,7 +24,7 @@
             "name": "musicshare",
             "displayNam": "Music sharing component for music platforms",
             "groupNam": "yawarakai-official",
-            "version": "v0.0.1",
+            "version": "v1.0.0",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
         }

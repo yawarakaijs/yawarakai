@@ -17,7 +17,12 @@ let thumb = "https://i.loli.net/2019/10/04/eNxTQaftWrh7Lsd.jpg"
 let main = {
     c2j: async (query) => {
         return hujiang.search(query, 'cn', 'jp').then(res => {
-            return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
+            if (res.wordEntries) {
+                return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
+            }
+            if (res.networkEntry) {
+                return res.networkEntry
+            }
         }).catch(err => {
             Compo.Interface.Log.Log.fatal(err)
         })
@@ -25,7 +30,13 @@ let main = {
 
     j2c: async (query) => {
         return hujiang.search(query, 'jp', 'cn').then(res => {
-            return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
+            if (res.wordEntries) {
+                return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
+            }
+            if (res.networkEntry) {
+                let result = [{ value: res.networkEntry.content }]
+                return result
+            }
         }).catch(err => {
             Compo.Interface.Log.Log.fatal(err)
         })
@@ -34,7 +45,7 @@ let main = {
         var data = {
             type: "article",
             id: ctx.inlineQuery.id,
-            title: `${query} 释义`,
+            title: `${query} 的${middleWord}释义`,
             description: result,
             thumb_url: thumb,
             input_message_content: { message_text: `${query} 的${middleWord}是 ${result}` }
@@ -56,7 +67,7 @@ exports.inlines = {
         // Send in
         var queryPlain = ctx.inlineQuery.query
         var defination
-        var defs = []
+        var defs = new Array()
 
         // let global = /((^(中文|日语|日文|汉语)((的)|()))(.*)|(^(.*)((的)|()))(中文|日语|汉语|日文)((是什么呢|是什么|是什么意思|怎么说)|()))$/gum
         let c2jpattern = /((^(日文|日语)((的)|()))(.*)|(^(.*)((的)|()))(日文|日语)((是什么呢|是什么|是什么意思|怎么说)|()))$/gum
@@ -70,11 +81,9 @@ exports.inlines = {
             return main.c2j(steptwo).then(res => {
                 defination = res
                 defination.map(element => {
-                    defs.push(element.value)
+                    defs.push(main.answer(ctx, steptwo, element.value, "日语"))
                 })
-                var result = defs.join(" | ")
-                any = main.answer(ctx, steptwo, result, "日语")
-                return any
+                return defs
             }).catch(err => {
                 Compo.Interface.Log.DiagnosticLog.fatal(new Error("Component Process Error: Cannot get the information of given query"))
             })
@@ -88,11 +97,9 @@ exports.inlines = {
             return main.j2c(steptwo).then(res => {
                 defination = res
                 defination.map(element => {
-                    defs.push(element.value)
+                    defs.push(main.answer(ctx, steptwo, element.value, "中文"))
                 })
-                var result = defs.join(" | ")
-                any = main.answer(ctx, steptwo, result, "中文")
-                return any
+                return defs
             }).catch(err => {
                 Compo.Interface.Log.DiagnosticLog.fatal(new Error("Component Process Error: Cannot get the information of given query"))
             })
@@ -104,11 +111,11 @@ exports.inlines = {
 exports.register = {
     // As the example to Yawarakai Compos
     commands: [
-        { cmdReg: 'c2j' },
-        { cmdReg: "j2c" }
+        { function: 'c2j' },
+        { function: "j2c" }
     ],
     inlines: [
-        { ilnReg: "dictionary" }
+        { function: "dictionary" }
     ],
     messages: [
         // { }
