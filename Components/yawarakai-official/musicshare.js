@@ -24,12 +24,82 @@ if (!fs.existsSync(musicDir)) {
 }
 
 let main = {
-    album: async function (params) {
+    /**
+     * Retrives the song source url back
+     * @param {*} params    - Object of params input as id, type, userid
+     * @param {*} bitrate   - Fixed number optionally set as the bitrate
+     * @return                Array that contains only one object as the audio inline type
+     */
+    song: async function (params, bitrate = 320000) {
+        let baseUrl = "https://api.yutsuki.moe/cloudmusic"
+        return Promise.all([
+            axios.get(baseUrl + '/song/url', { params: { id: params.id, br: bitrate } }),
+            axios.get(baseUrl + '/song/detail', { params: { ids: params.id } })
+        ]).then(resArray => {
+            let authorText = new Array()
+            let authorInfo = resArray[1].data.songs[0].ar
+            authorInfo.forEach(item => authorText.push(item.name))
+            authorText = authorText.join(" / ")
+            let resultText = resArray[1].data.songs[0].name + " - " + authorText
 
+            // fileid
+            let FUID = new Array()
+            for (let i = 0; i < 3; i++) {
+                FUID.push(Math.floor(Math.random() * Math.floor(9)))
+            }
+            FUID = FUID.join("")
+            FUID = "2523" + new Date().getTime() + FUID
+
+            // song file
+            return Promise.all([
+                // main.getSong(resArray[0].data.data[0].url, FUID),
+                // main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID),
+                axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
+            ]).then(dataArray => {
+                let infoContainer = {}
+                // infoContainer["song"] = resArray[1].data.songs[0]
+                infoContainer["album"] = dataArray[0].data.album
+
+                let data = [{
+                    type: "audio",
+                    id: FUID,
+                    title: resArray[1].data.songs[0].name,
+                    audio_url: resArray[0].data.data[0].url,
+                    caption: authorText + "\n" + dataArray[0].data.album.name + "\n#yawarakai",
+                    reply_markup: {
+                        inline_keyboard: [[
+                            {
+                                text: "Netease CloudMusic",
+                                url: `https://music.163.com/song?id=${params.id}`
+                            }
+                        ]]
+                    }
+                }]
+                return data
+
+            }).catch(err => Compo.Interface.Log.Log.fatal(err))
+        }).catch(err => {
+            err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+        })
+    },
+    /**
+     * 
+     * @param {*} params 
+     */
+    album: async function (params) {
+    /**
+     * 
+     */
     },
     playlist: async function (params) {
 
     },
+    /**
+     * Donwload the given music source url as the needed file format
+     * @param {*} url       - String of the required source to download
+     * @param {*} fileId    - Number of the unique file id
+     * @returns `             String of the full file name
+     */
     getSong: function (url, fileId) {
         return new Promise((resolve, reject) => {
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
@@ -45,6 +115,12 @@ let main = {
             })
         })
     },
+    /**
+     * Download the given picture source url as the needed file format
+     * @param {*} url       - String of the required source to download
+     * @param {*} fileId    - Number of the unique file id
+     * @returns               String of the full file name
+     */
     getAlbumPic: function (url, fileId) {
         return new Promise((resolve, reject) => {
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
@@ -89,6 +165,11 @@ let main = {
             }
         })
     },
+    /**
+     * Parse the types of the given string and return the final params
+     * @param {*} link      - String of the url that needed to be parsed
+     * @returns               Object of the params that contains type, id, userid
+     */
     parseArgs: function (link) {
         // type one
         // prefix cut
@@ -116,6 +197,12 @@ let main = {
 
         return undefined
     },
+    /**
+     * Parse the params based on the preprocessed string and retrives the params as a object
+     * @param {*} src       - String of the source that is needed to be parsed
+     * @param {*} type      - String of the source type that is differed to different processing categories
+     * @returns               Object of the retrived data that contains type, id, userid
+     */
     paramsDiffer: function (src, type) {
         let params = {}
         let idCheck = /^id=/gu
@@ -172,61 +259,14 @@ exports.inlines = {
         let globalUrlPattern = /((https?)?((:\/\/))?)(music.163.com)(\/(#\/)?)(song|album|playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gumi
         let link = ctx.inlineQuery.query
 
-        //get song
-        let baseUrl = "https://api.yutsuki.moe/cloudmusic"
-
         if (globalUrlPattern.test(link)) {
             link = link.match(globalUrlPattern)[0]
             let params = main.parseArgs(link)
             if (params.type == "song") {
                 Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 请求歌曲来自链接: ${link}`)
-                return Promise.all([
-                    axios.get(baseUrl + '/song/url', { params: { id: params.id } }),
-                    axios.get(baseUrl + '/song/detail', { params: { ids: params.id } })
-                ]).then(resArray => {
-                    let authorText = new Array()
-                    let authorInfo = resArray[1].data.songs[0].ar
-                    authorInfo.forEach(item => authorText.push(item.name))
-                    authorText = authorText.join(" / ")
-                    let resultText = resArray[1].data.songs[0].name + " - " + authorText
-
-                    // fileid
-                    let FUID = new Array()
-                    for (let i = 0; i < 3; i++) {
-                        FUID.push(Math.floor(Math.random() * Math.floor(9)))
-                    }
-                    FUID = FUID.join("")
-                    FUID = "2523" + new Date().getTime() + FUID
-
-                    // song file
-                    return Promise.all([
-                        // main.getSong(resArray[0].data.data[0].url, FUID),
-                        // main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID),
-                        axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
-                    ]).then(dataArray => {
-                        let infoContainer = {}
-                        // infoContainer["song"] = resArray[1].data.songs[0]
-                        infoContainer["album"] = dataArray[0].data.album
-
-                        let data = [{
-                            type: "audio",
-                            id: ctx.inlineQuery.id,
-                            title: resArray[1].data.songs[0].name,
-                            audio_url: resArray[0].data.data[0].url,
-                            caption: authorText + "\n" + dataArray[0].data.album.name + "\n#yawarakai",
-                            reply_markup: { inline_keyboard: [[
-                                {
-                                    text: "Netease CloudMusic",
-                                    url: `https://music.163.com/song?id=${params.id}`
-                                }
-                            ]]}
-                        }]
-                        return data
-
-                    }).catch(err => Compo.Interface.Log.Log.fatal(err))
-                }).catch(err => {
-                    err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
-                })
+                let data = await main.song(params)
+                console.log(data)
+                return data
             }
             else if (params.type == "album") {
                 Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
@@ -234,6 +274,7 @@ exports.inlines = {
             }
             else if (params.type == "playlist") {
                 Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 请求查询歌单来自链接: ${link}`)
+                return await main.playlist(params)
             }
         }
     }
@@ -264,13 +305,13 @@ exports.register = {
         }
     ],
     messages: [
-        // {
-        //     function: 'main'
-        // }
+        {
+            function: 'main'
+        }
     ],
     callbackQuery: [
-        // {
-        //     function: 'main'
-        // }
+        {
+            function: 'main'
+        }
     ]
 }
