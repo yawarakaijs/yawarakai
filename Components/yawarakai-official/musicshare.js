@@ -213,14 +213,13 @@ exports.inlines = {
                             id: ctx.inlineQuery.id,
                             title: resArray[1].data.songs[0].name,
                             audio_url: resArray[0].data.data[0].url,
-                            description: resultText,
-                            caption: dataArray[0].data.album.name,
+                            caption: resultText + "\n" + dataArray[0].data.album.name + "\n#yawarakai",
                             reply_markup: { inline_keyboard: [[
                                 {
                                     text: "Netease CloudMusic",
                                     url: `https://music.163.com/song?id=${params.id}`
                                 }
-                            ]] }
+                            ]]}
                         }]
                         return data
 
