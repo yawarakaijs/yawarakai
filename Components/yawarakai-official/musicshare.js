@@ -186,25 +186,23 @@ exports.inlines = {
                 FUID = FUID.join("")
                 FUID = "2523" + new Date().getTime() + FUID
     
-    
                 // song file
                 return Promise.all([
-                    main.getSong(resArray[0].data.data[0].url, FUID),
-                    main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID),
+                    // main.getSong(resArray[0].data.data[0].url, FUID),
+                    // main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID),
                     axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
                 ]).then(dataArray => {
                     let infoContainer = {}
-                    infoContainer["song"] = resArray[1].data.songs[0]
-                    infoContainer["album"] = dataArray[2].data.album
+                    // infoContainer["song"] = resArray[1].data.songs[0]
+                    infoContainer["album"] = dataArray[0].data.album
     
                     return [{
                         type: "audio",
                         id: ctx.inlineQuery.id,
-                        title: resultText,
-                        audio_url: "https://source.yutsuki.moe/cloudmusic/music/" + dataArray[0],
-                        description: "",
-                        caption: "",
-                        thumb_url: resArray[1].data.songs[0].al.picUrl
+                        title: resArray[1].data.songs[0].name,
+                        audio_url: resArray[0].data.data[0].url,
+                        description: resultText,
+                        caption: dataArray[0].data.album.name
                     }]
                 })
     
