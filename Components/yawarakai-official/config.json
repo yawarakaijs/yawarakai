@@ -1,6 +1,15 @@
 {
     "groupname": "yawarakai-official",
     "components": {
+        "wiki": {
+            "enable": true,
+            "name": "wiki",
+            "displayNam": "Wikipedia",
+            "groupNam": "yawarakai-official",
+            "version": "v1.0.0",
+            "author": ["Yawarakai Devs"],
+            "description": "Search keywords on Wikipedia"
+        },
         "dictionary": {
             "enable": true,
             "name": "dictionary",
