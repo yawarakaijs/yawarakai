@@ -194,7 +194,9 @@ Bot.Telegram.Bot.on("callback_query", async (ctx) => {
 
 Bot.Telegram.Bot.on("inline_query", async ctx => {
     let data = await inlineDistributor(ctx)
+    console.log(data)
     if (data != undefined) {
+        console.log(data)
         // Exchange all id of inline result to the system registered id
         data.map(item => {
             let id = new Array()
@@ -236,8 +238,6 @@ Bot.Telegram.Bot.on("inline_query", async ctx => {
     //         }
     //     ], { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
     // }
-
-    
 })
 
 Bot.Telegram.Bot.on("command", async ctx => {
