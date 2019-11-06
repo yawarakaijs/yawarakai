@@ -55,7 +55,7 @@ exports.commands = {
 exports.inlines = {
     main: async function (ctx) {
         let globalPattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/gumi
-        if (!globalPattern.test(ctx.inlineQuery.query)) {
+        if (!globalPattern.test(ctx.inlineQuery.query) && ctx.inlineQuery.query == "") {
             Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 发起了 Wikipedia 查询 ${ctx.inlineQuery.query}`)
             return main.wiki(ctx.inlineQuery.query, "en").then(res => {
                 if (res != undefined) {
