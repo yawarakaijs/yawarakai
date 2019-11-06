@@ -194,6 +194,7 @@ Bot.Telegram.Bot.on("callback_query", async (ctx) => {
 
 Bot.Telegram.Bot.on("inline_query", async ctx => {
     let data = await inlineDistributor(ctx)
+    
     if (data != undefined) {
         // Exchange all id of inline result to the system registered id
         data.map(item => {
@@ -205,37 +206,18 @@ Bot.Telegram.Bot.on("inline_query", async ctx => {
         })
         Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, data, { cache_time: 10 }).catch(err => DiagnosticLog.fatal(err))
     }
-    else if (ctx.inlineQuery.query == "" || ctx.inlineQuery.query == undefined) {
-
-        let results = new Array()
-        let words = ["手机", "猫", "樱花", "叶子", "羽毛", "数字", "教科书", "电脑", "人工智能", "名字", "一"]
-
-        ctx["inlineQuery"]["query"] = `日语的 ${words[Math.floor(Math.random() * Math.floor(words.length))]}`
-        let data = await inlineDistributor(ctx)
-
-        results = data
-        results.map(item => {
-            let id = new Array()
-            for (let i = 0; i < 8; i++) {
-                id.push(Math.floor(Math.random() * Math.floor(9)))
+    else if (data == undefined) {
+        Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, [
+            {
+                type: "article",
+                id: ctx.inlineQuery.id,
+                title: `没有找到你想要的东西呢`,
+                description: "Didn't find what you need",
+                thumb_url: "https://i.loli.net/2019/11/06/ykCwSbm68WUoYPv.jpg",
+                input_message_content: { message_text: `没有你需要的结果` }
             }
-            item["id"] = id.join("")
-            item["title"] = `试试看搜索 ${ctx.inlineQuery.query}`
-        })
-
-        Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, results, { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
+        ], { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
     }
-    // else if (data == undefined) {
-    //     Bot.Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, [
-    //         {
-    //             type: "article",
-    //             id: ctx.inlineQuery.id,
-    //             title: `没有找到你想要的东西呢`,
-    //             description: "Didn't find what you need",
-    //             input_message_content: { message_text: `没有你需要的结果` }
-    //         }
-    //     ], { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
-    // }
 })
 
 Bot.Telegram.Bot.on("command", async ctx => {
