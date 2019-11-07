@@ -8,6 +8,8 @@ let Command = require('./Bot/command')
 let Telegram = require('./Bot/telegram')
 let Component = require('../component')
 
+let config = require('../config.json')
+
 // Bot Method
 
 let Nlp = require('./Bot/nlp').Nlp
@@ -35,19 +37,24 @@ let Bot = {
         let args = []
         args.push(ctx)
         let method = compoData.inline
-        let detail
+        let detail = new Array()
+        let result = new Array()
         for (let i of method) {
             const idx = method.indexOf(i)
             try {
                 const res = await method[idx].instance.call(this, ctx)
                 if (res != undefined) {
-                    detail = res
+                    detail.push(res)
                 }
             } catch (err) {
                 DiagnosticLog.fatal(err)
             }
         }
-        return detail
+        if(detail.length == 1 || detail.length >= 2) {
+            detail.map(resArray => { resArray.map(item => result.push(item)) })
+            return result
+        }
+        else { return undefined }
     },
     callbackQueryDistributor: async function (ctx) {
         let args = []
@@ -88,20 +95,20 @@ let DiagnosticLog = {
     info: (text) => {
         DiagnosticLog.counter(text)
         if (config.diagnosticChannel.enable) {
-            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "📄 Info\n" + text)
+            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "📄 Info\n" + text)
         }
     },
     debug: (text) => {
         DiagnosticLog.counter(text)
         if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
-            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚙️ Debug\n" + text)
+            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚙️ Debug\n" + text)
         }
         Log.debug(text)
     },
     warning: (text) => {
         DiagnosticLog.counter(text)
         if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
-            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚠️ Warning\n" + text)
+            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚠️ Warning\n" + text)
         }
         Log.warning(text)
     },
@@ -119,7 +126,7 @@ let DiagnosticLog = {
                 let trimmer = new RegExp(__dirname.replace(/\/Core/gu, ""), "gu")
                 stack = JSON.stringify(text.stack).replace(trimmer, ".")
             }
-            Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
+            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
         }
         Log.fatal(text)
     },
@@ -141,13 +148,11 @@ let Control = {
     start: function () {
         Telegram.Bot.on("callback_query", async (ctx) => {
             let keyboard = await Bot.callbackQueryDistributor(ctx)
-            console.log(keyboard)
             Telegram.Bot.telegram.editMessageText(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id, ctx.callbackQuery.id, "Meow meow\nMeow Meow", { reply_markup: { inline_keyboard: keyboard } })
         })
 
         Telegram.Bot.on("inline_query", async ctx => {
             let data = await Bot.inlineDistributor(ctx)
-
             if (data != undefined) {
                 // Exchange all id of inline result to the system registered id
                 data.map(item => {
@@ -157,10 +162,10 @@ let Control = {
                     }
                     item["id"] = id.join("")
                 })
-                Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, data, { cache_time: 10 }).catch(err => DiagnosticLog.fatal(err))
+                ctx.answerInlineQuery(data, { cache_time: 10 }).catch(err => DiagnosticLog.fatal(err))
             }
             else if (data == undefined) {
-                Telegram.Bot.telegram.answerInlineQuery(ctx.inlineQuery.id, [
+                ctx.answerInlineQuery([
                     {
                         type: "article",
                         id: ctx.inlineQuery.id,
@@ -200,13 +205,8 @@ let Control = {
             })
             Bot.Message.messagectl.log(ctx)
         }).catch(err => DiagnosticLog(err))
-
-        // Telegram.Bot.on("voice", async (ctx) => {
-        //     console.log(JSON.stringify(ctx.message))
-        // })
-
+        
         // Log
-
         Telegram.Bot.catch((err) => {
             DiagnosticLog.fatal(err)
             throw err

@@ -25,16 +25,14 @@ let main = {
                 let pages = res.data.query.pages
                 if (!pages.hasOwnProperty("-1")) {
                     let pageNum = Object.keys(pages).map(item => item.match(/\d+/)).pop()
-                    return { 
-                        lang: lang, 
-                        title: pages[pageNum].title, 
-                        caption: pages[pageNum].extract.slice(0, 25) + "...", 
-                        content: `*${pages[pageNum].title}* [@Wikipedia](https://${lang}.wikipedia.org/wiki/${query})` + "\n" + pages[pageNum].extract 
+                    return {
+                        lang: lang,
+                        title: pages[pageNum].title,
+                        caption: pages[pageNum].extract.slice(0, 25) + "...",
+                        content: `*${pages[pageNum].title}* [@Wikipedia](https://${lang}.wikipedia.org/wiki/${query})` + "\n" + pages[pageNum].extract
                     }
                 }
-                else {
-                    return main.wiki(query, "zh")
-                }
+                return undefined
             }
         }).catch(err => console.error(err))
     }
@@ -55,31 +53,54 @@ exports.commands = {
 exports.inlines = {
     main: async function (ctx) {
         let globalPattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/gumi
-        if (!globalPattern.test(ctx.inlineQuery.query) && ctx.inlineQuery.query == "") {
+        if (!globalPattern.test(ctx.inlineQuery.query) && ctx.inlineQuery.query != "") {
             Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 发起了 Wikipedia 查询 ${ctx.inlineQuery.query}`)
-            return main.wiki(ctx.inlineQuery.query, "en").then(res => {
-                if (res != undefined) {
+            let data = await main.wiki(ctx.inlineQuery.query, "en")
+            if (data != undefined) {
+                return [{
+                    type: "article",
+                    id: ctx.inlineQuery.id,
+                    title: `${data.title}`,
+                    description: data.caption,
+                    thumb_url: "https://i.loli.net/2019/11/06/Om7oWzkAMRZl5sc.jpg",
+                    input_message_content: { message_text: `${data.content}`, parse_mode: "Markdown" },
+                    reply_markup: {
+                        inline_keyboard: [[
+                            {
+                                text: "Wikipedia Page",
+                                url: `https://en.wikipedia.org/wiki/${ctx.inlineQuery.query}`,
+                            }
+                        ]]
+                    }
+                }]
+            }
+            else {
+                data = await main.wiki(ctx.inlineQuery.query, "zh")
+                if (data != undefined) {
                     return [{
                         type: "article",
                         id: ctx.inlineQuery.id,
-                        title: `${res.title}`,
-                        description: res.caption,
+                        title: `${data.title}`,
+                        description: data.caption,
                         thumb_url: "https://i.loli.net/2019/11/06/Om7oWzkAMRZl5sc.jpg",
-                        input_message_content: { message_text: `${res.content}`, parse_mode: "Markdown" },
-                        reply_markup: { inline_keyboard: [[
-                            {
-                                text: "Wikipedia Page",
-                                url: `https://${res.lang}.wikipedia.org/wiki/${ctx.inlineQuery.query}`,
-                            }
-                        ]]}
+                        input_message_content: { message_text: `${data.content}`, parse_mode: "Markdown" },
+                        reply_markup: {
+                            inline_keyboard: [[
+                                {
+                                    text: "Wikipedia Page",
+                                    url: `https://zh.wikipedia.org/wiki/${ctx.inlineQuery.query}`,
+                                }
+                            ]]
+                        }
                     }]
                 }
-            })
+            }
+            return undefined
         }
     }
 }
 
-exports.message = {
+exports.messages = {
     main: async function () {
 
     }

@@ -18,9 +18,10 @@ let Register = {
              * The object that contains the components reflaction function,
              * this Object is loaded by component.js once the app starts up,
              * the later changes can be done through bot command
-             * @property {Array} command - Imported from exports.register.commands
-             * @property {Array} inline - Imported from exports.register.inline
-             * @property {Array} message - Imported from exports.register.message
+             * @property {Array} command            - Imported from exports.register.commands
+             * @property {Array} inline             - Imported from exports.register.inline
+             * @property {Array} message            - Imported from exports.register.message
+             * @property {Array} callbackQuery      - Imported from exports.register.callbackQuery
              */
             let Compo = { command: [], inline: [], message: [], callbackQuery: [] }
             // Read all folders inside the components folder
@@ -28,11 +29,11 @@ let Register = {
             // Iterial all folders to find the config.json under it
             files.forEach((value, index) => {
                 let folder = path.join(extension_dir, value)
-                var stats = fs.statSync(folder)
+                let stats = fs.statSync(folder)
                 // Check if folder has config.json
                 if (fs.existsSync(folder + "/config.json")) {
                     // Load config.json
-                    var compConfig = require(folder + "/config.json")
+                    let compConfig = require(folder + "/config.json")
                     // Check if config has the components key
                     if (compConfig.components) {
                         // Check if this folder is exist
@@ -40,13 +41,16 @@ let Register = {
                             // Iterial each key inside the components config
                             // configValue represents each component name
                             for (let [configKey, configValue] of Object.entries(compConfig.components)) {
+                                
                                 let compoPath = extension_dir + value + "/" + configValue.name + ".js"
                                 let core_exists = fs.statSync(compoPath)
+
                                 if (core_exists && configValue.enable) {
+                                    
                                     let compo = require(compoPath)
+
                                     // Check if register commands exist
                                     if (compo.register.commands) {
-
                                         compo.register.commands.map(cmd => {
                                             cmd.instance = compo.commands[cmd.function]
                                             cmd.meta = compo.meta
@@ -81,11 +85,8 @@ let Register = {
                                     loadedPlugins.push(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                     Log.Log.info(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
-                                else {
-                                    Log.Log.info(Lang.component.readIn + compConfig.groupname + Lang.component.loaded[1] + value)
-                                    return
-                                }
                             }
+                            Log.Log.info(Lang.component.readIn + compConfig.groupname + Lang.component.loaded[1] + value)
                         }
                     }
                     else { Log.Log.fatal(Lang.component.configFileInvalid + folder + "/config.json") }

@@ -24,7 +24,7 @@ exports.inlines = {
     }
 }
 
-exports.message = {
+exports.messages = {
     main: async function () {
 
     }

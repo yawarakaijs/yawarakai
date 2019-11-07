@@ -87,9 +87,9 @@ let main = {
      * @param {*} params 
      */
     album: async function (params) {
-    /**
-     * 
-     */
+        /**
+         * 
+         */
     },
     playlist: async function (params) {
 
@@ -264,9 +264,11 @@ exports.inlines = {
             let params = main.parseArgs(link)
             if (params.type == "song") {
                 Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 请求歌曲来自链接: ${link}`)
-                let data = await main.song(params)
-                console.log(data)
-                return data
+                let isAvailable = await axios.get("https://api.yutsuki.moe/cloudmusic/check/music", { params: { id: params.id } })
+                if (isAvailable) {
+                    let data = await main.song(params)
+                    return data
+                }
             }
             else if (params.type == "album") {
                 Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
@@ -277,6 +279,8 @@ exports.inlines = {
                 return await main.playlist(params)
             }
         }
+
+        return undefined
     }
 }
 
