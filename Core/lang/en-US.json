@@ -31,6 +31,8 @@
         "enabled": "Enabled ",
         "disabled": "Disabled ",
         "reloaded": "Reloaded ",
-        "configFileInvalid": ["ConfigFileInvalidError: \n", " 配置文件不正确或是无效"]
+        "noComponentFound": ["No components were loaded", "If you have installed, please check whether the Components directory exists under the project root"],
+        "noValidConfigFound": ["No components were loaded", "Component(s) with no valid config.json were found, please check the config.json file of your component if you have installed"],
+        "configFileInvalid": ["ConfigFileInvalidError: \n", " Incorrect config.json or file is invalid"]
     }
 }

@@ -25,6 +25,11 @@ let Register = {
              */
             let Compo = { command: [], inline: [], message: [], callbackQuery: [] }
             // Read all folders inside the components folder
+            if(!fs.existsSync(extension_dir)) {
+                Log.Log.warning(Lang.component.noComponentFound[0])
+                Log.Log.warning(Lang.component.noComponentFound[1])
+                return Compo
+            }
             var files = fs.readdirSync(extension_dir)
             // Iterial all folders to find the config.json under it
             files.forEach((value, index) => {
@@ -90,6 +95,11 @@ let Register = {
                         }
                     }
                     else { Log.Log.fatal(Lang.component.configFileInvalid + folder + "/config.json") }
+                }
+                else {
+                    Log.Log.warning(Lang.component.noValidConfigFound[0])
+                    Log.Log.warning(Lang.component.noValidConfigFound[1])
+                    return Compo
                 }
             })
             return Compo
