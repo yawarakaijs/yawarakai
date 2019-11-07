@@ -196,7 +196,7 @@ let NlpControl = {
                     currentAdd.push(userId)
                     let resultData = JSON.stringify(currentAdd)
                     Core.setKey("nlpAnalyzeIds", resultData).then(updated => {
-                        Log.Log.debug(updated)
+                        Log.Log.debug("NLP Analyzer List: ", updated)
                     })
                     NlpControl.start()
                     Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))

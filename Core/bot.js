@@ -203,7 +203,7 @@ let Control = {
                     })
                 }
             })
-            Bot.Message.messagectl.log(ctx)
+            Message.messagectl.log(ctx)
         }).catch(err => DiagnosticLog(err))
         
         // Log
