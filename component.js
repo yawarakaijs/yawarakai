@@ -87,7 +87,7 @@ let Register = {
                                         })
                                     }
 
-                                    loadedPlugins.push(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
+                                    loadedPlugins.push(`${Lang.component.loaded[0]} ${value}/${configValue.name}@${configValue.version}`)
                                     Log.Log.info(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
                             }
