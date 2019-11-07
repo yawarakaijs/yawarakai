@@ -186,7 +186,7 @@ let Control = {
         Telegram.Bot.on("text", async (ctx) => {
             Core.setKey("telegramMessageText", ctx.message.text)
             Core.setKey("telegramMessageFromId", ctx.from.id)
-            Bot.Message.Message.hears(ctx)
+            Message.Message.hears(ctx)
             Nlp.tag(ctx, ctx.message.text).then(res => {
                 ctx.replyWithChatAction("typing")
                 let text = res
