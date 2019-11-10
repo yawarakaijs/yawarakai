@@ -68,7 +68,6 @@ else {
     })
 }
 
-
 // CLI
 Core.cliInput('> ', input => {
     var command = input.split(' ')[0] // Cut Command and set to First string

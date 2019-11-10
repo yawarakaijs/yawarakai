@@ -97,6 +97,7 @@ exports.inlines = {
             }
             return undefined
         }
+        return undefined
     }
 }
 

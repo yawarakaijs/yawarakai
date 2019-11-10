@@ -151,6 +151,10 @@ let Control = {
             Telegram.Bot.telegram.editMessageText(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id, ctx.callbackQuery.id, "Meow meow\nMeow Meow", { reply_markup: { inline_keyboard: keyboard } })
         })
 
+        Telegram.Bot.on("chosen_inline_result", async (ctx) => {
+            console.log(ctx.chosenInlineResult)
+        })
+
         Telegram.Bot.on("inline_query", async ctx => {
             let data = await Bot.inlineDistributor(ctx)
             if (data != undefined) {
