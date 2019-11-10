@@ -152,6 +152,7 @@ let Control = {
         })
 
         Telegram.Bot.on("chosen_inline_result", async (ctx) => {
+            console.log("chosen_inline_result")
             console.log(ctx.chosenInlineResult)
         })
 
@@ -162,7 +163,7 @@ let Control = {
                 data.map(item => {
                     let id = new Array()
                     for (let i = 0; i < 8; i++) {
-                        id.push(Math.floor(Math.random() * Math.floor(9)))
+                        id.push(Math.floor(Math.random() * Math.floor(8)) + 1)
                     }
                     item["id"] = id.join("")
                 })

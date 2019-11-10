@@ -1,21 +1,12 @@
 {
     "groupname": "Yawarakai Official",
     "components": {
-        "wiki": {
-            "enable": true,
-            "name": "wiki",
-            "displayNam": "Wikipedia",
-            "groupNam": "yawarakai-official",
-            "version": "v1.2.0",
-            "author": ["Yawarakai Devs"],
-            "description": "Search keywords on Wikipedia"
-        },
         "dictionary": {
             "enable": true,
             "name": "dictionary",
             "displayNam": "Dictionary for Simplified Chinese",
             "groupNam": "yawarakai-official",
-            "version": "v1.3.0",
+            "version": "v1.3.2",
             "authort": ["Yawarakai Devs"],
             "description": "Find the foreign language words and Give the defination of it"
         },
@@ -27,6 +18,15 @@
             "version": "v1.2.0",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
+        },
+        "wiki": {
+            "enable": true,
+            "name": "wiki",
+            "displayNam": "Wikipedia",
+            "groupNam": "yawarakai-official",
+            "version": "v1.2.0",
+            "author": ["Yawarakai Devs"],
+            "description": "Search keywords on Wikipedia"
         }
     }
 }

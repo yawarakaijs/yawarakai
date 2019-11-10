@@ -88,7 +88,7 @@ let Register = {
                                     }
 
                                     loadedPlugins.push(`${Lang.component.loaded[0]} ${value}/${configValue.name}@${configValue.version}`)
-                                    Log.Log.info(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
+                                    Log.Log.debug(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
                             }
                             Log.Log.info(Lang.component.readIn + compConfig.groupname + Lang.component.loaded[1] + value)

@@ -54,7 +54,7 @@ if (config.debugmode) {
         Log.debug(`NLP set to ${res}`)
     })
     Core.getKey("nlpAnalyzeIds").then(res => {
-        Log.debug(`NLP Analyzer List: ${res}`)
+        Log.trace(`NLP Analyzer List: ${res}`)
     }).catch(err => {
         Core.setKey("nlpAnalyzeIds", "[]")
     })

@@ -34,7 +34,7 @@ client.on('error', function (err) {
 })
 
 client.auth(config.redis.auth, () => {
-  Log.Log.trace(`${Lang.core.redisAuthSuccess}`)
+  Log.Log.info(`${Lang.core.redisAuthSuccess}`)
 })
 
 let getKeyAsync = promisify(client.get).bind(client)

@@ -34,7 +34,10 @@ let main = {
                 }
                 return undefined
             }
-        }).catch(err => console.error(err))
+        }).catch(err => {
+            console.error(err)
+            return undefined
+        })
     }
 }
 
@@ -54,8 +57,11 @@ exports.inlines = {
     main: async function (ctx) {
         let globalPattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/gumi
         if (!globalPattern.test(ctx.inlineQuery.query) && ctx.inlineQuery.query != "") {
-            Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 发起了 Wikipedia 查询 ${ctx.inlineQuery.query}`)
-            let data = await main.wiki(ctx.inlineQuery.query, "en")
+            Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了 Wikipedia 查询 ${ctx.inlineQuery.query}`)
+            let data = await main.wiki(ctx.inlineQuery.query, "en").catch(err => {
+                Compo.Interface.Log.Log.fatal(err)
+                return undefined
+            })
             if (data != undefined) {
                 return [{
                     type: "article",

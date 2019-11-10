@@ -264,23 +264,14 @@ exports.inlines = {
             link = link.match(globalUrlPattern)[0]
             let params = main.parseArgs(link)
             if (params.type == "song") {
-                Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 请求歌曲来自链接: ${link}`)
+                Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求歌曲来自链接: ${link}`)
                 let isAvailable = await axios.get("https://api.yutsuki.moe/cloudmusic/check/music", { params: { id: params.id } })
                 if (isAvailable) {
                     let data = await main.song(params)
                     return data
                 }
             }
-            else if (params.type == "album") {
-                Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
-                return await main.album(params)
-            }
-            else if (params.type == "playlist") {
-                Compo.Interface.Log.Log.debug(`${ctx.from.first_name} 请求查询歌单来自链接: ${link}`)
-                return await main.playlist(params)
-            }
         }
-
         return undefined
     }
 }
@@ -294,6 +285,14 @@ exports.messages = {
 exports.callbackQuery = {
     main: async function (ctx) {
 
+        if (params.type == "album") {
+            Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
+            return await main.album(params)
+        }
+        else if (params.type == "playlist") {
+            Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询歌单来自链接: ${link}`)
+            return await main.playlist(params)
+        }
     }
 }
 

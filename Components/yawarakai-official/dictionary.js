@@ -51,6 +51,17 @@ let main = {
             input_message_content: { message_text: `${query} 的${middleWord}是 ${result}` }
         }
         return data
+    },
+    answerPlain: (ctx, query, result, middleWord) => {
+        var data = {
+            type: "article",
+            id: ctx.inlineQuery.id,
+            title: `${query} 的${middleWord}纯文本`,
+            description: result,
+            thumb_url: thumb,
+            input_message_content: { message_text: `${result}` }
+        }
+        return data
     }
 }
 
@@ -82,6 +93,7 @@ exports.inlines = {
                     defination = res
                     defination.map(element => {
                         defs.push(main.answer(ctx, steptwo, element.value, "日语"))
+                        defs.push(main.answerPlain(ctx, steptwo, element.value, "日语"))
                     })
                     return defs
                 }).catch(err => {
@@ -100,6 +112,7 @@ exports.inlines = {
                     defination = res
                     defination.map(element => {
                         defs.push(main.answer(ctx, steptwo, element.value, "中文"))
+                        defs.push(main.answerPlain(ctx, steptwo, element.value, "日语"))
                     })
                     return defs
                 }).catch(err => {
