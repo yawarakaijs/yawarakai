@@ -12,3 +12,4 @@ yarn*
 yarn.lock
 config.json
 !Components/*/config.json
+.DS_Store
