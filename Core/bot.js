@@ -19,30 +19,27 @@ let compoData = Component.Register.load()
 
 let Bot = {
     commandParse: function (ctx, callback) {
-        let commandArgs = ctx.message.text.split(" ");
-        let command = commandArgs[0].substr(1);
-        let args = [];
+        let commandArgs = ctx.message.text.split(" ")
+        let command = commandArgs[0].substring(1)
+        let args = []
         commandArgs.forEach((value, index) => {
             if (index > 0 && value !== "") {
-                args.push(value);
+                args.push(value)
             }
         })
-        callback({
+        return {
             cmd: command,
             args: args,
             ctx: ctx
-        });
+        }
     },
     inlineDistributor: async function (ctx) {
-        let args = []
-        args.push(ctx)
         let method = compoData.inline
         let detail = new Array()
         let result = new Array()
         for (let i of method) {
-            const idx = method.indexOf(i)
             try {
-                const res = await method[idx].instance.call(this, ctx)
+                const res = await i.instance.call(this, ctx)
                 if (res != undefined) {
                     detail.push(res)
                 }
@@ -50,7 +47,7 @@ let Bot = {
                 DiagnosticLog.fatal(err)
             }
         }
-        if(detail.length == 1 || detail.length >= 2) {
+        if (detail.length == 1 || detail.length >= 2) {
             detail.map(resArray => { resArray.map(item => result.push(item)) })
             return result
         }
@@ -64,7 +61,7 @@ let Bot = {
         for (let i of method) {
             const idx = method.indexOf(i)
             try {
-                const res = await method[idx].instance.call(this, ctx)
+                const res = await i.instance.call(this, ctx)
                 if (res != undefined) {
                     detail = res
                 }
@@ -74,21 +71,33 @@ let Bot = {
         }
         return detail
     },
-    commandDistributor: function (ctx) {
-        commandParse(ctx, (result) => {
-            const chatID = ctx.from.id
-            let cmd = compoData.command.find(command => {
-                // console.log(command.command === result.cmd)
-                return command.command === result.cmd
-            })
-            if (!cmd) { return 404 }
-            return Reflect.apply(cmd.instance, { chat: ctx.message.text, bot: "bot", chatID }, result.args)
+    commandDistributor: async function (ctx) {
+        let result = Bot.commandParse(ctx)
+        let cmd = compoData.command.find(command => {
+            return command.function === result.cmd
         })
+        if (!cmd) { return 404 }
+        return await cmd.instance.call(this, result.args)
     },
     staticCommandDistributor: function (ctx) {
         commandParse(ctx, (result) => {
 
         })
+    },
+    messasgeDistributor: async function (ctx) {
+        let method = compoData.message
+        let result = undefined
+        for (let i of method) {
+            try {
+                const res = await i.instance.call(this, ctx)
+                if (res != undefined) {
+                    result = res
+                }
+            } catch (err) {
+                DiagnosticLog.fatal(err)
+            }
+        }
+        return result
     }
 }
 let DiagnosticLog = {
@@ -151,11 +160,6 @@ let Control = {
             Telegram.Bot.telegram.editMessageText(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id, ctx.callbackQuery.id, "Meow meow\nMeow Meow", { reply_markup: { inline_keyboard: keyboard } })
         })
 
-        Telegram.Bot.on("chosen_inline_result", async (ctx) => {
-            console.log("chosen_inline_result")
-            console.log(ctx.chosenInlineResult)
-        })
-
         Telegram.Bot.on("inline_query", async ctx => {
             let data = await Bot.inlineDistributor(ctx)
             if (data != undefined) {
@@ -183,34 +187,39 @@ let Control = {
             }
         })
 
-        Telegram.Bot.on("command", async ctx => {
-            // Bot.staticCommandDistributor(ctx)
-            Bot.commandDistributor(ctx)
-        })
-
         Telegram.Bot.on("text", async (ctx) => {
-            Core.setKey("telegramMessageText", ctx.message.text)
-            Core.setKey("telegramMessageFromId", ctx.from.id)
-            Message.Message.hears(ctx)
-            Nlp.tag(ctx, ctx.message.text).then(res => {
-                ctx.replyWithChatAction("typing")
-                let text = res
-                if (text != undefined) {
-                    Core.getKey("nlpAnalyzeIds").then(ids => {
-                        let current = JSON.parse(ids)
-                        current.map(item => {
-                            if (item == ctx.from.id) {
-                                ctx.reply(text, { parse_mode: "Markdown" }).catch(err => {
-                                    DiagnosticLog.fatal(err)
-                                })
-                            }
-                        })
-                    })
-                }
-            })
             Message.messagectl.log(ctx)
+            if (/^\/.*/gui.test(ctx.message.text)) {
+                let data = await Bot.commandDistributor(ctx)
+                ctx.reply(data)
+            }
+            else {
+                let data = await Bot.messasgeDistributor(ctx)
+                if (data == undefined) {
+                    Message.Message.hears(ctx)
+                }
+                else {
+                    ctx.replyWithChatAction("typing")
+                    ctx.reply(data)
+                }
+                Nlp.tag(ctx, ctx.message.text).then(res => {
+                    let text = res
+                    if (text != undefined) {
+                        Core.getKey("nlpAnalyzeIds").then(ids => {
+                            let current = JSON.parse(ids)
+                            current.map(item => {
+                                if (item == ctx.from.id) {
+                                    ctx.reply(text, { parse_mode: "Markdown" }).catch(err => {
+                                        DiagnosticLog.fatal(err)
+                                    })
+                                }
+                            })
+                        })
+                    }
+                })
+            }
         }).catch(err => DiagnosticLog(err))
-        
+
         // Log
         Telegram.Bot.catch((err) => {
             DiagnosticLog.fatal(err)

@@ -71,9 +71,9 @@ let Register = {
                                         })
                                     }
                                     // Check if register message exist
-                                    if (compo.register.message) {
-                                        compo.register.message.map(msg => {
-                                            msg.instance = compo.message[msg.function]
+                                    if (compo.register.messages) {
+                                        compo.register.messages.map(msg => {
+                                            msg.instance = compo.messages[msg.function]
                                             msg.meta = compo.meta
                                             Compo.message.push(msg)
                                         })

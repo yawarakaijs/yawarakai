@@ -250,8 +250,8 @@ let main = {
 exports.meta = config.components.musicshare
 
 exports.commands = {
-    main: async function (ctx) {
-
+    netease: async function (ctx, args) {
+        
     }
 }
 
@@ -278,7 +278,7 @@ exports.inlines = {
 
 exports.messages = {
     main: async function (ctx) {
-
+        
     }
 }
 
@@ -300,7 +300,7 @@ exports.register = {
     // As the example to Yawarakai Compos
     commands: [
         {
-            function: 'main'
+            function: 'netease'
         }
     ],
     inlines: [
@@ -309,9 +309,9 @@ exports.register = {
         }
     ],
     messages: [
-        {
-            function: 'main'
-        }
+        // {
+        //     function: 'main'
+        // }
     ],
     callbackQuery: [
         {
