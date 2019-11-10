@@ -1,6 +1,7 @@
 // Dependencies
 
 let Telegraf = require('telegraf')
+let SocksProxyAgent = require('socks-proxy-agent');
 
 // Local Packages
 
@@ -12,9 +13,21 @@ let Component = require('../../component')
 
 let channelTime = new Date()
 
+// Proxy
+// SOCKS proxy to connect to
+var proxy = process.env.socks_proxy || 'socks://127.0.0.1:1080';
+console.log('using proxy server %j', proxy);
+
+// create an instance of the `SocksProxyAgent` class with the proxy server information
+var agent = new SocksProxyAgent(proxy)
+
 // Creating Bot
 // At this time Single User
-const Bot = new Telegraf(config.token).catch(err => {
+const Bot = new Telegraf(
+    config.token, 
+    {
+        telegram: { agent: agent }
+    }).catch(err => {
     Log.DiagnosticLog.fatal(err)
 })
 
@@ -69,6 +82,7 @@ let command = (cmd) => {
             Log.Log.info("Telegram Bot: " + config.botname + Lang.app.starting)
             Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.webhook.url == '' ? "127.0.0.1" : config.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.webhook.port}`)
             Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
+            Bot.telegram.sendMessage(915672797, "Hi")
             Bot.startWebhook('/', null, webhookPort != undefined ? webhookPort : 8000)
             break
         case 'stop':
