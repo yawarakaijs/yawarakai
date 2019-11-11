@@ -18,6 +18,7 @@ let Log = require('../Core/log').Log
 let compoData = Component.Register.load()
 
 let Bot = {
+    telegram: Telegram.Bot.telegram,
     commandParse: function (ctx, callback) {
         let commandArgs = ctx.message.text.split(" ")
         let command = commandArgs[0].substring(1)
@@ -77,7 +78,7 @@ let Bot = {
             return command.function === result.cmd
         })
         if (!cmd) { return 404 }
-        return await cmd.instance.call(this, result.args)
+        return await cmd.instance.call(this, result)
     },
     staticCommandDistributor: function (ctx) {
         commandParse(ctx, (result) => {
@@ -155,6 +156,14 @@ let DiagnosticLog = {
 
 let Control = {
     start: function () {
+        Telegram.Bot.on("new_chat_members", async (ctx) => {
+            let newMember = ctx.update.message.new_chat_member
+            if(!ctx.update.message.new_chat_member.is_bot) {
+                let name = newMember.first_name != "" && newMember.first_name != undefined ? newMember.first_name : newMember.username ? newMember.username : newMember.id
+                Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, `欢迎新朋友 [${name}](tg://user?id=${newMember.id}) !\n如果是第一次来到乐园的话，建议和大家自我介绍一下哦（当然也不会勉强了啦）\n希望乃在花見乐园能够玩的开心呢)`, { parse_mode: "Markdown" })
+            }
+        })
+
         Telegram.Bot.on("callback_query", async (ctx) => {
             let keyboard = await Bot.callbackQueryDistributor(ctx)
             Telegram.Bot.telegram.editMessageText(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id, ctx.callbackQuery.id, "Meow meow\nMeow Meow", { reply_markup: { inline_keyboard: keyboard } })
@@ -191,17 +200,11 @@ let Control = {
             Message.messagectl.log(ctx)
             if (/^\/.*/gui.test(ctx.message.text)) {
                 let data = await Bot.commandDistributor(ctx)
-                ctx.reply(data)
-            }
-            else {
-                let data = await Bot.messasgeDistributor(ctx)
-                if (data == undefined) {
-                    Message.Message.hears(ctx)
-                }
-                else {
-                    ctx.replyWithChatAction("typing")
+                if(data != undefined) {
                     ctx.reply(data)
                 }
+            }
+            else {
                 Nlp.tag(ctx, ctx.message.text).then(res => {
                     let text = res
                     if (text != undefined) {
@@ -209,7 +212,7 @@ let Control = {
                             let current = JSON.parse(ids)
                             current.map(item => {
                                 if (item == ctx.from.id) {
-                                    ctx.reply(text, { parse_mode: "Markdown" }).catch(err => {
+                                    Telegram.Bot.telegram.sendMessage(ctx.from.id, text, { parse_mode: "Markdown" }).catch(err => {
                                         DiagnosticLog.fatal(err)
                                     })
                                 }
@@ -217,8 +220,20 @@ let Control = {
                         })
                     }
                 })
+                let data = await Bot.messasgeDistributor(ctx)
+                if (data == undefined) {
+                    Message.Message.hears(ctx)
+                }
+                else {
+                    ctx.replyWithChatAction("typing")
+                    ctx.reply(data)
+                }  
             }
         }).catch(err => DiagnosticLog(err))
+
+        Telegram.Bot.on("forward", async (ctx) => {
+            console.log(ctx.message)
+        })
 
         // Log
         Telegram.Bot.catch((err) => {

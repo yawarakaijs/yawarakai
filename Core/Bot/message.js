@@ -71,12 +71,6 @@ let messagectl = {
 
 let Message = {
     async hears(ctx) {
-        // let meowmeow = /(喵～)/gui
-        // let startnlp = /((悠月，)|())打开分析模式/gui
-        // let stopnlp = /关闭分析模式/gui
-        // await Message.replyWithPattern(ctx, meowmeow, ["喵~"])
-        // await Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"])
-        // await Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"])
 
         let meowmeow = new MessageDictionary(
             [{reg: "(喵～)|(喵~)", mode: "gui"}],

@@ -66,7 +66,14 @@ let Nlp = {
                 newText = newText.replace(/\[/g, "")
                 newText = newText.replace(/\]/g, "")
                 newText = newText.slice(1)
-                let data = `原句: *${text}*` + "\n \n" + newText + "\n \n" + `\`正面： ${senti.pos} \n负面： ${senti.neg}\``
+                let sentimentResult
+                if(senti.pos > senti.neg) {
+                    sentimentResult = "文本偏正面"
+                }
+                else if(senti.pos < senti.neg) {
+                    sentimentResult = "文本偏负面"
+                }
+                let data = `原句: *${text}*` + "\n \n" + newText + "\n \n" + `*${sentimentResult}*\n正面: ${JSON.stringify(senti.pos).slice(0,11)} \n负面: ${JSON.stringify(senti.neg).slice(0,11)}`
 
                 Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${newText.replace(/_/g, "")}`)
                 return data
@@ -236,7 +243,7 @@ let NlpControl = {
             Log.DiagnosticLog.fatal(err)
             Log.Log.info("Init data not found, re-creating...")
             Core.setKey("nlpAnalyzeIds", `[]`).catch(err => Log.DiagnosticLog.fatal(err))
-            this.NlpControl.analyzeModeMan(userId)
+            this.NlpControl.analyzeModeMan(userId, "add")
         })
     }
 }
