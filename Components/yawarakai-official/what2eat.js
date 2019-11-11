@@ -51,9 +51,9 @@ exports.register = {
         }
     ],
     messages: [
-        {
+        // {
             // function: 'main'
-        }
+        // }
     ],
     callbackQuery: [
         // {

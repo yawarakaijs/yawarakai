@@ -108,7 +108,7 @@ exports.inlines = {
 }
 
 exports.messages = {
-    main: async function () {
+    main: async function (ctx) {
 
     }
 }

@@ -6,7 +6,6 @@ let path = require('path')
 // Local Files
 let Log = require('./Core/log')
 let Lang = require('./Core/lang').Lang
-let Message = require('./Core/Bot/message')
 
 // Body
 
@@ -112,8 +111,7 @@ let Register = {
 let loadedPlugins = new Array()
 
 let Interface = {
-    Log: Log,
-    Message: Message
+    Log: Log
 }
 
 // Exports

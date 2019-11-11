@@ -70,8 +70,8 @@ let main = {
                     reply_markup: {
                         inline_keyboard: [[
                             {
-                                text: "Netease CloudMusic",
-                                url: `https://music.163.com/song?id=${params.id}`
+                                text: "Open in CloudMusic",
+                                url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
                             }
                         ]]
                     }
@@ -88,12 +88,16 @@ let main = {
      * @param {*} params 
      */
     album: async function (params) {
-        /**
-         * 
-         */
+        
     },
     playlist: async function (params) {
-
+        let baseUrl = "https://api.yutsuki.moe/cloudmusic"
+        return axios.get(baseUrl + '/playlist/detail', { params: { id: params.id } }).then(res => {
+            let data = {
+                picUrl: res.data.playlist.coverImgUrl,
+                text: `${res.data.playlist}`
+            }
+        })
     },
     /**
      * Donwload the given music source url as the needed file format
@@ -175,7 +179,7 @@ let main = {
         // type one
         // prefix cut
         let domainName = /((https?:\/\/)|())(music.163.com)/gumi
-        let desktopVersionPrefix = /\/#/gumi
+        let desktopVersionPrefix = /(\/#)(\/m)?/gumi
         let categoriesPrefix = /\/((song)|(album)|(playlist))/gumi
         // REPLACE
         link = link.replace(domainName, "")
@@ -250,14 +254,41 @@ let main = {
 exports.meta = config.components.musicshare
 
 exports.commands = {
-    netease: async function (ctx, args) {
+    netease: async function (context) {
         
+    },
+    playlist: async function (context) {
+        console.log(this)
+        let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
+        let message = context.ctx.message.text
+        let link = new Array()
+        if(context.args[0]) {
+            context.args.forEach(item => {
+                link.push(item.match(urlCheck))
+            })
+            link = link.join("")
+            let params = main.parseArgs(link)
+            let data = { text: "", extra: null }
+            let result = await main.playlist(params)
+            this.telegram.sendMessage(ctx.from.id, result, { 
+                reply_markup: {
+                inline_keyboard: [
+                    [{
+                        text: "Test",
+                        url: "https://yutsuki.moe"
+                    }]
+                ]
+            } })
+        }
+        else {
+            return undefined
+        }
     }
 }
 
 exports.inlines = {
     main: async function (ctx) {
-        let globalUrlPattern = /((https?)?((:\/\/))?)(music.163.com)(\/(#\/)?)(song|album|playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gumi
+        let globalUrlPattern = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(song|album|playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
         let link = ctx.inlineQuery.query
 
         if (globalUrlPattern.test(link)) {
@@ -278,13 +309,12 @@ exports.inlines = {
 
 exports.messages = {
     main: async function (ctx) {
-        
+        let searchUser = /搜索用户/gui
     }
 }
 
 exports.callbackQuery = {
     main: async function (ctx) {
-
         if (params.type == "album") {
             Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
             return await main.album(params)
@@ -301,6 +331,9 @@ exports.register = {
     commands: [
         {
             function: 'netease'
+        },
+        {
+            function: 'playlist'
         }
     ],
     inlines: [
@@ -310,7 +343,7 @@ exports.register = {
     ],
     messages: [
         // {
-        //     function: 'main'
+            // function: 'main'
         // }
     ],
     callbackQuery: [
