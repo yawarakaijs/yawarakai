@@ -11,7 +11,9 @@
         "message": {
             "from": "From",
             "text": "Message",
-            "group": "Group"
+            "group": "Group",
+            "replyto": "Replied to",
+            "success": "successful"
         },
         "telegram": {
             "commandParameterInvalid": "Parameter Invalid",

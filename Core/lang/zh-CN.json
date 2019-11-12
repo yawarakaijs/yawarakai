@@ -11,7 +11,9 @@
         "message": {
             "from": "来自",
             "text": "消息",
-            "group": "群组"
+            "group": "群组",
+            "replyto": "回复至",
+            "success": "成功"
         },
         "telegram": {
             "commandParameterInvalid": "无效的参数",

@@ -114,7 +114,7 @@ let Message = {
                 ctx.replyWithChatAction("typing")
                 setTimeout(() => {
                     ctx.reply(i).then(res => {
-                        Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功`)
+                        Log.Log.debug(`${Lang.bot.message.replyto}: ${ctx.message.from.id} - ${Lang.bot.message.success}`)
                     }).catch(err => {
                         Log.DiagnosticLog.fatal(err)
                     })
