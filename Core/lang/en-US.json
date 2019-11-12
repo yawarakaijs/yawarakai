@@ -27,12 +27,13 @@
         "redisCausedShutdown": "Exiting Yawarakai due to the failure of redis server authentication"
     },
     "component": {
+        "readIn": "Scaned ",
         "loaded": ["Loaded component ", " from "],
         "enabled": "Enabled ",
         "disabled": "Disabled ",
         "reloaded": "Reloaded ",
-        "noComponentFound": ["No components were loaded", "If you have installed, please check whether the Components directory exists under the project root"],
-        "noValidConfigFound": ["No components were loaded", "Component(s) with no valid config.json were found, please check the config.json file of your component if you have installed"],
+        "noComponentFound": ["Partial components were loaded", "If you have installed, please check whether the Components directory exists under the project root"],
+        "noValidConfigFound": ["Partial components were loaded", "Component(s) with no valid config.json were found, please check the config.json file of your component if you have installed"],
         "configFileInvalid": ["ConfigFileInvalidError: \n", " Incorrect config.json or file is invalid"]
     }
 }
