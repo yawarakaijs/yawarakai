@@ -4,7 +4,7 @@ yawarakai.code-workspace
 .env/
 cache/
 log/
-.vscode
+.vscode/
 node_modules/
 
 yarn*

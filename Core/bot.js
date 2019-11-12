@@ -165,8 +165,8 @@ let Control = {
         })
 
         Telegram.Bot.on("callback_query", async (ctx) => {
-            let keyboard = await Bot.callbackQueryDistributor(ctx)
-            Telegram.Bot.telegram.editMessageText(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id, ctx.callbackQuery.id, "Meow meow\nMeow Meow", { reply_markup: { inline_keyboard: keyboard } })
+            let data = await Bot.callbackQueryDistributor(ctx)
+            console.log(data)
         })
 
         Telegram.Bot.on("inline_query", async ctx => {
@@ -212,7 +212,7 @@ let Control = {
                             let current = JSON.parse(ids)
                             current.map(item => {
                                 if (item == ctx.from.id) {
-                                    Telegram.Bot.telegram.sendMessage(ctx.from.id, text, { parse_mode: "Markdown" }).catch(err => {
+                                    Telegram.Bot.telegram.sendMessage(ctx.chat.id, text, { parse_mode: "Markdown" }).catch(err => {
                                         DiagnosticLog.fatal(err)
                                     })
                                 }
