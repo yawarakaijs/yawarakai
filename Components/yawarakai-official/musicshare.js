@@ -9,19 +9,19 @@ const https = require('https')
 
 let baseDir = __dirname.replace(/((\/)|(\\))(Components)(((\/)|(\\))(yawarakai-official))/gu, "")
 // io.js
-let cacheDir = path.join(baseDir, "/cache")
-let dataDir = path.join(cacheDir, "/data")
-let musicDir = path.join(cacheDir, "/music")
+// let cacheDir = path.join(baseDir, "/cache")
+// let dataDir = path.join(cacheDir, "/data")
+// let musicDir = path.join(cacheDir, "/music")
 
-if (!fs.existsSync(cacheDir)) {
-    fs.mkdirSync(cacheDir)
-}
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir)
-}
-if (!fs.existsSync(musicDir)) {
-    fs.mkdirSync(musicDir)
-}
+// if (!fs.existsSync(cacheDir)) {
+//     fs.mkdirSync(cacheDir)
+// }
+// if (!fs.existsSync(dataDir)) {
+//     fs.mkdirSync(dataDir)
+// }
+// if (!fs.existsSync(musicDir)) {
+//     fs.mkdirSync(musicDir)
+// }
 
 let main = {
     /**
@@ -66,7 +66,7 @@ let main = {
                     title: resArray[1].data.songs[0].name,
                     performer: authorText,
                     audio_url: resArray[0].data.data[0].url,
-                    caption: authorText + "\n" + dataArray[0].data.album.name + "\n#yawarakai",
+                    caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #${params.id}`,
                     reply_markup: {
                         inline_keyboard: [[
                             {
@@ -88,14 +88,33 @@ let main = {
      * @param {*} params 
      */
     album: async function (params) {
-        
+
     },
     playlist: async function (params) {
         let baseUrl = "https://api.yutsuki.moe/cloudmusic"
         return axios.get(baseUrl + '/playlist/detail', { params: { id: params.id } }).then(res => {
-            let data = {
-                picUrl: res.data.playlist.coverImgUrl,
-                text: `${res.data.playlist}`
+            if (res.data.code != 200) {
+                return undefined
+            }
+            else {
+                let playlistInfo = res.data.playlist
+                let trackData = playlistInfo.tracks
+                let trackResult = new Array()
+                trackData.forEach(item => {
+                    let authorText = new Array()
+                    item.ar.forEach(item => authorText.push(item.name))
+                    authorText = authorText.join("/")
+                    let trackObj = { id: item.id, name: item.name, artist: authorText, album: item.al.name }
+                    trackResult.push(trackObj)
+                })
+                let description = playlistInfo.description != null ? /\s+?.*/gumi.test(playlistInfo.description) ? playlistInfo.description : "_无简介_" : "_无简介_"
+                let tag = playlistInfo.tags.join(" | ") == "" ? "_无标签_" : playlistInfo.tags.join(" | ")
+                let data = {
+                    picUrl: playlistInfo.coverImgUrl,
+                    text: `*${playlistInfo.name}*\n${playlistInfo.creator.nickname}\n曲目: ${playlistInfo.tracks.length} 首\n标签: ${playlistInfo.tags.join(" | ")}\n简介: ${description}\n#yawarakai #${params.id}`,
+                    tracks: trackResult
+                }
+                return data
             }
         })
     },
@@ -178,7 +197,7 @@ let main = {
     parseArgs: function (link) {
         // type one
         // prefix cut
-        let domainName = /((https?:\/\/)|())(music.163.com)/gumi
+        let domainName = /((^https?:\/\/)|(^))(music.163.com)/gumi
         let desktopVersionPrefix = /(\/#)(\/m)?/gumi
         let categoriesPrefix = /\/((song)|(album)|(playlist))/gumi
         // REPLACE
@@ -198,6 +217,13 @@ let main = {
         else if (link.startsWith("/playlist")) {
             link = link.replace(categoriesPrefix, "")
             return main.paramsDiffer(link, "playlist")
+        }
+
+        let apiName = /(musicshare:\/\/)/gui
+
+        if (link.startsWith("playlist") || link.startsWith("song") || link.startsWith("album")) {
+            link = link.replace(apiName, "")
+            return main.paramsDiffer(link, "callback")
         }
 
         return undefined
@@ -248,6 +274,28 @@ let main = {
                 return params
             }
         }
+
+        else if (src.startsWith("callback")) {
+            let typeCheck = /^.*\?/i
+            let callbackType = src.match(typeCheck).slice(0, -1)
+            src = src.replace(typeCheck, "")
+            if (src.includes) {
+                src = src.split("&")
+                src.forEach(item => {
+                    params["type"] = callbackType
+                    if (idCheck.test(item)) { params["id"] = parseInt(item.replace(idCheck, "")) }
+                    if (/^pageid=/gi.test(item)) { params["pageid"] = parseInt(item.replace(idCheck, "")) }
+                    if (/([a-z]*)(?!((\.)\=))/gi.test(item)) { params[item.match(/([a-z]*)(?!((\.)\=))/i)] = true }
+                })
+                return params
+            }
+            else {
+                params["type"] = callbackType
+                if (idCheck.test(src[0])) { params["id"] = parseInt(src[0].replace(idCheck, "")) }
+                return params
+            }
+        }
+
     }
 }
 
@@ -255,30 +303,58 @@ exports.meta = config.components.musicshare
 
 exports.commands = {
     netease: async function (context) {
-        
+
     },
     playlist: async function (context) {
-        console.log(this)
         let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
         let message = context.ctx.message.text
         let link = new Array()
-        if(context.args[0]) {
+        if (context.args[0]) {
             context.args.forEach(item => {
                 link.push(item.match(urlCheck))
             })
             link = link.join("")
-            let params = main.parseArgs(link)
-            let data = { text: "", extra: null }
-            let result = await main.playlist(params)
-            this.telegram.sendMessage(ctx.from.id, result, { 
-                reply_markup: {
-                inline_keyboard: [
-                    [{
-                        text: "Test",
-                        url: "https://yutsuki.moe"
-                    }]
-                ]
-            } })
+            if (link == "") {
+                return "使用方法有误哦！\n/playlist 歌单链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease playlist 关键词"
+            }
+            else {
+                let params = main.parseArgs(link)
+                let data = { text: "", extra: null }
+                let result = await main.playlist(params)
+                if (result == undefined) {
+                    return undefined
+                }
+                else {
+                    let keys = new Array()
+                    for (let i = 0; i < 6; i++) {
+                        let key = [{
+                            text: `${result.tracks[i].name} - ${result.tracks[i].artist}`,
+                            callback_data: "musicshare://playlist/song?id=" + result.tracks[i].id,
+                        }]
+                        keys.push(key)
+                    }
+                    keys.push([
+                        {
+                            text: "<",
+                            callback_data: "musicshare://playlist?id=" + params.id + "&pagedown"
+                        },
+                        {
+                            text: 1,
+                            callback_data: "musicshare://playlist?id=" + params.id + "&pageid=" + 1
+                        },
+                        {
+                            text: ">",
+                            callback_data: "musicshare://playlist?id=" + params.id + "&pageup"
+                        }
+                    ])
+                    this.telegram.sendMessage(context.ctx.from.id, result.text, {
+                        reply_markup: {
+                            inline_keyboard: keys
+                        },
+                        parse_mode: "Markdown"
+                    })
+                }
+            }
         }
         else {
             return undefined
@@ -296,11 +372,36 @@ exports.inlines = {
             let params = main.parseArgs(link)
             if (params.type == "song") {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求歌曲来自链接: ${link}`)
-                let isAvailable = await axios.get("https://api.yutsuki.moe/cloudmusic/check/music", { params: { id: params.id } })
-                if (isAvailable) {
-                    let data = await main.song(params)
+
+                let data = await main.song(params)
+                if (data[0].audio_url == null) {
+                    return [{
+                        type: "article",
+                        id: params.id,
+                        title: `${data[0].title}`,
+                        description: "我们找到了曲目，但是对不起呢，歌曲暂不可用",
+                        thumb_url: "https://i.loli.net/2019/11/13/dQDxC4Nv91VYK2E.jpg",
+                        input_message_content: { message_text: `${data[0].title}\n${data[0].performer}\n实在是很抱歉呢，这个歌曲暂不可用，但是可以试试在 App 中打开\n#yawarakai #${params.id}` },
+                        reply_markup: {
+                            inline_keyboard: [[{
+                                text: "Open in App",
+                                url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
+                            }]]
+                        }
+                    }]
+                }
+                else {
                     return data
                 }
+
+            }
+            else if (params.type == "album") {
+                Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
+                return await main.album(params)
+            }
+            else if (params.type == "playlist") {
+                Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询歌单来自链接: ${link}`)
+                return await main.playlist(params)
             }
         }
         return undefined
@@ -315,14 +416,12 @@ exports.messages = {
 
 exports.callbackQuery = {
     main: async function (ctx) {
-        if (params.type == "album") {
-            Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
-            return await main.album(params)
-        }
-        else if (params.type == "playlist") {
-            Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询歌单来自链接: ${link}`)
-            return await main.playlist(params)
-        }
+        console.log(ctx.update)
+        let callbackData = ctx.update.callback_query
+        let params = main.parseArgs(callbackData.data)
+        console.log(params)
+
+        return "Got"
     }
 }
 
@@ -343,7 +442,7 @@ exports.register = {
     ],
     messages: [
         // {
-            // function: 'main'
+        // function: 'main'
         // }
     ],
     callbackQuery: [
