@@ -3,7 +3,7 @@
 // Local Packages
 
 let Log = require('../log')
-let Lang = require('../lang').Lang
+let Lang = require('../lang')
 let NlpControl = require('./nlp').NlpControl
 let MessageDictionary = require('./msgprocessor').MessageDictionary
 let MessageDictionaryControl = require('./msgprocessor').MessageDictionaryControl

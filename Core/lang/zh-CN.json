@@ -15,6 +15,18 @@
             "replyto": "回复至",
             "success": "成功"
         },
+        "inlineQuery": {
+            "from": "来自",
+            "query": "Inline 请求",
+            "answerto": "返回 Inline 数据至",
+            "success": "成功"
+        },
+        "callbackQuery": {
+            "from": "来自",
+            "callback": "回传请求数据",
+            "answerto": "返回 callbackQuery 数据",
+            "success": "成功"
+        },
         "telegram": {
             "commandParameterInvalid": "无效的参数",
             "commandParameterMissing": ["无效的参数：","，检查是否缺失必要参数："],
@@ -22,7 +34,6 @@
             "helpCommand": "telegram 命令是用于启动和管理 Telegram Bot 和 Telegram Client \n start     启动 Telegram Bot \n stop      停止 Telegram Bot",
             "webhookSettingsWarning": "如果你使用了外部服务器的命令行模式来设定 Webhook，这里显示的 Webhook 可能不是登记在 Telegram 服务器的 Webhook 地址"
         }
-
     },
     "core": {
         "redisAuthSuccess": "Redis 服务器验证成功并且已连接",

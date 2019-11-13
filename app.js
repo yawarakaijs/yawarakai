@@ -26,7 +26,7 @@
 // Local Packages
 
 let Log = require('./Core/log').Log
-let Lang = require('./Core/lang').Lang
+let Lang = require('./Core/lang')
 let config = require('./config.json')
 let packageInfo = require('./package.json')
 let AnonymousLog = require('./Core/log').AnonymousLog

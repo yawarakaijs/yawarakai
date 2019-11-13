@@ -5,7 +5,7 @@ let path = require('path')
 
 // Local Files
 let Log = require('./Core/log')
-let Lang = require('./Core/lang').Lang
+let Lang = require('./Core/lang')
 
 // Body
 
@@ -23,7 +23,7 @@ let Register = {
              * @property {Array} callbackQuery      - Imported from exports.register.callbackQuery
              */
             let Compo = { command: [], inline: [], message: [], callbackQuery: [] }
-            // Read all folders inside the components folder
+            // Read all folders inside the Components folder
             if(!fs.existsSync(extension_dir)) {
                 Log.Log.warning(Lang.component.noComponentFound[0])
                 Log.Log.warning(Lang.component.noComponentFound[1])

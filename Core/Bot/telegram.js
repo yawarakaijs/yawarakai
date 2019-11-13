@@ -7,7 +7,7 @@ let SocksProxyAgent = require('socks-proxy-agent');
 
 let config = require('../../config.json')
 let Log = require('../log')
-let Lang = require('../lang').Lang
+let Lang = require('../lang')
 let packageInfo = require('../../package.json')
 let Component = require('../../component')
 
