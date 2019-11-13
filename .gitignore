@@ -2,13 +2,15 @@
 yawarakai.code-workspace
 
 .env/
-.vscode/
 cache/
 log/
+.vscode/
 node_modules/
+Components/
 
 yarn*
 .eslintrc.json
 yarn.lock
 config.json
 !Components/*/config.json
+.DS_Store

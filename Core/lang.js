@@ -28,4 +28,4 @@ let setLang = () => {
 
 let Lang = setLang()
 
-exports.Lang = Lang
+module.exports = Lang

@@ -11,7 +11,21 @@
         "message": {
             "from": "来自",
             "text": "消息",
-            "group": "群组"
+            "group": "群组",
+            "replyto": "回复至",
+            "success": "成功"
+        },
+        "inlineQuery": {
+            "from": "来自",
+            "query": "Inline 请求",
+            "answerto": "返回 Inline 数据至",
+            "success": "成功"
+        },
+        "callbackQuery": {
+            "from": "来自",
+            "callback": "回传请求数据",
+            "answerto": "返回 callbackQuery 数据",
+            "success": "成功"
         },
         "telegram": {
             "commandParameterInvalid": "无效的参数",
@@ -20,7 +34,6 @@
             "helpCommand": "telegram 命令是用于启动和管理 Telegram Bot 和 Telegram Client \n start     启动 Telegram Bot \n stop      停止 Telegram Bot",
             "webhookSettingsWarning": "如果你使用了外部服务器的命令行模式来设定 Webhook，这里显示的 Webhook 可能不是登记在 Telegram 服务器的 Webhook 地址"
         }
-
     },
     "core": {
         "redisAuthSuccess": "Redis 服务器验证成功并且已连接",
@@ -33,6 +46,8 @@
         "enabled": "已激活 ",
         "disabled": "已禁用 ",
         "reloaded": "已重载 ",
+        "noComponentFound": ["没有加载部分组件","如果有安装组件，请检查 Components 文件夹是否存在于根目录下"],
+        "noValidConfigFound": ["没有加载部分组件", "找到了组件目录，如果安装了组件，请检查组件是否有 config.json 文件"],
         "configFileInvalid": ["ConfigFileInvalidError: \n", " 配置文件不正确或是无效"]
     }
 }

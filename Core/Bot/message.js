@@ -3,8 +3,7 @@
 // Local Packages
 
 let Log = require('../log')
-let Lang = require('../lang').Lang
-let Core = require('../../core')
+let Lang = require('../lang')
 let NlpControl = require('./nlp').NlpControl
 let MessageDictionary = require('./msgprocessor').MessageDictionary
 let MessageDictionaryControl = require('./msgprocessor').MessageDictionaryControl
@@ -72,20 +71,14 @@ let messagectl = {
 
 let Message = {
     async hears(ctx) {
-        // let meowmeow = /(喵～)/gui
-        // let startnlp = /((悠月，)|())打开分析模式/gui
-        // let stopnlp = /关闭分析模式/gui
-        // await Message.replyWithPattern(ctx, meowmeow, ["喵~"])
-        // await Message.replyWithPattern(ctx, startnlp, ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"])
-        // await Message.replyWithPattern(ctx, stopnlp, ["关闭了呢"])
 
         let meowmeow = new MessageDictionary(
-            [{reg: "(喵～)|(喵~)", mode: "gui"}],
+            [{reg: "(^喵～)|(^喵~)", mode: "gui"}],
             ["喵～"]
         ).push()
 
         let startnlp = new MessageDictionary(
-            [{reg: "((悠月，)|())打开分析模式", mode: "gui"}],
+            [{reg: "((^悠月，)|(^))打开分析模式$", mode: "gui"}],
             ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"],
             [NlpControl.analyzeModeMan],
             true,
@@ -93,7 +86,7 @@ let Message = {
         ).push()
         
         let stopnlp = new MessageDictionary(
-            [{reg: "((悠月)|())关闭分析模式", mode: "gui"}],
+            [{reg: "((^悠月)|(^))关闭分析模式$", mode: "gui"}],
             ["关闭了呢"],
             [NlpControl.analyzeModeMan],
             true,
@@ -121,7 +114,7 @@ let Message = {
                 ctx.replyWithChatAction("typing")
                 setTimeout(() => {
                     ctx.reply(i).then(res => {
-                        Log.Log.debug(`回复至: ${ctx.message.from.id} - 成功`)
+                        Log.Log.debug(`${Lang.bot.message.replyto}: ${ctx.message.from.id} - ${Lang.bot.message.success}`)
                     }).catch(err => {
                         Log.DiagnosticLog.fatal(err)
                     })

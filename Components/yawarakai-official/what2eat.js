@@ -24,7 +24,7 @@ exports.inlines = {
     }
 }
 
-exports.message = {
+exports.messages = {
     main: async function () {
 
     }
@@ -51,9 +51,9 @@ exports.register = {
         }
     ],
     messages: [
-        {
+        // {
             // function: 'main'
-        }
+        // }
     ],
     callbackQuery: [
         // {

@@ -51,6 +51,17 @@ let main = {
             input_message_content: { message_text: `${query} 的${middleWord}是 ${result}` }
         }
         return data
+    },
+    answerPlain: (ctx, query, result, middleWord) => {
+        var data = {
+            type: "article",
+            id: ctx.inlineQuery.id,
+            title: `${query} 的${middleWord}纯文本`,
+            description: result,
+            thumb_url: thumb,
+            input_message_content: { message_text: `${result}` }
+        }
+        return data
     }
 }
 
@@ -76,35 +87,41 @@ exports.inlines = {
         if (c2jpattern.test(queryPlain)) {
             var stepone = queryPlain.replace(/^(日文|日语)(的|())\s{0,}/gu, "")
             var steptwo = stepone.replace(/(是什么|是什么呢|怎么说|怎么写|怎么翻译|)(\?|)$/gu, "")
-
-            Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了单词查询 (中文至日文)：${steptwo}`)
-            return main.c2j(steptwo).then(res => {
-                defination = res
-                defination.map(element => {
-                    defs.push(main.answer(ctx, steptwo, element.value, "日语"))
+            if (steptwo != "") {
+                Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了单词查询 (中文至日文)：${steptwo}`)
+                return main.c2j(steptwo).then(res => {
+                    defination = res
+                    defination.map(element => {
+                        defs.push(main.answer(ctx, steptwo, element.value, "日语"))
+                        defs.push(main.answerPlain(ctx, steptwo, element.value, "日语"))
+                    })
+                    return defs
+                }).catch(err => {
+                    return undefined
                 })
-                return defs
-            }).catch(err => {
-                Compo.Interface.Log.DiagnosticLog.fatal(new Error("Component Process Error: Cannot get the information of given query"))
-            })
+            }
         }
 
         // Translate to Chinese
         if (j2cpattern.test(queryPlain)) {
             var stepone = queryPlain.replace(/^(中文|汉语)(的|())\s{0,}/gu, "")
             var steptwo = stepone.replace(/(是什么|是什么呢|怎么说|怎么写|怎么翻译|)(\?|)$/gu, "")
-            Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了单词查询 (日文至中文)：${steptwo}`)
-            return main.j2c(steptwo).then(res => {
-                defination = res
-                defination.map(element => {
-                    defs.push(main.answer(ctx, steptwo, element.value, "中文"))
+            if (steptwo != "") {
+                Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了单词查询 (日文至中文)：${steptwo}`)
+                return main.j2c(steptwo).then(res => {
+                    defination = res
+                    defination.map(element => {
+                        defs.push(main.answer(ctx, steptwo, element.value, "中文"))
+                        defs.push(main.answerPlain(ctx, steptwo, element.value, "日语"))
+                    })
+                    return defs
+                }).catch(err => {
+                    return undefined
                 })
-                return defs
-            }).catch(err => {
-                Compo.Interface.Log.DiagnosticLog.fatal(new Error("Component Process Error: Cannot get the information of given query"))
-            })
-
+            }
         }
+
+        return undefined
     }
 }
 

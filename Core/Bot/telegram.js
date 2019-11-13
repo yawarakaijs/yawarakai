@@ -1,27 +1,45 @@
 // Dependencies
 
 let Telegraf = require('telegraf')
+let SocksProxyAgent = require('socks-proxy-agent');
 
 // Local Packages
 
 let config = require('../../config.json')
 let Log = require('../log')
-let Lang = require('../lang').Lang
+let Lang = require('../lang')
 let packageInfo = require('../../package.json')
 let Component = require('../../component')
 
 let channelTime = new Date()
 
+// Proxy
+// SOCKS proxy to connect to
+let proxy = process.env.socks_proxy || config.proxy.url
+
+// create an instance of the `SocksProxyAgent` class with the proxy server information
+let agent = new SocksProxyAgent(proxy)
+
 // Creating Bot
 // At this time Single User
-const Bot = new Telegraf(config.token).catch(err => {
-    Log.DiagnosticLog.fatal(err)
-})
+
+let Bot
+
+if(config.proxy.enable) {
+    Bot = new Telegraf(config.token, { telegram: { agent: agent } }).catch(err => {
+        Log.DiagnosticLog.fatal(err)
+    })
+}
+else {
+    Bot = new Telegraf(config.token).catch(err => {
+        Log.DiagnosticLog.fatal(err)
+    })
+}
 
 let command = (cmd) => {
-    var webhookPort
-    var webhookUrl
-    var args = cmd.split(" ")
+    let webhookPort
+    let webhookUrl
+    let args = cmd.split(" ")
     switch (args[1]) {
         default:
             console.log("Yawarakai: " + cmd + " " + Lang.bot.telegram.commandInvalid)
@@ -62,18 +80,22 @@ let command = (cmd) => {
             Log.Log.info("Telegram Bot: " + config.botname + Lang.app.starting)
             Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.webhook.url == '' ? "127.0.0.1" : config.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.webhook.port}`)
             Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
-            Log.DiagnosticLog.info(`${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.loadedPlugins.join("\n")}`)
+            if(config.diagnosticChannel.enable) {
+                Bot.telegram.sendMessage(config.diagnosticChannel.channel,`📄 Info\n${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.loadedPlugins.join("\n")}`)
+            }
+            webhookUrl != undefined ? Bot.telegram.setWebhook(webhookUrl).catch(err => Log.Log.fatal(err)) : Bot.telegram.setWebhook("127.0.0.1")
             Bot.startWebhook('/', null, webhookPort != undefined ? webhookPort : 8000)
             break
         case 'debug':
             Log.Log.info("Telegram Bot: " + config.botname + Lang.app.starting)
             Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.webhook.url == '' ? "127.0.0.1" : config.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.webhook.port}`)
             Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
+            config.webhook.url != undefined || config.webhook.url != "" ? Bot.telegram.setWebhook(config.webhook.url).catch(err => Log.Log.fatal(err)) : Bot.telegram.setWebhook("127.0.0.1")
             Bot.startWebhook('/', null, webhookPort != undefined ? webhookPort : 8000)
             break
         case 'stop':
             Bot.stop()
-            break;
+            break
     }
 }
 

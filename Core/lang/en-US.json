@@ -11,7 +11,21 @@
         "message": {
             "from": "From",
             "text": "Message",
-            "group": "Group"
+            "group": "Group",
+            "replyto": "Replied to",
+            "success": "successful"
+        },
+        "inlineQuery": {
+            "from": "From",
+            "query": "Inline query",
+            "answerto": "Answering Inline data to",
+            "success": "Successful"
+        },
+        "callbackQuery": {
+            "from": "From",
+            "callback": "Callback query",
+            "answerto": "Answering callbackQuery data to",
+            "success": "Successful"
         },
         "telegram": {
             "commandParameterInvalid": "Parameter Invalid",
@@ -27,10 +41,13 @@
         "redisCausedShutdown": "Exiting Yawarakai due to the failure of redis server authentication"
     },
     "component": {
+        "readIn": "Scaned ",
         "loaded": ["Loaded component ", " from "],
         "enabled": "Enabled ",
         "disabled": "Disabled ",
         "reloaded": "Reloaded ",
-        "configFileInvalid": ["ConfigFileInvalidError: \n", " 配置文件不正确或是无效"]
+        "noComponentFound": ["Partial components were loaded", "If you have installed, please check whether the Components directory exists under the project root"],
+        "noValidConfigFound": ["Partial components were loaded", "Component(s) with no valid config.json were found, please check the config.json file of your component if you have installed"],
+        "configFileInvalid": ["ConfigFileInvalidError: \n", " Incorrect config.json or file is invalid"]
     }
 }

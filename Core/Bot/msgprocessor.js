@@ -23,7 +23,7 @@
  */
 
 let MessageDictionaryControl = {
-    /**
+/**
  * Try to match the text with the dictionary with its own
  * This will return the object of the found match
  * @param {string} text -   The text that needs to be checked
