@@ -14,6 +14,7 @@ let config = require('../config.json')
 
 let Nlp = require('./Bot/nlp').Nlp
 let Log = require('../Core/log').Log
+let Lang = require('./lang')
 
 let compoData = Component.Register.load()
 
@@ -156,6 +157,9 @@ let DiagnosticLog = {
 
 let Control = {
     start: function () {
+        /**
+         * Handle new chat member
+         */
         Telegram.Bot.on("new_chat_members", async (ctx) => {
             let newMember = ctx.update.message.new_chat_member
             if(!ctx.update.message.new_chat_member.is_bot) {
@@ -164,12 +168,23 @@ let Control = {
             }
         })
 
+        /**
+         * Handle callback queries
+         */
         Telegram.Bot.on("callback_query", async (ctx) => {
+            let user = ctx.callbackQuery.from
+            Log.info(`${Lang.bot.callbackQuery.from} ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${user.id}] ${Lang.bot.callbackQuery.callback} ${ctx.callbackQuery.data}`)
             let data = await Bot.callbackQueryDistributor(ctx)
             console.log(data)
+            Log.info(`${Lang.bot.callbackQuery.answerto}: ${ctx.callbackQuery.from.id} - ${Lang.bot.callbackQuery.success}`)
         })
 
+        /**
+         * Handle inline queries
+         */
         Telegram.Bot.on("inline_query", async ctx => {
+            let user = ctx.inlineQuery.from
+            Log.info(`${Lang.bot.inlineQuery.from} ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${ctx.inlineQuery.from.id}] ${Lang.bot.inlineQuery.query}`)
             let data = await Bot.inlineDistributor(ctx)
             if (data != undefined) {
                 // Exchange all id of inline result to the system registered id
@@ -180,7 +195,7 @@ let Control = {
                     }
                     item["id"] = id.join("")
                 })
-                ctx.answerInlineQuery(data, { cache_time: 10 }).catch(err => DiagnosticLog.fatal(err))
+                ctx.answerInlineQuery(data, { cache_time: 10 }).then(res => { Log.info(`${Lang.bot.inlineQuery.answerto}: ${ctx.inlineQuery.from.id} - ${Lang.bot.inlineQuery.success}`) }).catch(err => DiagnosticLog.fatal(err))
             }
             else if (data == undefined) {
                 ctx.answerInlineQuery([
@@ -189,21 +204,32 @@ let Control = {
                         id: ctx.inlineQuery.id,
                         title: `没有找到你想要的东西呢`,
                         description: "Didn't find what you need",
-                        thumb_url: "https://i.loli.net/2019/11/06/ykCwSbm68WUoYPv.jpg",
+                        thumb_url: "https://i.loli.net/2019/11/13/dQDxC4Nv91VYK2E.jpg",
                         input_message_content: { message_text: `没有你需要的结果` }
                     }
-                ], { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
+                ], { cache_time: 1 }).then(res => { Log.info(`${Lang.bot.inlineQuery.answerto}: ${ctx.inlineQuery.from.id} - ${Lang.bot.inlineQuery.success}`) }).catch(err => DiagnosticLog.fatal(err))
             }
         })
 
+        /**
+         * Handle all text like messages
+         */
         Telegram.Bot.on("text", async (ctx) => {
             Message.messagectl.log(ctx)
+
+            /**
+             * Handle commands
+             */
             if (/^\/.*/gui.test(ctx.message.text)) {
                 let data = await Bot.commandDistributor(ctx)
                 if(data != undefined) {
                     ctx.reply(data)
                 }
             }
+
+            /**
+             * Handle general messages
+             */
             else {
                 Nlp.tag(ctx, ctx.message.text).then(res => {
                     let text = res

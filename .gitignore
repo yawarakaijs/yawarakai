@@ -6,6 +6,7 @@ cache/
 log/
 .vscode/
 node_modules/
+Components/
 
 yarn*
 .eslintrc.json
