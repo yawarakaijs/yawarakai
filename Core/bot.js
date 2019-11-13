@@ -173,7 +173,7 @@ let Control = {
          */
         Telegram.Bot.on("callback_query", async (ctx) => {
             let user = ctx.callbackQuery.from
-            Log.info(`${Lang.bot.callbackQuery.from} ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${user.id}] ${Lang.bot.callbackQuery.callback} ${ctx.callbackQuery.data}`)
+            Log.info(`${Lang.bot.callbackQuery.from}: ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${user.id}] ${Lang.bot.callbackQuery.callback} ${ctx.callbackQuery.data}`)
             let data = await Bot.callbackQueryDistributor(ctx)
             console.log(data)
             Log.info(`${Lang.bot.callbackQuery.answerto}: ${ctx.callbackQuery.from.id} - ${Lang.bot.callbackQuery.success}`)
@@ -184,7 +184,7 @@ let Control = {
          */
         Telegram.Bot.on("inline_query", async ctx => {
             let user = ctx.inlineQuery.from
-            Log.info(`${Lang.bot.inlineQuery.from} ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${ctx.inlineQuery.from.id}] ${Lang.bot.inlineQuery.query}`)
+            Log.info(`${Lang.bot.inlineQuery.from}: ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${ctx.inlineQuery.from.id}] ${Lang.bot.inlineQuery.query}`)
             let data = await Bot.inlineDistributor(ctx)
             if (data != undefined) {
                 // Exchange all id of inline result to the system registered id

@@ -16,16 +16,16 @@
             "success": "successful"
         },
         "inlineQuery": {
-            "from": "来自",
-            "query": "Inline 请求",
-            "answerto": "返回 Inline 数据至",
-            "success": "成功"
+            "from": "From",
+            "query": "Inline query",
+            "answerto": "Answering Inline data to",
+            "success": "Successful"
         },
         "callbackQuery": {
-            "from": "来自",
-            "callback": "回传请求数据",
-            "answerto": "返回 callbackQuery 数据",
-            "success": "成功"
+            "from": "From",
+            "callback": "Callback query",
+            "answerto": "Answering callbackQuery data to",
+            "success": "Successful"
         },
         "telegram": {
             "commandParameterInvalid": "Parameter Invalid",
