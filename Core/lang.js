@@ -1,28 +1,33 @@
 // Dependencies
 
+const fs = require('fs')
+const path = require('path')
+
 // Local Packages
 
+let Log = require('./log')
 let config = require('../config.json')
 
 // Use-Ready Lang Files
+// Scan all language files
 
-const zhCNLang = require('./lang/zh-CN.json')
-const enUSLang = require('./lang/en-US.json')
+const languageDir = path.join(__dirname, '/lang/')
 
-var content
+if(!fs.existsSync(languageDir)) {
+    // resolve folder not found
+}
+var files = fs.readdirSync(languageDir).filter(locale => locale.match(/^[a-z]{2}-[[A-Z]{2}\.json$/))
+// Iterial all folders to find the locale under it
+let locales = new Array()
+
+files.forEach(value => {
+    if (fs.existsSync(languageDir + value)) {
+        locales.push({locale: value.replace(".json", ""), content: require(languageDir + value)})
+    }
+})
 
 let setLang = () => {
-    switch(config.language) {
-        default:
-            content = enUSLang
-            break;
-        case "zh-CN":
-            content = zhCNLang
-            break;
-        case "en-US":
-            content = enUSLang
-            break
-    }
+    let content = locales.filter(item => item.locale == config.language).pop().content
     return content
 }
 
