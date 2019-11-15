@@ -33,6 +33,18 @@ let AnonymousLog = require('./Core/log').AnonymousLog
 
 // Core Runtime
 
+try {
+    if(!Lang.app.startTime) {
+        throw new Error("Application Initialization Error: Invalid locale file")
+    }   
+}
+catch (err) {
+    Log.fatal(err)
+    Log.info("Application failed to load because of the invalid locale file")
+    Log.warning("Please make sure you have the latest locale files downloaded and exist")
+    process.exit(1)
+}
+
 let startInfo = Lang.app.startTime + "：" + Date() + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
 
 console.log("Yawarakai  Copyright (C) 2019  Yuna Hanami")
