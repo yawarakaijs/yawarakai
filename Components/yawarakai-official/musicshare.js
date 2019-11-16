@@ -69,7 +69,7 @@ let main = {
                     title: resArray[1].data.songs[0].name,
                     performer: authorText,
                     audio_url: resArray[0].data.data[0].url,
-                    caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #${authorTag} #s${params.id}`,
+                    caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #s${params.id}`,
                     reply_markup: {
                         inline_keyboard: [[
                             {
