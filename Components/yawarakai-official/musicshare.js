@@ -37,9 +37,12 @@ let main = {
             axios.get(baseUrl + '/song/detail', { params: { ids: params.id } })
         ]).then(resArray => {
             let authorText = new Array()
+            let authorTag = new Array()
             let authorInfo = resArray[1].data.songs[0].ar
             authorInfo.forEach(item => authorText.push(item.name))
-            authorText = authorText.join(" / ")
+            authorInfo.forEach(item => authorTag.push("#"+item.name))
+            authorText = authorText.join(" / "),
+            authorTag = authorTag.join(" ")
             let resultText = resArray[1].data.songs[0].name + " - " + authorText
 
             // fileid
@@ -66,7 +69,7 @@ let main = {
                     title: resArray[1].data.songs[0].name,
                     performer: authorText,
                     audio_url: resArray[0].data.data[0].url,
-                    caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #${params.id}`,
+                    caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #${authorTag} #s${params.id}`,
                     reply_markup: {
                         inline_keyboard: [[
                             {
