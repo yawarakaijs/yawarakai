@@ -24,7 +24,6 @@ let Bot = {
         let commandArgs = ctx.message.text.split(" ")
         let command = commandArgs[0].substring(1)
         command = command.replace(/@\w+/g, "")
-        console.log(command)
         let args = []
         commandArgs.forEach((value, index) => {
             if (index > 0 && value !== "") {
@@ -179,7 +178,6 @@ let Control = {
             Log.info(`${Lang.bot.callbackQuery.from}: ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${user.id}] ${Lang.bot.callbackQuery.callback} ${ctx.callbackQuery.data}`)
             let data = await Bot.callbackQueryDistributor(ctx)
             console.log(data)
-            ctx.answerCallbackQuery()
             Log.info(`${Lang.bot.callbackQuery.answerto}: ${ctx.callbackQuery.from.id} - ${Lang.bot.callbackQuery.success}`)
         })
 

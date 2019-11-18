@@ -44,6 +44,7 @@ let Register = {
                         if (stats.isDirectory()) {
                             // Iterial each key inside the components config
                             // configValue represents each component name
+                            loadedPlugins.push(`${Lang.component.loaded[0]}`)
                             for (let [configKey, configValue] of Object.entries(compConfig.components)) {
                                 
                                 let compoPath = extensionDir + value + "/" + configValue.name + ".js"
@@ -86,7 +87,7 @@ let Register = {
                                         })
                                     }
 
-                                    loadedPlugins.push(`${Lang.component.loaded[0]} ${value}/${configValue.name}@${configValue.version}`)
+                                    loadedPlugins.push(`${value}/${configValue.name}@${configValue.version}`)
                                     Log.Log.debug(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
                             }
