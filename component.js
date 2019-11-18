@@ -90,13 +90,13 @@ let Register = {
                                     Log.Log.debug(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
                             }
-                            Log.Log.info(Lang.component.readIn + compConfig.groupname + Lang.component.loaded[1] + value)
+                            Log.Log.info(Lang.component.readIn + compConfig.groupname + " " + Lang.component.component + ": " + loadedPlugins.length + Lang.component.loaded[1] + value)
                         }
                     }
                     else { Log.Log.fatal(Lang.component.configFileInvalid + folder + "/config.json") }
                 }
                 else {
-                    Log.Log.warning(Lang.component.noValidConfigFound[0])
+                    Log.Log.warning(Lang.component.noValidConfigFound[0] + " " + folder)
                     Log.Log.warning(Lang.component.noValidConfigFound[1])
                     return Compo
                 }

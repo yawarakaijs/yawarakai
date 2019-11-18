@@ -2,7 +2,7 @@
     "app": {
         "startTime": "Starting time",
         "coreVersion": "Version",
-        "cli-command-unknown-prompt": "Unknown Command, check your spelling or command not exist \nHint: Use /help to get help or /aval to get usable command list \nExecute \"/exit\" if you wish to quit the program",
+        "cliCommandUnknownPrompt": "Unknown Command, check your spelling or command not exist \nHint: Use /help to get help or /aval to get usable command list \nExecute \"/exit\" if you wish to quit the program",
         "cliAvailiableCommand": "Availiable Command(s)",
         "commandExecution": "User command execution",
         "starting": " starting"
@@ -46,7 +46,8 @@
         "enabled": "Enabled ",
         "disabled": "Disabled ",
         "reloaded": "Reloaded ",
-        "noComponentFound": ["Partial components were loaded", "If you have installed, please check whether the Components directory exists under the project root"],
+        "component": "component(s)",
+        "noComponentFound": ["Partial components weren't loaded", "If you have installed, please check whether the Components directory exists under the project root"],
         "noValidConfigFound": ["Partial components were loaded", "Component(s) with no valid config.json were found, please check the config.json file of your component if you have installed"],
         "configFileInvalid": ["ConfigFileInvalidError: \n", " Incorrect config.json or file is invalid"]
     }

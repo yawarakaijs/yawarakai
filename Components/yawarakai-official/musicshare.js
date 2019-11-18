@@ -306,7 +306,7 @@ exports.meta = config.components.musicshare
 
 exports.commands = {
     netease: async function (context) {
-
+        return "功能正在开发中哦"
     },
     playlist: async function (context) {
         let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
