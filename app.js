@@ -80,6 +80,37 @@ else {
     })
 }
 
+let args = process.argv.slice(2)
+
+if(args.length != 0) {
+    switch(args[0]) {
+        case "start":
+            if (args.length > 1 && (args[1] == "--debug" || args[1] == "--d")) {
+                Core.setKey("logtext", "")
+                Bot.Telegram.command("/telegram debug")
+                Core.setKey("nlpfeedback", false)
+                Core.getKey("nlpfeedback").then(res => {
+                    Log.debug(`NLP set to ${res}`)
+                })
+                Core.getKey("nlpAnalyzeIds").then(res => {
+                    Log.trace(`NLP Analyzer List: ${res}`)
+                }).catch(err => {
+                    Core.setKey("nlpAnalyzeIds", "[]")
+                })
+            }
+            else {
+                Core.setKey("logtext", "")
+                Bot.Telegram.command("/telegram start")
+                Core.setKey("nlpfeedback", false)
+                Core.getKey("nlpfeedback")
+                Core.getKey("nlpAnalyzeIds").catch(err => {
+                    Core.setKey("nlpAnalyzeIds", "[]")
+                })
+            }
+            break
+    }
+}
+
 // CLI
 Core.cliInput('> ', input => {
     var command = input.split(' ')[0] // Cut Command and set to First string
