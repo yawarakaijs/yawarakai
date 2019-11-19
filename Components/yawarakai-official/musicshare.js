@@ -471,8 +471,9 @@ exports.callbackQuery = {
                 ).catch(err => {
                     console.error(err)
                 })
+                return undefined
             }
-
+            console.log(data.callback.audio)
             message = await Telegram.editMessageText(
                 message.chat.id,
                 message.message_id,
