@@ -106,8 +106,8 @@ exports.commands = {
         let ctx = context.ctx
         let data = context.args.join(" ")
 
-        let flightNumPattern = /(([A-Z])|(\d)){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /(([A-Z])|(\d)){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /(([a-zA-Z])|(\d)){2}((-)|( ))?(\d{3,4})/gi
+        let flightNumInputPattern = /(([a-zA-Z])|(\d)){2}(-)(\d{3,4})/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -142,8 +142,8 @@ exports.commands = {
 
         if(!flightNumInputPattern.test(flightNum)) {
 
-            let flightNumInputPattern1 = /(([A-Z])|(\d)){2}( )(\d{3,4})/gi
-            let flightNumInputPattern2 = /(([A-Z])|(\d)){2}(\d{3,4})/gi
+            let flightNumInputPattern1 = /(([a-zA-Z])|(\d)){2}( )(\d{3,4})/gi
+            let flightNumInputPattern2 = /(([a-zA-Z])|(\d)){2}(\d{3,4})/gi
 
             if(flightNumInputPattern1.test(flightNum)) {
                 let array = flightNum.split(' ')
@@ -176,8 +176,8 @@ exports.inlines = {
     main: async function (ctx) {
         let data = ctx.inlineQuery.query
 
-        let flightNumPattern = /(([A-Z])|(\d)){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /(([A-Z])|(\d)){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /(([a-zA-Z])|(\d)){2}((-)|( ))?(\d{3,4})/gi
+        let flightNumInputPattern = /(([a-zA-Z])|(\d)){2}(-)(\d{3,4})/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -217,8 +217,8 @@ exports.inlines = {
 
         if(!flightNumInputPattern.test(flightNum)) {
 
-            let flightNumInputPattern1 = /(([A-Z])|(\d)){2}( )(\d{3,4})/gi
-            let flightNumInputPattern2 = /(([A-Z])|(\d)){2}(\d{3,4})/gi
+            let flightNumInputPattern1 = /(([a-zA-Z])|(\d)){2}( )(\d{3,4})/gi
+            let flightNumInputPattern2 = /(([a-zA-Z])|(\d)){2}(\d{3,4})/gi
 
             if(flightNumInputPattern1.test(flightNum)) {
                 let array = flightNum.split(' ')
