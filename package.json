@@ -1,10 +1,12 @@
 {
   "name": "yawarakai",
-  "version": "1.2.3",
+  "version": "1.2.6",
   "description": "A Experiment",
   "main": "app.js",
   "scripts": {
-    "test": "node app.js"
+    "test": "node app.js",
+    "start": "node app.js start",
+    "debug": "node app.js start --debug"
   },
   "repository": {
     "type": "git",

@@ -10,7 +10,7 @@ let Lang = require('./Core/lang')
 // Body
 
 let Register = {
-    load: (extension_dir = path.join(__dirname, '/Components/')) => {
+    load: (extensionDir = path.join(__dirname, '/Components/')) => {
         try {
             // Init object for later storage
             /**
@@ -24,15 +24,15 @@ let Register = {
              */
             let Compo = { command: [], inline: [], message: [], callbackQuery: [] }
             // Read all folders inside the Components folder
-            if(!fs.existsSync(extension_dir)) {
+            if(!fs.existsSync(extensionDir)) {
                 Log.Log.warning(Lang.component.noComponentFound[0])
                 Log.Log.warning(Lang.component.noComponentFound[1])
                 return Compo
             }
-            var files = fs.readdirSync(extension_dir)
+            var files = fs.readdirSync(extensionDir)
             // Iterial all folders to find the config.json under it
             files.forEach((value, index) => {
-                let folder = path.join(extension_dir, value)
+                let folder = path.join(extensionDir, value)
                 let stats = fs.statSync(folder)
                 // Check if folder has config.json
                 if (fs.existsSync(folder + "/config.json")) {
@@ -44,12 +44,13 @@ let Register = {
                         if (stats.isDirectory()) {
                             // Iterial each key inside the components config
                             // configValue represents each component name
+                            loadedPlugins.push(`${Lang.component.loaded[0]}`)
                             for (let [configKey, configValue] of Object.entries(compConfig.components)) {
                                 
-                                let compoPath = extension_dir + value + "/" + configValue.name + ".js"
-                                let core_exists = fs.statSync(compoPath)
+                                let compoPath = extensionDir + value + "/" + configValue.name + ".js"
+                                let coreExists = fs.statSync(compoPath)
 
-                                if (core_exists && configValue.enable) {
+                                if (coreExists && configValue.enable) {
                                     
                                     let compo = require(compoPath)
 
@@ -86,17 +87,17 @@ let Register = {
                                         })
                                     }
 
-                                    loadedPlugins.push(`${Lang.component.loaded[0]} ${value}/${configValue.name}@${configValue.version}`)
+                                    loadedPlugins.push(`${value}/${configValue.name}@${configValue.version}`)
                                     Log.Log.debug(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
                             }
-                            Log.Log.info(Lang.component.readIn + compConfig.groupname + Lang.component.loaded[1] + value)
+                            Log.Log.info(Lang.component.readIn + compConfig.groupname + " " + Lang.component.component + ": " + loadedPlugins.length + Lang.component.loaded[1] + value)
                         }
                     }
                     else { Log.Log.fatal(Lang.component.configFileInvalid + folder + "/config.json") }
                 }
                 else {
-                    Log.Log.warning(Lang.component.noValidConfigFound[0])
+                    Log.Log.warning(Lang.component.noValidConfigFound[0] + " " + folder)
                     Log.Log.warning(Lang.component.noValidConfigFound[1])
                     return Compo
                 }

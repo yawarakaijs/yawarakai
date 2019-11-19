@@ -15,7 +15,7 @@
             "name": "musicshare",
             "displayNam": "Music sharing component for music platforms",
             "groupNam": "yawarakai-official",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
         },
@@ -27,6 +27,16 @@
             "version": "v1.2.0",
             "author": ["Yawarakai Devs"],
             "description": "Search keywords on Wikipedia"
+        },
+        "flight": {
+            "enable": true,
+            "name": "flight",
+            "displayNam": "Flight Info",
+            "groupNam": "yawarakai-official",
+            "version": "v1.0.0",
+            "author": ["Yawarakai Devs"],
+            "description": "Get flight information",
+            "locale": "zh-CN"
         }
     }
 }

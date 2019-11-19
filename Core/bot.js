@@ -23,6 +23,7 @@ let Bot = {
     commandParse: function (ctx, callback) {
         let commandArgs = ctx.message.text.split(" ")
         let command = commandArgs[0].substring(1)
+        command = command.replace(/@\w+/g, "")
         let args = []
         commandArgs.forEach((value, index) => {
             if (index > 0 && value !== "") {
@@ -157,6 +158,7 @@ let DiagnosticLog = {
 
 let Control = {
     start: function () {
+        
         /**
          * Handle new chat member
          */
@@ -175,7 +177,6 @@ let Control = {
             let user = ctx.callbackQuery.from
             Log.info(`${Lang.bot.callbackQuery.from}: ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${user.id}] ${Lang.bot.callbackQuery.callback} ${ctx.callbackQuery.data}`)
             let data = await Bot.callbackQueryDistributor(ctx)
-            console.log(data)
             Log.info(`${Lang.bot.callbackQuery.answerto}: ${ctx.callbackQuery.from.id} - ${Lang.bot.callbackQuery.success}`)
         })
 
@@ -207,7 +208,7 @@ let Control = {
                         thumb_url: "https://i.loli.net/2019/11/13/dQDxC4Nv91VYK2E.jpg",
                         input_message_content: { message_text: `没有你需要的结果` }
                     }
-                ], { cache_time: 1 }).then(res => { Log.info(`${Lang.bot.inlineQuery.answerto}: ${ctx.inlineQuery.from.id} - ${Lang.bot.inlineQuery.success}`) }).catch(err => DiagnosticLog.fatal(err))
+                ], { cache_time: 1 }).catch(err => DiagnosticLog.fatal(err))
             }
         })
 
@@ -220,7 +221,12 @@ let Control = {
             /**
              * Handle commands
              */
-            if (/^\/.*/gui.test(ctx.message.text)) {
+            
+            if (/^\/\w+/gui.test(ctx.message.text)) {
+                let me = await Telegram.Bot.telegram.getMe()
+                if (/^\/\w+@\w+/.test(ctx.message.text) && !ctx.message.text.includes(me.username)) {
+                    return
+                }
                 let data = await Bot.commandDistributor(ctx)
                 if(data != undefined) {
                     ctx.reply(data)

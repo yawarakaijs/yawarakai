@@ -14,7 +14,15 @@ npm install # or yarn install
 ```
 cp config.js.example config.json
 # Edit the info inside config.json
-node app.js
+```
+
+## Start an instance
+```
+npm start
+# or
+node app.js start
+# add --debug flag if you want it to be debug mode
+node app.js start --debug
 ```
 
 [![forthebadge](https://forthebadge.com/images/badges/contains-cat-gifs.svg)](https://forthebadge.com)  [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)  [![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com)  [![forthebadge](https://forthebadge.com/images/badges/just-plain-nasty.svg)](https://forthebadge.com)

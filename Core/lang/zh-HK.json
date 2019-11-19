@@ -1,0 +1,54 @@
+{
+    "app": {
+        "startTime": "開始時間",
+        "coreVersion": "版本",
+        "cliCommandUnknownPrompt": "未知命令，請檢查你的拼寫或者命令不存在 \n提示：使用 /help 命令來獲得幫助或者使用 /aval 來獲得可用命令列表 \n輸入 /exit 以退出 Yawarakai",
+        "cliAvailiableCommand": "可用命令",
+        "commandExecution": "用戶執行命令",
+        "starting": " 啟動中..."
+    },
+    "bot": {
+        "message": {
+            "from": "來自",
+            "text": "消息",
+            "group": "群組",
+            "replyto": "回復至",
+            "success": "成功"
+        },
+        "inlineQuery": {
+            "from": "來自",
+            "query": "Inline 請求",
+            "answerto": "返回 Inline Data至",
+            "success": "成功"
+        },
+        "callbackQuery": {
+            "from": "來自",
+            "callback": "回傳請求Data",
+            "answerto": "返回 callbackQuery Data",
+            "success": "成功"
+        },
+        "telegram": {
+            "commandParameterInvalid": "無效的參數",
+            "commandParameterMissing": ["無效的參數：","，檢查是否缺失必要參數："],
+            "commandInvalid": "參數命令錯誤 \n執行 /telegram h 或者 /telegram help 來獲取幫助",
+            "helpCommand": "telegram 命令是用於啟動和管理 Telegram Bot 和 Telegram Client \n start     啟動 Telegram Bot \n stop      停止 Telegram Bot",
+            "webhookSettingsWarning": "如果你使用了外部服務器的命令行模式來設定 Webhook，這裡顯示的 Webhook 可能不是登記在 Telegram 伺服器的 Webhook 地址"
+        }
+    },
+    "core": {
+        "redisAuthSuccess": "Redis 伺服器驗證成功並且已連線",
+        "redisAuthFail": "Redis 伺服器驗證失敗",
+        "redisCausedShutdown": "由於 Redis 連結失敗正在退出 Yawarakai..."
+    },
+    "component": {
+        "readIn": "已讀取 ",
+        "loaded": ["已掛載組件 ", " 來自 "],
+        "enabled": "已激活 ",
+        "disabled": "已禁用 ",
+        "reloaded": "已重載 ",
+        "component": "組件",
+        "noComponentFound": ["沒有加載部分組件","如果有安裝組件，請檢查 Components 資料夾是否存在於根目錄下"],
+        "noValidConfigFound": ["沒有加載部分組件", "找到了組件目錄，如果安裝了組件，請檢查組件是否有 config.json 文件"],
+        "configFileInvalid": ["ConfigFileInvalidError: \n", " 配置文件不正確或是無效"]
+    }
+}
