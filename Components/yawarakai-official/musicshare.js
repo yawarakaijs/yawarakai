@@ -3,26 +3,27 @@ const config = require("./config.json")
 const Compo = require("../../component")
 const fs = require('fs')
 const path = require('path')
-const NodeID3 = require('node-id3')
 const http = require('http')
 const https = require('https')
+const id3 = require('@calme1709/id3-js')
+
 
 let baseDir = __dirname.replace(/((\/)|(\\))(Components)(((\/)|(\\))(yawarakai-official))/gu, "")
 
 // io.js
-// let cacheDir = path.join(baseDir, "/cache")
-// let dataDir = path.join(cacheDir, "/data")
-// let musicDir = path.join(cacheDir, "/music")
+let cacheDir = path.join(baseDir, "/cache")
+let dataDir = path.join(cacheDir, "/data")
+let musicDir = path.join(cacheDir, "/music")
 
-// if (!fs.existsSync(cacheDir)) {
-//     fs.mkdirSync(cacheDir)
-// }
-// if (!fs.existsSync(dataDir)) {
-//     fs.mkdirSync(dataDir)
-// }
-// if (!fs.existsSync(musicDir)) {
-//     fs.mkdirSync(musicDir)
-// }
+if (!fs.existsSync(cacheDir)) {
+    fs.mkdirSync(cacheDir)
+}
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir)
+}
+if (!fs.existsSync(musicDir)) {
+    fs.mkdirSync(musicDir)
+}
 
 let main = {
     /**
@@ -54,12 +55,22 @@ let main = {
             FUID = FUID.join("")
             FUID = "2523" + new Date().getTime() + FUID
 
+            if (!fs.existsSync(cacheDir)) {
+                fs.mkdirSync(cacheDir)
+            }
+            if (!fs.existsSync(dataDir)) {
+                fs.mkdirSync(dataDir)
+            }
+            if (!fs.existsSync(musicDir)) {
+                fs.mkdirSync(musicDir)
+            }
+
             // song file
             return Promise.all([
                 // main.getSong(resArray[0].data.data[0].url, FUID),
                 // main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID),
                 axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
-            ]).then(dataArray => {
+            ]).then(async (dataArray) => {
 
                 let data = {
                     inline: [{
@@ -95,6 +106,7 @@ let main = {
                 return data
 
             }).catch(err => Compo.Interface.Log.Log.fatal(err))
+
         }).catch(err => {
             err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
         })
@@ -113,6 +125,7 @@ let main = {
     playlist: async function (params) {
         let baseUrl = "https://api.yutsuki.moe/cloudmusic"
         return axios.get(baseUrl + '/playlist/detail', { params: { id: params.id } }).then(res => {
+
             if (res.data.code != 200) {
                 return undefined
             }
@@ -151,7 +164,7 @@ let main = {
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
             let fileName = fileId + "." + extName
 
-            let file = fs.createWriteStream("./cache/music/" + fileName)
+            let file = fs.createWriteStream("./cache/data/" + fileName)
             let request = http.get(url, function (response) {
                 if (response.statusCode != 200) {
                     reject()
@@ -182,33 +195,32 @@ let main = {
             })
         })
     },
-    writeTag: function (audioFile, picFile, info) {
+    writeTag: async function (audioFile, picFile, info) {
         return new Promise((resolve, reject) => {
-            console.log(NodeID3.read(path.join(baseDir, "/cache/data/", audioFile)))
+            let file = path.join(baseDir, "/cache/data/", audioFile)
+
+            let image = fs.readFileSync(path.join(baseDir, "/cache/data/" + picFile))
+
+            let artist = new Array()
+            info.track.ar.forEach(item => {
+                artist.push(item.name)
+            })
+
+            artist = artist.join("/")
+            let time = info.track.publishTime
+            let year = new Date(time).getFullYear()
+
             let tag = {
-                album: "",
-                composer: "",
-                genre: "",
-                date: "",
-                time: "",
-                title: "",
-                subtitle: "",
-                artist: "",
-                publisher: "",
-                trackNumber: "",
-                recordingDates: "",
-                size: "",
-                year: "",
-                image: {
-                    mime: "png/jpeg" / undefined,
-                    type: {
-                        id: 3,
-                        name: "front cover"
-                    },
-                    description: "image description",
-                    imageBuffer: null
-                }
+                album: info.album.name,
+                title: info.track.name,
+                artist: artist,
+                image: image
             }
+
+            id3.write(file, tag)
+            
+            const buffer = fs.readFileSync(file)
+            ID3JS.read(buffer)
         })
     },
     /**
@@ -308,6 +320,98 @@ let main = {
             return params
         }
 
+    },
+    pageUp: function(itemNum, dataArray, params, type) {
+        let desPage = params.pid - 1
+
+        let end = itemNum * desPage
+        let start = end - itemNum
+
+        let keys = new Array()
+        let isTop = desPage == 1
+        for (let i = start; i < end; i++) {
+            let key = [{
+                text: `${dataArray[i].name} - ${dataArray[i].artist}`,
+                callback_data: "musicshare://song?id=" + dataArray[i].id
+            }]
+            keys.push(key)
+        }
+        if (isTop) {
+            keys.push([
+                {
+                    text: desPage,
+                    callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
+                },
+                {
+                    text: ">",
+                    callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
+                }
+            ])
+        }
+        else {
+            keys.push([
+                {
+                    text: "<",
+                    callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
+                },
+                {
+                    text: desPage,
+                    callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
+                },
+                {
+                    text: ">",
+                    callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
+                }
+            ])
+        }
+        return keys                        
+    },
+    pageDown: function(itemNum, dataArray, params, type) {
+        let desPage = params.pid + 1
+
+        let end = itemNum * desPage
+        let start = end - itemNum
+        let keys = new Array()
+        let length = dataArray.length > end ? end : dataArray.length
+        let isEnd = dataArray.length > end ? false : true 
+                               
+        for (let i = start; i < length; i++) {
+            let key = [{
+                    text: `${dataArray[i].name} - ${dataArray[i].artist}`,
+                    callback_data: "musicshare://song?id=" + dataArray[i].id
+            }]
+            keys.push(key)
+        }
+
+        if (isEnd) {
+            keys.push([
+                {
+                    text: "<",
+                    callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
+                },
+                {
+                    text: desPage,
+                    callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
+                }
+            ])
+        }
+        else {
+            keys.push([
+                {
+                    text: "<",
+                    callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
+                },
+                {
+                    text: desPage,
+                    callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
+                },
+                {
+                    text: ">",
+                    callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
+                }
+            ])
+        }
+        return keys        
     }
 }
 
@@ -461,7 +565,7 @@ exports.callbackQuery = {
             })
 
             let data = await main.song(params)
-            
+
             if (data.callback.audio == null) {
                 Telegram.editMessageText(
                     message.chat.id,
@@ -473,7 +577,7 @@ exports.callbackQuery = {
                 })
                 return undefined
             }
-            console.log(data.callback.audio)
+
             message = await Telegram.editMessageText(
                 message.chat.id,
                 message.message_id,
@@ -494,10 +598,6 @@ exports.callbackQuery = {
                         [{
                             text: "Open in App",
                             url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
-                        }],
-                        [{
-                            text: "Back to Playlist",
-                            callback_data: "musicshare://album?id=" + data.track.id
                         }]
                     ]
                 }
@@ -569,7 +669,7 @@ exports.callbackQuery = {
                 else {
                     keys.push([
                         {
-                            text: ">",
+                            text: "<",
                             callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
                         },
                         {
@@ -582,7 +682,7 @@ exports.callbackQuery = {
                         }
                     ])
                 }
-                console.log(callbackData)
+
                 this.telegram.sendMessage(
                     callbackData.message.chat.id,
                     playlistData.text, {
@@ -615,48 +715,8 @@ exports.callbackQuery = {
                 }
                 else {
 
-                    let desPage = params.pid - 1
+                    let keys = main.pageUp(6, previous.tracks, params, "playlist")
 
-                    let end = 6 * desPage
-                    let start = end - 6
-
-                    let keys = new Array()
-                    let isTop = desPage == 1
-                    for (let i = start; i < end; i++) {
-                        let key = [{
-                                text: `${previous.tracks[i].name} - ${previous.tracks[i].artist}`,
-                                callback_data: "musicshare://song?id=" + previous.tracks[i].id
-                        }]
-                        keys.push(key)
-                    }
-                    if (isTop) {
-                        keys.push([
-                            {
-                                text: desPage,
-                                callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
-                            },
-                            {
-                                text: ">",
-                                callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
-                            }
-                        ])
-                    }
-                    else {
-                        keys.push([
-                            {
-                                text: ">",
-                                callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
-                            },
-                            {
-                                text: desPage,
-                                callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
-                            },
-                            {
-                                text: ">",
-                                callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
-                            }
-                        ])
-                    }
                     message = await this.telegram.editMessageText(
                         message.chat.id,
                         message.message_id,
@@ -677,49 +737,8 @@ exports.callbackQuery = {
                 }
                 else {
 
-                    let desPage = params.pid + 1
+                    let keys = main.pageDown(6, next.tracks, params, "playlist")
 
-                    let end = 6 * desPage
-                    let start = end - 6
-
-                    let keys = new Array()
-                    let length = next.tracks.length > end ? end : next.tracks.length
-                    let isEnd = next.tracks.length > end ? false : true
-                    for (let i = start; i < length; i++) {
-                        let key = [{
-                                text: `${next.tracks[i].name} - ${next.tracks[i].artist}`,
-                                callback_data: "musicshare://song?id=" + next.tracks[i].id
-                        }]
-                        keys.push(key)
-                    }
-                    if (isEnd) {
-                        keys.push([
-                            {
-                                text: "<",
-                                callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
-                            },
-                            {
-                                text: desPage,
-                                callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
-                            }
-                        ])
-                    }
-                    else {
-                        keys.push([
-                            {
-                                text: "<",
-                                callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
-                            },
-                            {
-                                text: desPage,
-                                callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
-                            },
-                            {
-                                text: ">",
-                                callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
-                            }
-                        ])
-                    }
                     message = await this.telegram.editMessageText(
                         message.chat.id,
                         message.message_id,

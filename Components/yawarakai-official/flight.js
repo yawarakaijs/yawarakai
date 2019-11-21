@@ -88,9 +88,6 @@ let main = {
 
             data =  { data: data.join("\n"), flight: flight }
             return data
-
-        }).catch(function (err) {
-            Compo.Interface.Log.Log.fatal(`用户 ${ctx.message.from.id} 查询的航班信息获取失败。`)
         })
     }
 }
@@ -233,17 +230,24 @@ exports.inlines = {
         }
 
         let info = [flight, date]
-        let result = await main.getData(ctx, info, data)
-        data = [{
-            type: "article",
-            id: ctx.inlineQuery.id,
-            title: info[1] + " " + info[0],
-            description: result.flight.departSchechuleTimeInfo + " -> " + result.flight.arrivalActualTimeInfo,
-            thumb: "https://i.loli.net/2019/11/13/dQDxC4Nv91VYK2E.jpg",
-            input_message_content: { message_text: result.data, parse_mode: "Markdown" }
-        }]
-
-        return data
+        let result = await main.getData(ctx, info, data).catch(err => {
+            return undefined
+        })
+        if (result == undefined) {
+            return undefined
+        }
+        else {
+            data = [{
+                type: "article",
+                id: ctx.inlineQuery.id,
+                title: "Flight " + info[1] + " " + info[0],
+                description: result.flight.departSchechuleTimeInfo + " -> " + result.flight.arrivalActualTimeInfo,
+                thumb_url: "https://i.loli.net/2019/11/21/mDbIqPokTR675wn.png",
+                input_message_content: { message_text: result.data, parse_mode: "Markdown" }
+            }]
+    
+            return data
+        }
     }
 }
 
