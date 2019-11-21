@@ -46,6 +46,7 @@
         "enabled": "有効化 ",
         "disabled": "無効 ",
         "reloaded": "過負荷 ",
+        "component": "部品",
         "noComponentFound": ["一部のコンポーネントがロードされていません","コンポーネントがインストールされている場合は、ルートディレクトリにComponentsフォルダーが存在するかどうかを確認します。"],
         "noValidConfigFound": ["一部のコンポーネントがロードされていません", "コンポーネントディレクトリが見つかりました。コンポーネントがインストールされている場合は、コンポーネントにconfig.jsonファイルがあるかどうかを確認してください"],
         "configFileInvalid": ["ConfigFileInvalidError: \n", " プロファイルが正しくないか無効です"]
