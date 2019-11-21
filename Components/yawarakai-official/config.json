@@ -24,7 +24,7 @@
             "name": "wiki",
             "displayNam": "Wikipedia",
             "groupNam": "yawarakai-official",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "author": ["Yawarakai Devs"],
             "description": "Search keywords on Wikipedia"
         },
@@ -33,7 +33,7 @@
             "name": "flight",
             "displayNam": "Flight Info",
             "groupNam": "yawarakai-official",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "author": ["Yawarakai Devs"],
             "description": "Get flight information",
             "locale": "zh-CN"
