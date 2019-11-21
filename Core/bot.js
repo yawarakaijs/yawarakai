@@ -164,7 +164,7 @@ let Control = {
          */
         Telegram.Bot.on("new_chat_members", async (ctx) => {
             let newMember = ctx.update.message.new_chat_member
-            if(!ctx.update.message.new_chat_member.is_bot) {
+            if(!ctx.update.message.new_chat_member.is_bot && config.debugmode) {
                 let name = newMember.first_name != "" && newMember.first_name != undefined ? newMember.first_name : newMember.username ? newMember.username : newMember.id
                 Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, `欢迎新朋友 [${name}](tg://user?id=${newMember.id}) !\n如果是第一次来到乐园的话，建议和大家自我介绍一下哦（当然也不会勉强了啦）\n希望乃在花見乐园能够玩的开心呢)`, { parse_mode: "Markdown" })
             }
