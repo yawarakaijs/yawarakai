@@ -5,7 +5,6 @@ const fs = require('fs')
 const path = require('path')
 const http = require('http')
 const https = require('https')
-const id3 = require('@calme1709/id3-js')
 
 
 let baseDir = __dirname.replace(/((\/)|(\\))(Components)(((\/)|(\\))(yawarakai-official))/gu, "")
@@ -216,11 +215,6 @@ let main = {
                 artist: artist,
                 image: image
             }
-
-            id3.write(file, tag)
-            
-            const buffer = fs.readFileSync(file)
-            ID3JS.read(buffer)
         })
     },
     /**
@@ -482,7 +476,7 @@ exports.commands = {
             }
         }
         else {
-            return undefined
+            return "/playlist 歌单链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease playlist 关键词"
         }
     }
 }

@@ -4,7 +4,7 @@
 
 let Core = require('../core')
 let Message = require('./Bot/message')
-let Command = require('./Bot/command')
+let Command = require('./Bot/command').Command
 let Telegram = require('./Bot/telegram')
 let Component = require('../component')
 
@@ -33,7 +33,9 @@ let Bot = {
         return {
             cmd: command,
             args: args,
-            ctx: ctx
+            ctx: ctx,
+            telegram: Telegram.Bot.telegram,
+            compo: compoData
         }
     },
     inlineDistributor: async function (ctx) {
@@ -83,9 +85,14 @@ let Bot = {
         return await cmd.instance.call(this, result)
     },
     staticCommandDistributor: function (ctx) {
-        commandParse(ctx, (result) => {
-
-        })
+        let result = Bot.commandParse(ctx)
+        let data = Command.switcher(result)
+        if (data != undefined) {
+            return data
+        }
+        else {
+            return undefined
+        }
     },
     messasgeDistributor: async function (ctx) {
         let method = compoData.message
@@ -227,9 +234,12 @@ let Control = {
                 if (/^\/\w+@\w+/.test(ctx.message.text) && !ctx.message.text.includes(me.username)) {
                     return
                 }
-                let data = await Bot.commandDistributor(ctx)
+                let data = Bot.staticCommandDistributor(ctx)
+                if (data == undefined) {
+                    data = await Bot.commandDistributor(ctx)
+                }
                 if(data != undefined) {
-                    ctx.reply(data)
+                    ctx.reply(data, { parse_mode: "Markdown" })
                 }
             }
 

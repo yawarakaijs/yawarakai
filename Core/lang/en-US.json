@@ -27,6 +27,12 @@
             "answerto": "Answering callbackQuery data to",
             "success": "Successful"
         },
+        "command": {
+            "start": "/start Start to interact with Bot",
+            "help": "/help Display all the available helping context along with commands\nThe detailed information are following below, if you want to read more information about the command with component, use /info instead",
+            "info": "/info Get the basic information of the Bot and the chat",
+            "settings": "/settings Set the available settings with Bot [Temporarily Unavailable - Under Construction]"
+        },
         "telegram": {
             "commandParameterInvalid": "Parameter Invalid",
             "commandParameterMissing": ["Invalid Parameter: ",", Please check the missing parameter: "],

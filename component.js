@@ -7,6 +7,10 @@ let path = require('path')
 let Log = require('./Core/log')
 let Lang = require('./Core/lang')
 
+let compoInfo = new Array()
+let compoHelp = new Array()
+let compoPair = new Array()
+
 // Body
 
 let Register = {
@@ -44,9 +48,13 @@ let Register = {
                         if (stats.isDirectory()) {
                             // Iterial each key inside the components config
                             // configValue represents each component name
-                            loadedPlugins.push(`${Lang.component.loaded[0]}`)
+                            compoInfo.push(`${Lang.component.loaded[0]}`)
                             for (let [configKey, configValue] of Object.entries(compConfig.components)) {
                                 
+                                compoPair.push(`\n*${configValue.displayName}*`)
+                                compoPair.push(`${configValue.description}`)
+                                compoPair.push(`${value}/${configValue.name}@${configValue.version}`)
+
                                 let compoPath = extensionDir + value + "/" + configValue.name + ".js"
                                 let coreExists = fs.statSync(compoPath)
 
@@ -60,6 +68,10 @@ let Register = {
                                             cmd.instance = compo.commands[cmd.function]
                                             cmd.meta = compo.meta
                                             Compo.command.push(cmd)
+
+                                            // Append the help text to compoHelp
+                                            compoPair.push(`/${cmd.function}`)
+                                            compoHelp.push(`/${cmd.function} ${cmd.help}`)
                                         })
                                     }
                                     // Check if register inlines exist
@@ -87,11 +99,13 @@ let Register = {
                                         })
                                     }
 
-                                    loadedPlugins.push(`${value}/${configValue.name}@${configValue.version}`)
+                                    compoInfo.push(`${value}/${configValue.name}@${configValue.version}`)
                                     Log.Log.debug(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                 }
+
                             }
-                            Log.Log.info(Lang.component.readIn + compConfig.groupname + " " + Lang.component.component + ": " + loadedPlugins.length + Lang.component.loaded[1] + value)
+                            Log.Log.info(Lang.component.readIn + compConfig.groupname + " " + Lang.component.component + ": " + compoInfo.length + Lang.component.loaded[1] + value)
+                            compoPair.push(`\n${Lang.component.readIn}${Lang.component.component}: *${compoInfo.length}*`)
                         }
                     }
                     else { Log.Log.fatal(Lang.component.configFileInvalid + folder + "/config.json") }
@@ -109,14 +123,14 @@ let Register = {
     }
 }
 
-let loadedPlugins = new Array()
-
 let Interface = {
     Log: Log
 }
 
 // Exports
 
-exports.loadedPlugins = loadedPlugins
+exports.compoPair = compoPair
+exports.compoHelp = compoHelp
+exports.compoInfo = compoInfo
 exports.Interface = Interface
 exports.Register = Register

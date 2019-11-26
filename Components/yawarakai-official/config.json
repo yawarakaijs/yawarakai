@@ -4,8 +4,8 @@
         "dictionary": {
             "enable": true,
             "name": "dictionary",
-            "displayNam": "Dictionary for Simplified Chinese",
-            "groupNam": "yawarakai-official",
+            "displayName": "Dictionary for Simplified Chinese",
+            "groupName": "yawarakai-official",
             "version": "v1.3.2",
             "authort": ["Yawarakai Devs"],
             "description": "Find the foreign language words and Give the defination of it"
@@ -13,8 +13,8 @@
         "musicshare": {
             "enable": true,
             "name": "musicshare",
-            "displayNam": "Music sharing component for music platforms",
-            "groupNam": "yawarakai-official",
+            "displayName": "Music sharing component for music platforms",
+            "groupName": "yawarakai-official",
             "version": "v1.3.2",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
@@ -22,8 +22,8 @@
         "wiki": {
             "enable": true,
             "name": "wiki",
-            "displayNam": "Wikipedia",
-            "groupNam": "yawarakai-official",
+            "displayName": "Wikipedia",
+            "groupName": "yawarakai-official",
             "version": "v1.2.1",
             "author": ["Yawarakai Devs"],
             "description": "Search keywords on Wikipedia"
@@ -31,8 +31,8 @@
         "flight": {
             "enable": true,
             "name": "flight",
-            "displayNam": "Flight Info",
-            "groupNam": "yawarakai-official",
+            "displayName": "Flight Info",
+            "groupName": "yawarakai-official",
             "version": "v1.0.1",
             "author": ["Yawarakai Devs"],
             "description": "Get flight information",
