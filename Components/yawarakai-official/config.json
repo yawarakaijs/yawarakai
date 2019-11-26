@@ -6,7 +6,7 @@
             "name": "dictionary",
             "displayName": "Dictionary for Simplified Chinese",
             "groupName": "yawarakai-official",
-            "version": "v1.3.2",
+            "version": "v1.3.3",
             "authort": ["Yawarakai Devs"],
             "description": "Find the foreign language words and Give the defination of it"
         },
@@ -15,7 +15,7 @@
             "name": "musicshare",
             "displayName": "Music sharing component for music platforms",
             "groupName": "yawarakai-official",
-            "version": "v1.3.2",
+            "version": "v1.3.3",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
         },
@@ -33,7 +33,7 @@
             "name": "flight",
             "displayName": "Flight Info",
             "groupName": "yawarakai-official",
-            "version": "v1.0.1",
+            "version": "v1.1.0",
             "author": ["Yawarakai Devs"],
             "description": "Get flight information",
             "locale": "zh-CN"
