@@ -756,10 +756,12 @@ exports.register = {
     // As the example to Yawarakai Compos
     commands: [
         {
-            function: 'netease'
+            function: 'netease',
+            help: "Unavailable (Under Construction)"
         },
         {
-            function: 'playlist'
+            function: 'playlist',
+            help: "歌单链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease playlist 关键词"
         }
     ],
     inlines: [

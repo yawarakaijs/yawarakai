@@ -257,7 +257,8 @@ exports.register = {
     // As the example to Yawarakai Compos
     commands: [
         {
-            function: 'flight'
+            function: 'flight',
+            help: "AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01"
         }
     ],
     inlines: [
