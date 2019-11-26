@@ -274,7 +274,7 @@ let Control = {
         }).catch(err => DiagnosticLog(err))
 
         Telegram.Bot.on("forward", async (ctx) => {
-            console.log(ctx.message)
+            Log.debug(ctx.message)
         })
 
         // Log
