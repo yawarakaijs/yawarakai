@@ -103,8 +103,8 @@ exports.commands = {
         let ctx = context.ctx
         let data = context.args.join(" ")
 
-        let flightNumPattern = /(([a-zA-Z])|(\d)){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /(([a-zA-Z])|(\d)){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}((-)|( ))?(\d{3,4})/gi
+        let flightNumInputPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}(-)(\d{3,4})/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -173,8 +173,8 @@ exports.inlines = {
     main: async function (ctx) {
         let data = ctx.inlineQuery.query
 
-        let flightNumPattern = /(([a-zA-Z])|(\d)){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /(([a-zA-Z])|(\d)){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}((-)|( ))?(\d{3,4})/gi
+        let flightNumInputPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}(-)(\d{3,4})/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {

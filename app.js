@@ -57,29 +57,6 @@ let Bot = require('./Core/bot')
 let Core = require('./core')
 Bot.Control.start()
 
-// Debug block
-if (config.debugmode) {
-    Core.setKey("logtext", "")
-    Bot.Telegram.command("/telegram debug")
-    Core.setKey("nlpfeedback", false)
-    Core.getKey("nlpfeedback").then(res => {
-        Log.debug(`NLP set to ${res}`)
-    })
-    Core.getKey("nlpAnalyzeIds").then(res => {
-        Log.trace(`NLP Analyzer List: ${res}`)
-    }).catch(err => {
-        Core.setKey("nlpAnalyzeIds", "[]")
-    })
-}
-else {
-    Core.setKey("logtext", "")
-    Core.setKey("nlpfeedback", false)
-    Core.getKey("nlpfeedback")
-    Core.getKey("nlpAnalyzeIds").catch(err => {
-        Core.setKey("nlpAnalyzeIds", "[]")
-    })
-}
-
 let args = process.argv.slice(2)
 
 if(args.length != 0) {
@@ -108,6 +85,30 @@ if(args.length != 0) {
                 })
             }
             break
+    }
+}
+else {
+    // Debug block
+    if (config.debugmode) {
+        Core.setKey("logtext", "")
+        Bot.Telegram.command("/telegram debug")
+        Core.setKey("nlpfeedback", false)
+        Core.getKey("nlpfeedback").then(res => {
+            Log.debug(`NLP set to ${res}`)
+        })
+        Core.getKey("nlpAnalyzeIds").then(res => {
+            Log.trace(`NLP Analyzer List: ${res}`)
+        }).catch(err => {
+            Core.setKey("nlpAnalyzeIds", "[]")
+        })
+    }
+    else {
+        Core.setKey("logtext", "")
+        Core.setKey("nlpfeedback", false)
+        Core.getKey("nlpfeedback")
+        Core.getKey("nlpAnalyzeIds").catch(err => {
+            Core.setKey("nlpAnalyzeIds", "[]")
+        })
     }
 }
 

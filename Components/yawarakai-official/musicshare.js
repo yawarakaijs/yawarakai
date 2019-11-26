@@ -522,11 +522,13 @@ exports.inlines = {
             }
             else if (params.type == "album") {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
-                return await main.album(params)
+                let data = await main.album(params)
+                return undefined
             }
             else if (params.type == "playlist") {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询歌单来自链接: ${link}`)
-                return await main.playlist(params)
+                let data = await main.playlist(params)
+                return undefined
             }
         }
         return undefined
@@ -566,7 +568,7 @@ exports.callbackQuery = {
 
             let data = await main.song(params)
 
-            if (data.callback.audio == null) {
+            if (data.callback.audio == null || data == undefined || data.callback == undefined) {
                 Telegram.editMessageText(
                     message.chat.id,
                     message.message_id,
