@@ -70,7 +70,7 @@ let messagectl = {
 }
 
 let Message = {
-    async hears(ctx) {
+    hears: async function (ctx) {
 
         let meowmeow = new MessageDictionary(
             [{reg: "(^喵～)|(^喵~)", mode: "gui"}],
@@ -97,16 +97,21 @@ let Message = {
         if(matchResult.reply.length != 0) {
             this.reply(ctx, matchResult)
         }
+        else {
+            return undefined
+        }
         if(matchResult.hasFunc) {
             MessageDictionaryControl.callFunc(matchResult)
+            return "Passed"
         }
+        return "Passed"
     },
-    todo(ctx, length) {
+    todo: function (ctx, length) {
         let thetimer = length * 200
         ctx.replyWithChatAction("typing")
     },
     //ctx, textReply, extra
-    async reply(ctx, context) {
+    reply: async function (ctx, context) {
         let textReply = context.reply
         if (Message.count == 0) {
             Message.count++

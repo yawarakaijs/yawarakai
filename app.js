@@ -65,10 +65,10 @@ if(args.length != 0) {
             if (args.length > 1 && (args[1] == "--debug" || args[1] == "--d")) {
                 Core.setKey("logtext", "")
                 Bot.Telegram.command("/telegram debug")
-                Core.setKey("nlpfeedback", false)
                 Core.getKey("nlpfeedback").then(res => {
                     Log.debug(`NLP set to ${res}`)
                 })
+                Core.setKey("nlpAnalyzeIds", "[]")
                 Core.getKey("nlpAnalyzeIds").then(res => {
                     Log.trace(`NLP Analyzer List: ${res}`)
                 }).catch(err => {
@@ -78,7 +78,6 @@ if(args.length != 0) {
             else {
                 Core.setKey("logtext", "")
                 Bot.Telegram.command("/telegram start")
-                Core.setKey("nlpfeedback", false)
                 Core.getKey("nlpfeedback")
                 Core.getKey("nlpAnalyzeIds").catch(err => {
                     Core.setKey("nlpAnalyzeIds", "[]")
@@ -92,7 +91,6 @@ else {
     if (config.debugmode) {
         Core.setKey("logtext", "")
         Bot.Telegram.command("/telegram debug")
-        Core.setKey("nlpfeedback", false)
         Core.getKey("nlpfeedback").then(res => {
             Log.debug(`NLP set to ${res}`)
         })
@@ -104,7 +102,6 @@ else {
     }
     else {
         Core.setKey("logtext", "")
-        Core.setKey("nlpfeedback", false)
         Core.getKey("nlpfeedback")
         Core.getKey("nlpAnalyzeIds").catch(err => {
             Core.setKey("nlpAnalyzeIds", "[]")

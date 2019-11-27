@@ -249,24 +249,26 @@ let Control = {
              * Handle general messages
              */
             else {
-                Nlp.tag(ctx, ctx.message.text).then(res => {
-                    let text = res
-                    if (text != undefined) {
-                        Core.getKey("nlpAnalyzeIds").then(ids => {
-                            let current = JSON.parse(ids)
-                            current.map(item => {
-                                if (item == ctx.from.id) {
-                                    Telegram.Bot.telegram.sendMessage(ctx.chat.id, text, { parse_mode: "Markdown" }).catch(err => {
-                                        DiagnosticLog.fatal(err)
-                                    })
-                                }
-                            })
-                        })
-                    }
-                })
                 let data = await Bot.messasgeDistributor(ctx)
                 if (data == undefined) {
-                    Message.Message.hears(ctx)
+                    let noneMsg = await Message.Message.hears(ctx)
+                    if (noneMsg == undefined) {
+                        Nlp.tag(ctx, ctx.message.text).then(res => {
+                            let text = res
+                            if (text != undefined) {
+                                Core.getKey("nlpAnalyzeIds").then(ids => {
+                                    let current = JSON.parse(ids)
+                                    current.map(item => {
+                                        if (item == ctx.message.from.id) {
+                                            Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, text, { parse_mode: "Markdown" }).catch(err => {
+                                                DiagnosticLog.fatal(err)
+                                            })
+                                        }
+                                    })
+                                })
+                            }
+                        })
+                    }
                 }
                 else {
                     ctx.replyWithChatAction("typing")
