@@ -104,10 +104,14 @@ let main = {
 
                 return data
 
-            }).catch(err => Compo.Interface.Log.Log.fatal(err))
+            }).catch(err => {
+                err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+                return err
+            })
 
         }).catch(err => {
             err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+            return err
         })
     },
     /**
@@ -493,7 +497,11 @@ exports.inlines = {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求歌曲来自链接: ${link}`)
 
                 let data = await main.song(params)
-                if (data.inline[0].audio_url == null) {
+                if(data instanceof Error) {
+                    this.DiagnosticLog.fatal(data)
+                    return undefined
+                }
+                else if (data.inline[0].audio_url == null) {
                     return [{
                         type: "article",
                         id: params.id,
