@@ -28,10 +28,10 @@
             "success": "成功"
         },
         "command": {
-            "start": "/start Start to interact with Bot",
-            "help": "/help Display all the available helping context along with commands\nThe detailed information are following below, if you want to read more information about the command with component, use /info instead",
-            "info": "/info Get the basic information of the Bot and the chat",
-            "settings": "/settings Set the available settings with Bot [Temporarily Unavailable - Under Construction]"
+            "start": "/start ボットとの対話を開始",
+            "help": "/help 使用可能なすべてのヘルプコンテキストとコマンドを表示します\n詳細情報は以下のとおりです。コンポーネントを使用したコマンドに関する詳細情報を読みたい場合は、代わりに使用してください /info ",
+            "info": "/info ボットとチャットの基本情報を取得する",
+            "settings": "/settings ボットで利用可能な設定を設定する [一時的に利用不可-工事中]"
         },
         "telegram": {
             "commandParameterInvalid": "無効なパラメーター",
