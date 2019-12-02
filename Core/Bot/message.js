@@ -19,14 +19,14 @@ let messagectl = {
         // Prefix
         var output = `${Lang.bot.message.from}: `
         var chatMessage = `: ${ctx.message.text}`
-        var fromChatId = ` [${ctx.message.from.id}]`
-        var groupInfo = ` | ${Lang.bot.message.group}: ${ctx.message.chat.title} [${ctx.message.chat.id}]`
+        var fromChatId = ` <${ctx.message.from.id}>`
+        var groupInfo = `${Lang.bot.message.group}: ${ctx.message.chat.title} <${ctx.message.chat.id}> | `
 
         // Case of User had their FIRSTNAME and LAST NAME set
         if ((ctx.message.from.first_name && ctx.message.from.last_name)) {
             var infoFullId = output + ctx.message.from.first_name + " " + ctx.message.from.last_name + fromChatId
             if (isGroup) {
-                Log.msgLog.log(infoFullId + groupInfo + chatMessage)
+                Log.msgLog.log(groupInfo + infoFullId + chatMessage)
             }
             else {
                 Log.msgLog.log(infoFullId + chatMessage)
@@ -36,7 +36,7 @@ let messagectl = {
         else if (ctx.message.from.first_name) {
             var infoNameOnly = output + ctx.message.from.first_name + fromChatId
             if (isGroup) {
-                Log.msgLog.log(infoNameOnly + groupInfo + chatMessage)
+                Log.msgLog.log(groupInfo + infoNameOnly + chatMessage)
             }
             else {
                 Log.msgLog.log(infoNameOnly + chatMessage)
@@ -46,7 +46,7 @@ let messagectl = {
         else if (ctx.message.from.username) {
             var infoUsernameOnly = output + ctx.message.from.username + fromChatId
             if (isGroup) {
-                Log.msgLog.log(infoUsernameOnly + groupInfo)
+                Log.msgLog.log(groupInfo + infoUsernameOnly)
                 Log.msgLog.log(chatMessage)
             }
             else {
@@ -57,7 +57,7 @@ let messagectl = {
         // Case of User only have ID could be provided or perhaps incorrectly set FIRSTNAME in LASTNAME or forgot to set username with above
         else {
             if (isGroup) {
-                Log.msgLog.log(output + fromChatId + groupInfo)
+                Log.msgLog.log(output + groupInfo + fromChatId)
                 Log.msgLog.log(chatMessage)
             }
             else {
