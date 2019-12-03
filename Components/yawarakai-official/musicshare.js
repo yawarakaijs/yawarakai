@@ -658,17 +658,6 @@ exports.callbackQuery = {
 
             console.log(data)
             try {
-                if (data == undefined || data.callback.hasOwnProperty("audio") == null || data.callback == undefined) {
-                    Telegram.editMessageText(
-                        message.chat.id,
-                        message.message_id,
-                        null,
-                        "歌曲找到了，但是暂时不可用呢"
-                    ).catch(err => {
-                        console.error(err)
-                    })
-                    return undefined
-                }
 
                 message = await Telegram.editMessageText(
                     message.chat.id,
@@ -702,7 +691,7 @@ exports.callbackQuery = {
                     message.chat.id,
                     message.message_id,
                     null,
-                    "数据获取失败了呢，可以重新试试看～"
+                    "歌曲找到了，但是暂时不可用呢~\n如果一直出现这个问题的话，可以去 Bot 汇报错误情况呢，并且给出指定的歌曲 链接"
                 ).catch(err => {
                     console.log(err)
                 })
