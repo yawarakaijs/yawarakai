@@ -5,7 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const http = require('http')
 const https = require('https')
-
+const NodeID3 = require('node-id3')
 
 let baseDir = __dirname.replace(/((\/)|(\\))(Components)(((\/)|(\\))(yawarakai-official))/gu, "")
 
@@ -31,7 +31,7 @@ let main = {
      * @param {*} bitrate   - Fixed number optionally set as the bitrate
      * @return                Array that contains only one object as the audio inline type
      */
-    song: async function (params, bitrate = 320000) {
+    song: async function (params, bitrate = 320000, type = "inline") {
         let baseUrl = "https://api.yutsuki.moe/cloudmusic"
         return Promise.all([
             axios.get(baseUrl + '/song/url', { params: { id: params.id, br: bitrate } }),
@@ -41,18 +41,10 @@ let main = {
             let authorTag = new Array()
             let authorInfo = resArray[1].data.songs[0].ar
             authorInfo.forEach(item => authorText.push(item.name))
-            authorInfo.forEach(item => authorTag.push("#"+item.name.replace(" ","")))
+            authorInfo.forEach(item => authorTag.push("#" + item.name.replace(" ", "")))
             authorText = authorText.join(" / "),
-            authorTag = authorTag.join(" ")
+                authorTag = authorTag.join(" ")
             let resultText = resArray[1].data.songs[0].name + " - " + authorText
-
-            // fileid
-            let FUID = new Array()
-            for (let i = 0; i < 3; i++) {
-                FUID.push(Math.floor(Math.random() * Math.floor(9)))
-            }
-            FUID = FUID.join("")
-            FUID = "2523" + new Date().getTime() + FUID
 
             if (!fs.existsSync(cacheDir)) {
                 fs.mkdirSync(cacheDir)
@@ -64,53 +56,115 @@ let main = {
                 fs.mkdirSync(musicDir)
             }
 
+            // fileid
+            let FUID = new Array()
+            for (let i = 0; i < 3; i++) {
+                FUID.push(Math.floor(Math.random() * Math.floor(9)))
+            }
+            FUID = FUID.join("")
+            FUID = "2523" + new Date().getTime() + FUID
+
             // song file
-            return Promise.all([
-                // main.getSong(resArray[0].data.data[0].url, FUID),
-                // main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID),
-                axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
-            ]).then(async (dataArray) => {
+            if (type == "inline") {
+                return Promise.all([
+                    axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
+                ]).then(async (dataArray) => {
+                    console.log("Returning data...")
+                    let titleAlias = resArray[1].data.songs[0].alia[0] == undefined ? "" : ` (${resArray[1].data.songs[0].alia[0]})`
+                    let albumAlias = dataArray[0].data.album.alias[0] == undefined ? "" : ` (${dataArray[0].data.album.alias[0]}))`
 
-                let data = {
-                    inline: [{
-                        type: "audio",
-                        id: params.id,
-                        title: resArray[1].data.songs[0].name,
-                        performer: authorText,
-                        audio_url: resArray[0].data.data[0].url,
-                        caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #s${params.id}`,
-                        reply_markup: {
-                            inline_keyboard: [[
-                                {
-                                    text: "Open in CloudMusic",
-                                    url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
-                                }
-                            ]]
+                    let data = {
+                        inline: [{
+                            type: "audio",
+                            id: params.id,
+                            title: resArray[1].data.songs[0].name,
+                            performer: authorText,
+                            audio_url: resArray[0].data.data[0].url,
+                            caption: resArray[1].data.songs[0].name + titleAlias + "\n" + authorText + "\n" + dataArray[0].data.album.name + albumAlias + `\n#yawarakai #s${params.id}`,
+                            reply_markup: {
+                                inline_keyboard: [[
+                                    {
+                                        text: "Open in CloudMusic",
+                                        url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
+                                    }
+                                ]]
+                            }
+                        }],
+                        track: {
+                            id: resArray[1].data.songs[0].al.id
                         }
-                    }],
-                    callback: {
-                        type: "audio",
-                        title: resArray[1].data.songs[0].name,
-                        performer: authorText,
-                        audio: resArray[0].data.data[0].url,
-                        caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #s${params.id}`,
-                        thumb: dataArray[0].data.album.picUrl,
-                        parse_mode: "Markdown"
-                    },
-                    track: {
-                        id: resArray[1].data.songs[0].al.id
                     }
-                }
+                    console.log(data)
+                    return data
 
-                return data
+                }).catch(err => {
+                    //err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+                    return err
+                })
+            }
+            else if (type == "callback") {
+                return Promise.all([
+                    main.getSong(resArray[0].data.data[0].url, FUID),
+                    main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID),
+                    axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
+                ]).then(async (dataArray) => {
 
-            }).catch(err => {
-                err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
-                return err
-            })
+                    let titleAlias = resArray[1].data.songs[0].alia[0] == undefined ? "" : ` (${resArray[1].data.songs[0].alia[0]})`
+                    let albumAlias = dataArray[2].data.album.alias[0] == undefined ? "" : ` (${dataArray[2].data.album.alias[0]}))`
 
+                    let info = {
+                        track: resArray[1].data.songs[0],
+                        album: dataArray[2].data.album
+                    }
+
+                    let writeSuccess = await main.writeTag(dataArray[0], dataArray[1], info)
+                    if (!writeSuccess) return undefined
+                    else {
+                        console.log(writeSuccess)
+
+                        fs.renameSync(writeSuccess, path.join(baseDir, "/cache/music/", dataArray[0]))
+
+                        let srcDir = path.join(baseDir, "/cache/data")
+                        fs.readdir(srcDir, (err, files) => {
+                            if (err) throw err
+
+                            for (let file of files) {
+                                fs.unlink(path.join(srcDir, file), err => {
+                                    if (err) throw err
+                                })
+                            }
+                        })
+                    }
+
+                    let data = {
+                        callback: {
+                            type: "audio",
+                            title: resArray[1].data.songs[0].name,
+                            performer: authorText,
+                            audio: resArray[0].data.data[0].url,
+                            caption: resArray[1].data.songs[0].name + titleAlias + "\n" + authorText + "\n" + dataArray[2].data.album.name + albumAlias + `\n#yawarakai #s${params.id}`,
+                            thumb: dataArray[2].data.album.picUrl,
+                            parse_mode: "Markdown"
+                        },
+                        track: {
+                            id: resArray[1].data.songs[0].al.id
+                        },
+                        file: {
+                            audioFile: dataArray[0],
+                            picFile: dataArray[1],
+                            audio: path.join(baseDir, "/cache/music/", dataArray[0])
+                        }
+                    }
+
+                    return data
+
+                }).catch(err => {
+                    //err["message"] = "Component Error: System failed to process file\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+                    return err
+                })
+            }
         }).catch(err => {
-            err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+            //err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
             return err
         })
     },
@@ -164,10 +218,13 @@ let main = {
      */
     getSong: function (url, fileId) {
         return new Promise((resolve, reject) => {
+
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
             let fileName = fileId + "." + extName
 
-            let file = fs.createWriteStream("./cache/data/" + fileName)
+            console.log("Downloading ", fileId + "." + extName)
+
+            let file = fs.createWriteStream(baseDir + "/cache/data/" + fileName)
             let request = http.get(url, function (response) {
                 if (response.statusCode != 200) {
                     reject()
@@ -185,10 +242,12 @@ let main = {
      */
     getAlbumPic: function (url, fileId) {
         return new Promise((resolve, reject) => {
+
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
             let fileName = fileId + "." + extName
 
-            let file = fs.createWriteStream("./cache/data/" + fileName)
+            console.log("Downloading ", fileId + "." + extName)
+            let file = fs.createWriteStream(baseDir + "/cache/data/" + fileName)
             let request = https.get(url, function (response) {
                 if (response.statusCode != 200) {
                     reject()
@@ -200,8 +259,8 @@ let main = {
     },
     writeTag: async function (audioFile, picFile, info) {
         return new Promise((resolve, reject) => {
+            console.log("Writing tags...")
             let file = path.join(baseDir, "/cache/data/", audioFile)
-
             let image = fs.readFileSync(path.join(baseDir, "/cache/data/" + picFile))
 
             let artist = new Array()
@@ -217,8 +276,28 @@ let main = {
                 album: info.album.name,
                 title: info.track.name,
                 artist: artist,
-                image: image
+                image: image,
+                year: year,
+                trackNumber: info.track.no,
+                partOfSet: info.track.cd,
+                composer: artist
             }
+            
+            console.log("Here to write...")
+
+            NodeID3.write(tag, file, (err, buffer) => {
+                if (err) {
+                    console.log("Failed")
+                    reject(success)
+                }
+                else {
+                    console.log("Finished")
+                    let result = NodeID3.read(file)
+                    console.log(result)
+                    resolve(file)
+                }
+            })
+            
         })
     },
     /**
@@ -319,7 +398,7 @@ let main = {
         }
 
     },
-    pageUp: function(itemNum, dataArray, params, type) {
+    pageUp: function (itemNum, dataArray, params, type) {
         let desPage = params.pid - 1
 
         let end = itemNum * desPage
@@ -362,21 +441,21 @@ let main = {
                 }
             ])
         }
-        return keys                        
+        return keys
     },
-    pageDown: function(itemNum, dataArray, params, type) {
+    pageDown: function (itemNum, dataArray, params, type) {
         let desPage = params.pid + 1
 
         let end = itemNum * desPage
         let start = end - itemNum
         let keys = new Array()
         let length = dataArray.length > end ? end : dataArray.length
-        let isEnd = dataArray.length > end ? false : true 
-                               
+        let isEnd = dataArray.length > end ? false : true
+
         for (let i = start; i < length; i++) {
             let key = [{
-                    text: `${dataArray[i].name} - ${dataArray[i].artist}`,
-                    callback_data: "musicshare://song?id=" + dataArray[i].id
+                text: `${dataArray[i].name} - ${dataArray[i].artist}`,
+                callback_data: "musicshare://song?id=" + dataArray[i].id
             }]
             keys.push(key)
         }
@@ -409,7 +488,7 @@ let main = {
                 }
             ])
         }
-        return keys        
+        return keys
     }
 }
 
@@ -497,7 +576,7 @@ exports.inlines = {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求歌曲来自链接: ${link}`)
 
                 let data = await main.song(params)
-                if(data instanceof Error) {
+                if (data instanceof Error) {
                     this.DiagnosticLog.fatal(data)
                     return undefined
                 }
@@ -546,7 +625,7 @@ exports.messages = {
 exports.callbackQuery = {
     main: async function (ctx) {
         const Telegram = this.telegram
-        
+
         if (!ctx.update.callback_query.data.startsWith("musicshare")) { return undefined }
 
         let callbackData = ctx.update.callback_query
@@ -559,58 +638,76 @@ exports.callbackQuery = {
          */
         if (params.type == "song") {
 
-            let message = await this.telegram.editMessageText(
+            // let message = await this.telegram.editMessageText(
+            //     callbackData.message.chat.id,
+            //     callbackData.message.message_id,
+            //     null,
+            //     "稍等呢，正在获取数据"
+            // ).catch(err => {
+            //     console.error(err)
+            // })
+
+            let message = await this.telegram.sendMessage(
                 callbackData.message.chat.id,
-                callbackData.message.message_id,
-                null,
                 "稍等呢，正在获取数据"
             ).catch(err => {
                 console.error(err)
             })
 
-            let data = await main.song(params)
+            let data = await main.song(params, undefined, "callback")
 
-            if (data.callback.audio == null || data == undefined || data.callback == undefined) {
+            console.log(data)
+            try {
+                if (data == undefined || data.callback.hasOwnProperty("audio") == null || data.callback == undefined) {
+                    Telegram.editMessageText(
+                        message.chat.id,
+                        message.message_id,
+                        null,
+                        "歌曲找到了，但是暂时不可用呢"
+                    ).catch(err => {
+                        console.error(err)
+                    })
+                    return undefined
+                }
+
+                message = await Telegram.editMessageText(
+                    message.chat.id,
+                    message.message_id,
+                    null,
+                    "数据获取成功，正在更新到消息~"
+                ).catch(err => {
+                    console.error(err)
+                })
+
+                await Telegram.sendAudio(callbackData.message.chat.id, {source: data.file.audio}, {
+                    caption: data.callback.caption,
+                    parse_mode: data.callback.parse_mode,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{
+                                text: "Open in App",
+                                url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
+                            }]
+                        ]
+                    }
+                }).catch(err => {
+                    console.error(err)
+                })
+                //Telegram.deleteMessage(callbackData.message.chat.id, callbackData.message.message_id)
+                Telegram.deleteMessage(message.chat.id, message.message_id)
+                return "Passed"
+            }
+            catch (err) {
                 Telegram.editMessageText(
                     message.chat.id,
                     message.message_id,
                     null,
-                    "歌曲找到了，但是暂时不可用呢"
+                    "数据获取失败了呢，可以重新试试看～"
                 ).catch(err => {
-                    console.error(err)
+                    console.log(err)
                 })
-                return undefined
+                console.error(err)
             }
-
-            message = await Telegram.editMessageText(
-                message.chat.id,
-                message.message_id,
-                null,
-                "数据获取成功，正在更新到消息~"
-            ).catch(err => {
-                console.error(err)
-            })
-
-            await Telegram.sendAudio(callbackData.message.chat.id, data.callback.audio, {
-                title: data.callback.title,
-                caption: data.callback.caption,
-                performer: data.callback.performer,
-                thumb: data.callback.thumb,
-                parse_mode: data.callback.parse_mode,
-                reply_markup: {
-                    inline_keyboard: [
-                        [{
-                            text: "Open in App",
-                            url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
-                        }]
-                    ]
-                }
-            }).catch(err => {
-                console.error(err)
-            })
-            Telegram.deleteMessage(callbackData.message.chat.id, callbackData.message.message_id)
-
-            return "Passed"
         }
 
         /**
@@ -625,7 +722,7 @@ exports.callbackQuery = {
             }
             else {
                 let index = 1
-                for(let i = 0; i < playlistData.tracks.length; i++) {
+                for (let i = 0; i < playlistData.tracks.length; i++) {
                     if (playlistData.tracks[i]["id"] == params.id) {
                         index = i
                     }
@@ -641,8 +738,8 @@ exports.callbackQuery = {
                 let keys = new Array()
                 for (let i = start; i < end; i++) {
                     let key = [{
-                            text: `${playlistData.tracks[i].name} - ${playlistData.tracks[i].artist}`,
-                            callback_data: "musicshare://song?id=" + playlistData.tracks[i].id
+                        text: `${playlistData.tracks[i].name} - ${playlistData.tracks[i].artist}`,
+                        callback_data: "musicshare://song?id=" + playlistData.tracks[i].id
                     }]
                     keys.push(key)
                 }
