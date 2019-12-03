@@ -684,6 +684,7 @@ exports.callbackQuery = {
                 })
                 //Telegram.deleteMessage(callbackData.message.chat.id, callbackData.message.message_id)
                 Telegram.deleteMessage(message.chat.id, message.message_id)
+                fs.unlink(data.file.audio)
                 return "Passed"
             }
             catch (err) {
