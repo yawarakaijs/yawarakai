@@ -15,7 +15,7 @@
             "name": "musicshare",
             "displayName": "Music sharing component for music platforms",
             "groupName": "yawarakai-official",
-            "version": "v1.3.6",
+            "version": "v1.3.7",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
         },
