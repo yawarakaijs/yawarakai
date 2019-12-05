@@ -30,7 +30,7 @@ client.on('error', function (err) {
   return setTimeout(() => {
     Log.Log.fatal(`${Lang.core.redisCausedShutdown}`)
     process.exit(1)
-  }, 5000)
+  }, 10000)
 })
 
 client.auth(config.redis.auth, () => {

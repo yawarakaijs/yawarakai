@@ -125,6 +125,10 @@ Core.cliInput('> ', input => {
             case '/help':
                 console.log(Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
                 break
+            case '/loadCompo':
+                break
+            case '/unloadCompo':
+                break
             case '/stop':
             case '/exit':
                 return false;
