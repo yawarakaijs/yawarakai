@@ -3,6 +3,7 @@
     "coreName": "Yawarakai",
     "botname": "Bot Display Name",
     "token": "Bot API Token",
+    "admin": 915672797,
     "webhook": {
         "url": "",
         "port" : 8000
