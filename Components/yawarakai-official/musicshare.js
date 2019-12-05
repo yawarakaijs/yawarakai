@@ -775,7 +775,7 @@ exports.callbackQuery = {
                 if (data == undefined) { throw new Error() }
                 console.log(data)
                 
-                let sendSuccess = await Telegram.sendAudio(callbackData.message.chat.id, { source: fs.createReadStream(data.file.audio) }, {
+                let audioMessage = await Telegram.sendAudio(callbackData.message.chat.id, { source: fs.createReadStream(data.file.audio) }, {
                     performer: data.callback.performer,
                     thumb: data.callback.thumb,
                     title: data.callback.title,
@@ -790,8 +790,7 @@ exports.callbackQuery = {
                         ]
                     }
                 }).then(res => {
-                    //Telegram.deleteMessage(message.chat.id, message.message_id)
-                    fs.unlinkSync(data.file.audio)
+                    Telegram.deleteMessage(message.chat.id, message.message_id)
                     return "Passed"
                 }).catch(err => {
                     throw err
