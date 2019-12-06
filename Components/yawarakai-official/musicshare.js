@@ -64,7 +64,7 @@ let main = {
             FUID = FUID.join("")
             FUID = "2523" + new Date().getTime() + FUID
 
-            if (resArray[0].data.data[0].url == "null") {resArray[0].data.data[0].url}
+            if (resArray[0].data.data[0].url == "null") { console.log(resArray[0].data.data[0].url) }
             if (resArray[0].data.data[0].url == null) { return undefined }
 
             // song file
@@ -97,7 +97,6 @@ let main = {
                             id: resArray[1].data.songs[0].al.id
                         }
                     }
-
                     return data
 
                 }).catch(err => {
@@ -157,7 +156,6 @@ let main = {
                             audio: path.join(baseDir, "/cache/music/", dataArray[1])
                         }
                     }
-
                     return data
 
                 }).catch(err => {
@@ -775,6 +773,7 @@ exports.callbackQuery = {
 
                 if (data == undefined) { throw new Error() }
                 
+                Telegram.sendChatAction(callbackData.message.chat.id, "upload_audio")
                 let audioMessage = await Telegram.sendAudio(callbackData.message.chat.id, { source: fs.createReadStream(data.file.audio) }, {
                     performer: data.callback.performer,
                     thumb: data.callback.thumb,
