@@ -73,20 +73,20 @@ let Message = {
     hears: async function (ctx) {
 
         let meowmeow = new MessageDictionary(
-            [{reg: "(^喵～)|(^喵~)", mode: "gui"}],
+            [{ reg: "(^喵～)|(^喵~)", mode: "gui" }],
             ["喵～"]
         ).push()
 
         let startnlp = new MessageDictionary(
-            [{reg: "((^悠月，)|(^))打开分析模式$", mode: "gui"}],
+            [{ reg: "((^悠月，)|(^))打开分析模式$", mode: "gui" }],
             ["好的", "接下来乃说的话都可以得到一个 NLP 的分析"],
             [NlpControl.analyzeModeMan],
             true,
             [[ctx.from.id, "add"]]
         ).push()
-        
+
         let stopnlp = new MessageDictionary(
-            [{reg: "((^悠月)|(^))关闭分析模式$", mode: "gui"}],
+            [{ reg: "((^悠月)|(^))关闭分析模式$", mode: "gui" }],
             ["关闭了呢"],
             [NlpControl.analyzeModeMan],
             true,
@@ -94,13 +94,13 @@ let Message = {
         ).push()
 
         let matchResult = MessageDictionaryControl.tryMatch(ctx.message.text)
-        if(matchResult.reply.length != 0) {
+        if (matchResult.reply.length != 0) {
             this.reply(ctx, matchResult)
         }
         else {
             return undefined
         }
-        if(matchResult.hasFunc) {
+        if (matchResult.hasFunc) {
             MessageDictionaryControl.callFunc(matchResult)
             return "Passed"
         }
@@ -115,18 +115,31 @@ let Message = {
         let textReply = context.reply
         if (Message.count == 0) {
             Message.count++
-            for (let i of textReply) {
+            if (textReply.length > 1) {
+                ctx.replyWithChatAction("typing")
+                for (let i of textReply) {
+                    ctx.replyWithChatAction("typing")
+                    setTimeout(() => {
+                        ctx.reply(i).then(res => {
+                            Log.Log.debug(`${Lang.bot.message.replyto}: ${ctx.message.from.id} - ${Lang.bot.message.success}`)
+                        }).catch(err => {
+                            Log.DiagnosticLog.fatal(err)
+                        })
+                        //this.todo(ctx, i.length)
+                    }, i.length * 200)
+                }
+            }
+            else {
                 ctx.replyWithChatAction("typing")
                 setTimeout(() => {
-                    ctx.reply(i).then(res => {
+                    ctx.reply(textReply[0]).then(res => {
                         Log.Log.debug(`${Lang.bot.message.replyto}: ${ctx.message.from.id} - ${Lang.bot.message.success}`)
                     }).catch(err => {
                         Log.DiagnosticLog.fatal(err)
                     })
-                    this.todo(ctx, i.length)
-                }, i.length * 200)
+                    //this.todo(ctx, i.length)
+                }, textReply[0].length * 200)
             }
-            ctx.replyWithChatAction("typing")
         }
         Message.count = Message.count >= 1 ? 0 : Message.count
         return
