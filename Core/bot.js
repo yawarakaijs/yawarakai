@@ -16,7 +16,13 @@ let Nlp = require('./Bot/nlp').Nlp
 let Log = require('../Core/log').Log
 let Lang = require('./lang')
 
-let compoData = Component.Register.load()
+function reload() {
+    delete require.cache[require.resolve('../component')]
+    Component = require('../component')
+    Component.Register.load()
+}
+
+Component.Register.load()
 
 let DiagnosticLog = {
     info: (text) => {
@@ -89,11 +95,11 @@ let Bot = {
             args: args,
             ctx: ctx,
             telegram: Telegram.Bot.telegram,
-            compo: compoData
+            compo: Component.Compo
         }
     },
     inlineDistributor: async function (ctx) {
-        let method = compoData.inline
+        let method = Component.Compo.inline
         let detail = new Array()
         let result = new Array()
         for (let i of method) {
@@ -115,7 +121,7 @@ let Bot = {
     callbackQueryDistributor: async function (ctx) {
         let args = []
         args.push(ctx)
-        let method = compoData.callbackQuery
+        let method = Component.Compo.callbackQuery
         let detail
         for (let i of method) {
             const idx = method.indexOf(i)
@@ -132,7 +138,7 @@ let Bot = {
     },
     commandDistributor: async function (ctx) {
         let result = Bot.commandParse(ctx)
-        let cmd = compoData.command.find(command => {
+        let cmd = Component.Compo.command.find(command => {
             return command.function === result.cmd
         })
         if (!cmd) { return 404 }
@@ -149,7 +155,7 @@ let Bot = {
         }
     },
     messasgeDistributor: async function (ctx) {
-        let method = compoData.message
+        let method = Component.Compo.message
         let result = undefined
         for (let i of method) {
             try {
@@ -290,6 +296,7 @@ let Control = {
 }
 
 exports.Core = Core
+exports.reload = reload
 exports.Control = Control
 exports.Message = Message
 exports.Command = Command

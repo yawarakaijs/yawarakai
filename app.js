@@ -28,6 +28,7 @@
 let Log = require('./Core/log').Log
 let Lang = require('./Core/lang')
 let config = require('./config.json')
+let Component = require('./component')
 let packageInfo = require('./package.json')
 let AnonymousLog = require('./Core/log').AnonymousLog
 
@@ -109,6 +110,22 @@ else {
     }
 }
 
+function commandParse (input) {
+    let commandArgs = input.split(" ")
+    let command = commandArgs[0].substring(1)
+    command = command.replace(/@\w+/g, "")
+    let args = []
+    commandArgs.forEach((value, index) => {
+        if (index > 0 && value !== "") {
+            args.push(value)
+        }
+    })
+    return {
+        cmd: command,
+        args: args
+    }
+}
+
 // CLI
 Core.cliInput('> ', input => {
     var command = input.split(' ')[0] // Cut Command and set to First string
@@ -125,9 +142,22 @@ Core.cliInput('> ', input => {
             case '/help':
                 console.log(Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
                 break
-            case '/loadCompo':
+            case '/reload':
+                Component.Register.reload()
+                Bot.reload()
                 break
-            case '/unloadCompo':
+            case '/unload':
+                let unloadArgs = commandParse(input).args
+                
+                break
+            case '/compo':
+                let compoArgs = commandParse(input).args
+                if (args[0] == "list" || "--list" || "--l") {
+                    console.log(Component.Register.list().list.join("\n"))
+                }
+                else {
+                    console.log(Lang.app.cliCommandUnknownPrompt)
+                }
                 break
             case '/stop':
             case '/exit':
