@@ -64,6 +64,7 @@ let main = {
             FUID = FUID.join("")
             FUID = "2523" + new Date().getTime() + FUID
 
+            if (resArray[0].data.data[0].url == "null") {resArray[0].data.data[0].url}
             if (resArray[0].data.data[0].url == null) { return undefined }
 
             // song file
@@ -692,14 +693,14 @@ exports.inlines = {
                     this.DiagnosticLog.fatal(data)
                     return undefined
                 }
-                else if (data.inline[0].audio_url == null) {
+                else if (data == undefined) {
                     return [{
                         type: "article",
                         id: params.id,
-                        title: `${data.inline[0].title}`,
+                        title: `对不起喔`,
                         description: "我们找到了曲目，但是对不起呢，歌曲暂不可用",
                         thumb_url: "https://i.loli.net/2019/11/13/dQDxC4Nv91VYK2E.jpg",
-                        input_message_content: { message_text: `${data.inline[0].title}\n${data.inline[0].performer}\n实在是很抱歉呢，这个歌曲暂不可用，但是可以试试在 App 中打开\n#yawarakai #${params.id}` },
+                        input_message_content: { message_text: `实在是很抱歉呢，这个歌曲暂不可用，但是可以试试在 App 中打开\n#yawarakai #${params.id}` },
                         reply_markup: {
                             inline_keyboard: [[{
                                 text: "Open in App",
@@ -773,7 +774,6 @@ exports.callbackQuery = {
                 })
 
                 if (data == undefined) { throw new Error() }
-                console.log(data)
                 
                 let audioMessage = await Telegram.sendAudio(callbackData.message.chat.id, { source: fs.createReadStream(data.file.audio) }, {
                     performer: data.callback.performer,
