@@ -27,6 +27,12 @@
             "answerto": "返回 callbackQuery 数据",
             "success": "成功"
         },
+        "command": {
+            "start": "/start 开始与 Bot 的交互",
+            "help": "/help 是用于显示所有现有的命令的帮助信息的\n以下是所有的可用命令的列表，想要查询每一个命令与插件相关的信息，请使用 /info 命令",
+            "info": "/info 获取当前 Bot 运行的基本信息和聊天数据情况",
+            "settings": "/settings 设置与 Bot 的基本可设定内容 [暂时不可用]"
+        },
         "telegram": {
             "commandParameterInvalid": "无效的参数",
             "commandParameterMissing": ["无效的参数：","，检查是否缺失必要参数："],

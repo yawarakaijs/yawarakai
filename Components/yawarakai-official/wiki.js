@@ -35,8 +35,7 @@ let main = {
                 return undefined
             }
         }).catch(err => {
-            console.error(err)
-            return undefined
+            return err
         })
     }
 }
@@ -59,10 +58,14 @@ exports.inlines = {
         if (!globalPattern.test(ctx.inlineQuery.query) && ctx.inlineQuery.query != "") {
             Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了 Wikipedia 查询 ${ctx.inlineQuery.query}`)
             let data = await main.wiki(ctx.inlineQuery.query, "zh").catch(err => {
-                Compo.Interface.Log.Log.fatal(err)
+                this.DiagnosticLog.fatal(err)
                 return undefined
             })
-            if (data != undefined) {
+            if (data instanceof Error) {
+                this.DiagnosticLog.fatal(err)
+                return undefined
+            }
+            else if (data != undefined) {
                 return [{
                     type: "article",
                     id: ctx.inlineQuery.id,

@@ -28,6 +28,10 @@ node app.js start --debug
 
 Yawarakai provides a dynamical and powerful API for users to control the message flows and the way the users could do through the core system
 
+# Credits
+
+Translation by [KagurazakaIzumi](https://github.com/KagurazakaIzumi)
+
 # Change log
 
 

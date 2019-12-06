@@ -28,6 +28,7 @@
 let Log = require('./Core/log').Log
 let Lang = require('./Core/lang')
 let config = require('./config.json')
+let Component = require('./component')
 let packageInfo = require('./package.json')
 let AnonymousLog = require('./Core/log').AnonymousLog
 
@@ -57,29 +58,6 @@ let Bot = require('./Core/bot')
 let Core = require('./core')
 Bot.Control.start()
 
-// Debug block
-if (config.debugmode) {
-    Core.setKey("logtext", "")
-    Bot.Telegram.command("/telegram debug")
-    Core.setKey("nlpfeedback", false)
-    Core.getKey("nlpfeedback").then(res => {
-        Log.debug(`NLP set to ${res}`)
-    })
-    Core.getKey("nlpAnalyzeIds").then(res => {
-        Log.trace(`NLP Analyzer List: ${res}`)
-    }).catch(err => {
-        Core.setKey("nlpAnalyzeIds", "[]")
-    })
-}
-else {
-    Core.setKey("logtext", "")
-    Core.setKey("nlpfeedback", false)
-    Core.getKey("nlpfeedback")
-    Core.getKey("nlpAnalyzeIds").catch(err => {
-        Core.setKey("nlpAnalyzeIds", "[]")
-    })
-}
-
 let args = process.argv.slice(2)
 
 if(args.length != 0) {
@@ -88,10 +66,10 @@ if(args.length != 0) {
             if (args.length > 1 && (args[1] == "--debug" || args[1] == "--d")) {
                 Core.setKey("logtext", "")
                 Bot.Telegram.command("/telegram debug")
-                Core.setKey("nlpfeedback", false)
                 Core.getKey("nlpfeedback").then(res => {
                     Log.debug(`NLP set to ${res}`)
                 })
+                Core.setKey("nlpAnalyzeIds", "[]")
                 Core.getKey("nlpAnalyzeIds").then(res => {
                     Log.trace(`NLP Analyzer List: ${res}`)
                 }).catch(err => {
@@ -101,13 +79,50 @@ if(args.length != 0) {
             else {
                 Core.setKey("logtext", "")
                 Bot.Telegram.command("/telegram start")
-                Core.setKey("nlpfeedback", false)
                 Core.getKey("nlpfeedback")
                 Core.getKey("nlpAnalyzeIds").catch(err => {
                     Core.setKey("nlpAnalyzeIds", "[]")
                 })
             }
             break
+    }
+}
+else {
+    // Debug block
+    if (config.debugmode) {
+        Core.setKey("logtext", "")
+        Bot.Telegram.command("/telegram debug")
+        Core.getKey("nlpfeedback").then(res => {
+            Log.debug(`NLP set to ${res}`)
+        })
+        Core.getKey("nlpAnalyzeIds").then(res => {
+            Log.trace(`NLP Analyzer List: ${res}`)
+        }).catch(err => {
+            Core.setKey("nlpAnalyzeIds", "[]")
+        })
+    }
+    else {
+        Core.setKey("logtext", "")
+        Core.getKey("nlpfeedback")
+        Core.getKey("nlpAnalyzeIds").catch(err => {
+            Core.setKey("nlpAnalyzeIds", "[]")
+        })
+    }
+}
+
+function commandParse (input) {
+    let commandArgs = input.split(" ")
+    let command = commandArgs[0].substring(1)
+    command = command.replace(/@\w+/g, "")
+    let args = []
+    commandArgs.forEach((value, index) => {
+        if (index > 0 && value !== "") {
+            args.push(value)
+        }
+    })
+    return {
+        cmd: command,
+        args: args
     }
 }
 
@@ -126,6 +141,23 @@ Core.cliInput('> ', input => {
                 break
             case '/help':
                 console.log(Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
+                break
+            case '/reload':
+                Component.Register.reload()
+                Bot.reload()
+                break
+            case '/unload':
+                let unloadArgs = commandParse(input).args
+                
+                break
+            case '/compo':
+                let compoArgs = commandParse(input).args
+                if (args[0] == "list" || "--list" || "--l") {
+                    console.log(Component.Register.list().list.join("\n"))
+                }
+                else {
+                    console.log(Lang.app.cliCommandUnknownPrompt)
+                }
                 break
             case '/stop':
             case '/exit':

@@ -7,6 +7,12 @@ let path = require('path')
 let Log = require('./Core/log')
 let Lang = require('./Core/lang')
 
+let compos = { list: [], path: [], info: [], name: [] }
+let compoInfo = new Array()
+let compoHelp = new Array()
+let compoPair = new Array()
+let Compo = { command: [], inline: [], message: [], callbackQuery: [], channelPost: [] }
+
 // Body
 
 let Register = {
@@ -22,9 +28,9 @@ let Register = {
              * @property {Array} message            - Imported from exports.register.message
              * @property {Array} callbackQuery      - Imported from exports.register.callbackQuery
              */
-            let Compo = { command: [], inline: [], message: [], callbackQuery: [] }
+            
             // Read all folders inside the Components folder
-            if(!fs.existsSync(extensionDir)) {
+            if (!fs.existsSync(extensionDir)) {
                 Log.Log.warning(Lang.component.noComponentFound[0])
                 Log.Log.warning(Lang.component.noComponentFound[1])
                 return Compo
@@ -37,6 +43,7 @@ let Register = {
                 // Check if folder has config.json
                 if (fs.existsSync(folder + "/config.json")) {
                     // Load config.json
+                    delete require.cache[require.resolve(folder + "/config.json")]
                     let compConfig = require(folder + "/config.json")
                     // Check if config has the components key
                     if (compConfig.components) {
@@ -44,54 +51,84 @@ let Register = {
                         if (stats.isDirectory()) {
                             // Iterial each key inside the components config
                             // configValue represents each component name
-                            loadedPlugins.push(`${Lang.component.loaded[0]}`)
+                            compoInfo.push(`${Lang.component.loaded[0]}`)
                             for (let [configKey, configValue] of Object.entries(compConfig.components)) {
-                                
-                                let compoPath = extensionDir + value + "/" + configValue.name + ".js"
-                                let coreExists = fs.statSync(compoPath)
 
-                                if (coreExists && configValue.enable) {
-                                    
-                                    let compo = require(compoPath)
+                                try {
 
-                                    // Check if register commands exist
-                                    if (compo.register.commands) {
-                                        compo.register.commands.map(cmd => {
-                                            cmd.instance = compo.commands[cmd.function]
-                                            cmd.meta = compo.meta
-                                            Compo.command.push(cmd)
-                                        })
-                                    }
-                                    // Check if register inlines exist
-                                    if (compo.register.inlines) {
-                                        compo.register.inlines.map(iln => {
-                                            iln.instance = compo.inlines[iln.function]
-                                            iln.meta = compo.meta
-                                            Compo.inline.push(iln)
-                                        })
-                                    }
-                                    // Check if register message exist
-                                    if (compo.register.messages) {
-                                        compo.register.messages.map(msg => {
-                                            msg.instance = compo.messages[msg.function]
-                                            msg.meta = compo.meta
-                                            Compo.message.push(msg)
-                                        })
-                                    }
-                                    // Check if register callback Query exist
-                                    if (compo.register.callbackQuery) {
-                                        compo.register.callbackQuery.map(cbq => {
-                                            cbq.instance = compo.callbackQuery[cbq.function]
-                                            cbq.meta = compo.meta
-                                            Compo.callbackQuery.push(cbq)
-                                        })
+                                    compoPair.push(`\n*${configValue.displayName}*`)
+                                    compoPair.push(`${configValue.description}`)
+                                    compoPair.push(`${value}/${configValue.name}@${configValue.version}`)
+
+                                    let compoPath = extensionDir + value + "/" + configValue.name + ".js"
+                                    let coreExists = fs.statSync(compoPath)
+
+                                    if (coreExists && configValue.enable) {
+                                        delete require.cache[require.resolve(compoPath)]
+                                        let compo = require(compoPath)
+
+                                        // Check if register commands exist
+                                        if (compo.register.commands) {
+                                            compo.register.commands.map(cmd => {
+                                                cmd.instance = compo.commands[cmd.function]
+                                                cmd.meta = compo.meta
+                                                Compo.command.push(cmd)
+
+                                                // Append the help text to compoHelp
+                                                compoPair.push(`/${cmd.function}`)
+                                                compoHelp.push(`/${cmd.function} ${cmd.help}`)
+                                            })
+                                        }
+                                        // Check if register inlines exist
+                                        if (compo.register.inlines) {
+                                            compo.register.inlines.map(iln => {
+                                                iln.instance = compo.inlines[iln.function]
+                                                iln.meta = compo.meta
+                                                Compo.inline.push(iln)
+                                            })
+                                        }
+                                        // Check if register message exist
+                                        if (compo.register.messages) {
+                                            compo.register.messages.map(msg => {
+                                                msg.instance = compo.messages[msg.function]
+                                                msg.meta = compo.meta
+                                                Compo.message.push(msg)
+                                            })
+                                        }
+                                        // Check if register callback Query exist
+                                        if (compo.register.callbackQuery) {
+                                            compo.register.callbackQuery.map(cbq => {
+                                                cbq.instance = compo.callbackQuery[cbq.function]
+                                                cbq.meta = compo.meta
+                                                Compo.callbackQuery.push(cbq)
+                                            })
+                                        }
+
+                                        // Check if register channel post exist
+                                        if (compo.register.channelPost) {
+                                            compo.register.channelPost.map(chp => {
+                                                chp.instance = compo.channelPost[chp.function]
+                                                chp.meta = compo.meta
+                                                Compo.channelPost.push(chp)
+                                            })
+                                        }
+
+                                        compos.path.push(path.join(value, configValue.name))
+                                        compos.list.push(`${configValue.name} \x1b[34m${configValue.version}\x1b[0m from \x1b[33m${value}\x1b[0m`)
+                                        compos.name.push(configValue.name)
+                                        compoInfo.push(`${value}/${configValue.name}@${configValue.version}`)
+                                        Log.Log.debug(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
                                     }
 
-                                    loadedPlugins.push(`${value}/${configValue.name}@${configValue.version}`)
-                                    Log.Log.debug(`${Lang.component.loaded[0]} ${configValue.name}@${configValue.version} ${Lang.component.loaded[1]} ${value}`)
+                                } 
+                                catch (error) {
+                                    Log.Log.fatal(error)
                                 }
+
                             }
-                            Log.Log.info(Lang.component.readIn + compConfig.groupname + " " + Lang.component.component + ": " + loadedPlugins.length + Lang.component.loaded[1] + value)
+                            compos.info = compoInfo
+                            Log.Log.info(Lang.component.readIn + compConfig.groupname + " " + Lang.component.component + ": " + `${compoInfo.length - 1}` + Lang.component.loaded[1] + value)
+                            compoPair.push(`\n${Lang.component.readIn}${Lang.component.component}: *${compoInfo.length - 1}*`)
                         }
                     }
                     else { Log.Log.fatal(Lang.component.configFileInvalid + folder + "/config.json") }
@@ -103,13 +140,33 @@ let Register = {
                 }
             })
             return Compo
-        } catch (error) {
+        } 
+        catch (error) {
             Log.Log.fatal(error)
         }
+    },
+    list: () => {
+        return compos
+    },
+    reload: () => {
+        compos.path.forEach(item => {
+            console.log(path.join(path.join(__dirname, '/Components/'), item + ".js"))
+            delete require.cache[require.resolve(path.join(path.join(__dirname, '/Components/'), item + ".js"))]
+        })
+
+        compoInfo = new Array()
+        compoHelp = new Array()
+        compoPair = new Array()
+        compos = { list: [], path: [], info: [], name: [] }
+        Compo = { command: [], inline: [], message: [], callbackQuery: [], channelPost: [] }
+
+        this.Register.load()
+        console.log(Compo.command[4].instance.call(this, undefined))
+    },
+    unload: (context) => {
+
     }
 }
-
-let loadedPlugins = new Array()
 
 let Interface = {
     Log: Log
@@ -117,6 +174,9 @@ let Interface = {
 
 // Exports
 
-exports.loadedPlugins = loadedPlugins
+exports.Compo = Compo
+exports.compoPair = compoPair
+exports.compoHelp = compoHelp
+exports.compoInfo = compoInfo
 exports.Interface = Interface
 exports.Register = Register

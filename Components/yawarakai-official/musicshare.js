@@ -5,8 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const http = require('http')
 const https = require('https')
-const id3 = require('@calme1709/id3-js')
-
+const NodeID3 = require('node-id3')
 
 let baseDir = __dirname.replace(/((\/)|(\\))(Components)(((\/)|(\\))(yawarakai-official))/gu, "")
 
@@ -32,7 +31,7 @@ let main = {
      * @param {*} bitrate   - Fixed number optionally set as the bitrate
      * @return                Array that contains only one object as the audio inline type
      */
-    song: async function (params, bitrate = 320000) {
+    song: async function (params, bitrate = 320000, type = "inline") {
         let baseUrl = "https://api.yutsuki.moe/cloudmusic"
         return Promise.all([
             axios.get(baseUrl + '/song/url', { params: { id: params.id, br: bitrate } }),
@@ -42,18 +41,10 @@ let main = {
             let authorTag = new Array()
             let authorInfo = resArray[1].data.songs[0].ar
             authorInfo.forEach(item => authorText.push(item.name))
-            authorInfo.forEach(item => authorTag.push("#"+item.name.replace(" ","")))
+            authorInfo.forEach(item => authorTag.push("#" + item.name.replace(" ", "")))
             authorText = authorText.join(" / "),
-            authorTag = authorTag.join(" ")
+                authorTag = authorTag.join(" ")
             let resultText = resArray[1].data.songs[0].name + " - " + authorText
-
-            // fileid
-            let FUID = new Array()
-            for (let i = 0; i < 3; i++) {
-                FUID.push(Math.floor(Math.random() * Math.floor(9)))
-            }
-            FUID = FUID.join("")
-            FUID = "2523" + new Date().getTime() + FUID
 
             if (!fs.existsSync(cacheDir)) {
                 fs.mkdirSync(cacheDir)
@@ -65,50 +56,116 @@ let main = {
                 fs.mkdirSync(musicDir)
             }
 
+            // fileid
+            let FUID = new Array()
+            for (let i = 0; i < 3; i++) {
+                FUID.push(Math.floor(Math.random() * Math.floor(9)))
+            }
+            FUID = FUID.join("")
+            FUID = "2523" + new Date().getTime() + FUID
+
+            if (resArray[0].data.data[0].url == "null") { console.log(resArray[0].data.data[0].url) }
+            if (resArray[0].data.data[0].url == null) { return undefined }
+
             // song file
-            return Promise.all([
-                // main.getSong(resArray[0].data.data[0].url, FUID),
-                // main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID),
-                axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
-            ]).then(async (dataArray) => {
+            if (type == "inline") {
+                return Promise.all([
+                    axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } })
+                ]).then(async (dataArray) => {
+                    
+                    let titleAlias = resArray[1].data.songs[0].alia[0] == undefined ? "" : ` (${resArray[1].data.songs[0].alia[0]})`
+                    let albumAlias = dataArray[0].data.album.alias[0] == undefined ? "" : ` (${dataArray[0].data.album.alias[0]}))`
 
-                let data = {
-                    inline: [{
-                        type: "audio",
-                        id: params.id,
-                        title: resArray[1].data.songs[0].name,
-                        performer: authorText,
-                        audio_url: resArray[0].data.data[0].url,
-                        caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #s${params.id}`,
-                        reply_markup: {
-                            inline_keyboard: [[
-                                {
-                                    text: "Open in CloudMusic",
-                                    url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
-                                }
-                            ]]
+                    let data = {
+                        inline: [{
+                            type: "audio",
+                            id: params.id,
+                            title: resArray[1].data.songs[0].name,
+                            performer: authorText,
+                            audio_url: resArray[0].data.data[0].url,
+                            caption: resArray[1].data.songs[0].name + titleAlias + "\n" + authorText + "\n" + dataArray[0].data.album.name + albumAlias + `\n#yawarakai #s${params.id}`,
+                            reply_markup: {
+                                inline_keyboard: [[
+                                    {
+                                        text: "Open in CloudMusic",
+                                        url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
+                                    }
+                                ]]
+                            }
+                        }],
+                        track: {
+                            id: resArray[1].data.songs[0].al.id
                         }
-                    }],
-                    callback: {
-                        type: "audio",
-                        title: resArray[1].data.songs[0].name,
-                        performer: authorText,
-                        audio: resArray[0].data.data[0].url,
-                        caption: authorText + "\n" + dataArray[0].data.album.name + `\n#yawarakai #s${params.id}`,
-                        thumb: dataArray[0].data.album.picUrl,
-                        parse_mode: "Markdown"
-                    },
-                    track: {
-                        id: resArray[1].data.songs[0].al.id
                     }
-                }
+                    return data
 
-                return data
+                }).catch(err => {
+                    //err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+                    return err
+                })
+            }
+            else if (type == "callback") {
+                return Promise.all([
+                    axios.get(baseUrl + '/album', { params: { id: resArray[1].data.songs[0].al.id } }),
+                    main.getSong(resArray[0].data.data[0].url, FUID),
+                    main.getAlbumPic(resArray[1].data.songs[0].al.picUrl, FUID)
+                ]).then(async (dataArray) => {
 
-            }).catch(err => Compo.Interface.Log.Log.fatal(err))
+                    let titleAlias = resArray[1].data.songs[0].alia[0] == undefined ? "" : ` (${resArray[1].data.songs[0].alia[0]})`
+                    let albumAlias = dataArray[0].data.album.alias[0] == undefined ? "" : ` (${dataArray[0].data.album.alias[0]}))`
 
+                    let info = {
+                        track: resArray[1].data.songs[0],
+                        album: dataArray[0].data.album
+                    }
+
+                    let writeSuccess = await main.writeTag(dataArray[1], dataArray[2], info)
+                    if (!writeSuccess) return undefined
+                    else {
+
+                        fs.renameSync(writeSuccess, path.join(baseDir, "/cache/music/", dataArray[1]))
+
+                        let srcDir = path.join(baseDir, "/cache/data")
+                        fs.readdir(srcDir, (err, files) => {
+                            if (err) throw err
+
+                            for (let file of files) {
+                                fs.unlink(path.join(srcDir, file), err => {
+                                    if (err) throw err
+                                })
+                            }
+                        })
+                    }
+
+                    let data = {
+                        callback: {
+                            type: "audio",
+                            title: resArray[1].data.songs[0].name,
+                            performer: authorText,
+                            audio: resArray[0].data.data[0].url,
+                            caption: resArray[1].data.songs[0].name + titleAlias + "\n" + authorText + "\n" + dataArray[0].data.album.name + albumAlias + `\n#yawarakai #s${params.id}`,
+                            thumb: dataArray[0].data.album.picUrl,
+                            parse_mode: "Markdown"
+                        },
+                        track: {
+                            id: resArray[1].data.songs[0].al.id
+                        },
+                        file: {
+                            audioFile: dataArray[1],
+                            picFile: dataArray[2],
+                            audio: path.join(baseDir, "/cache/music/", dataArray[1])
+                        }
+                    }
+                    return data
+
+                }).catch(err => {
+                    //err["message"] = "Component Error: System failed to process file\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+                    return err
+                })
+            }
         }).catch(err => {
-            err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+            //err["message"] = "Component Error: Yutsuki API failed to respond the request\nProbably could be the issue of Netease, you should report this issue to the API server maintainer"
+            return err
         })
     },
     /**
@@ -116,7 +173,40 @@ let main = {
      * @param {*} params 
      */
     album: async function (params) {
+        let baseUrl = "https://api.yutsuki.moe/cloudmusic"
+        return axios.get(baseUrl + '/album', { params: { id: params.id } }).then(res => {
 
+            if (res.data.code != 200) {
+                return undefined
+            }
+            else {
+                let albumInfo = res.data.album
+                let trackData = res.data.songs
+                let trackResult = new Array()
+
+                trackData.forEach(item => {
+                    let authorText = new Array()
+                    item.ar.forEach(item => authorText.push(item.name))
+                    authorText = authorText.join("/")
+                    let trackObj = { id: item.id, name: item.name, artist: authorText, album: item.al.name }
+                    trackResult.push(trackObj)
+                })
+
+                let albumAlias = albumInfo.alias[0] == undefined ? "" : " " + albumInfo.alias[0]
+                let albumArtist = new Array()
+
+                albumInfo.artists.forEach(item => albumArtist.push(item.name))
+                albumArtist.join("/")
+
+                let description = albumInfo.description != null ? /\s+?.+/gumi.test(albumInfo.description) ? albumInfo.description : "_无简介_" : "_无简介_"
+                let data = {
+                    picUrl: albumInfo.picUrl,
+                    text: `*${albumInfo.name}${albumAlias}*\n${albumArtist}\n曲目: ${albumInfo.songs.length} 首\n简介: ${description}\n#yawarakai #p${params.id}`,
+                    tracks: trackResult
+                }
+                return data
+            }
+        })
     },
     /**
      * Retrive the playlist data as the object based on the params provides
@@ -161,10 +251,11 @@ let main = {
      */
     getSong: function (url, fileId) {
         return new Promise((resolve, reject) => {
+
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
             let fileName = fileId + "." + extName
 
-            let file = fs.createWriteStream("./cache/data/" + fileName)
+            let file = fs.createWriteStream(baseDir + "/cache/data/" + fileName)
             let request = http.get(url, function (response) {
                 if (response.statusCode != 200) {
                     reject()
@@ -182,10 +273,11 @@ let main = {
      */
     getAlbumPic: function (url, fileId) {
         return new Promise((resolve, reject) => {
+
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
             let fileName = fileId + "." + extName
 
-            let file = fs.createWriteStream("./cache/data/" + fileName)
+            let file = fs.createWriteStream(baseDir + "/cache/data/" + fileName)
             let request = https.get(url, function (response) {
                 if (response.statusCode != 200) {
                     reject()
@@ -198,7 +290,6 @@ let main = {
     writeTag: async function (audioFile, picFile, info) {
         return new Promise((resolve, reject) => {
             let file = path.join(baseDir, "/cache/data/", audioFile)
-
             let image = fs.readFileSync(path.join(baseDir, "/cache/data/" + picFile))
 
             let artist = new Array()
@@ -214,13 +305,23 @@ let main = {
                 album: info.album.name,
                 title: info.track.name,
                 artist: artist,
-                image: image
+                image: image,
+                year: year,
+                trackNumber: info.track.no,
+                partOfSet: info.track.cd,
+                composer: artist
             }
 
-            id3.write(file, tag)
-            
-            const buffer = fs.readFileSync(file)
-            ID3JS.read(buffer)
+            NodeID3.write(tag, file, (err, buffer) => {
+                if (err) {
+                    reject(success)
+                }
+                else {
+                    let result = NodeID3.read(file)
+                    resolve(file)
+                }
+            })
+
         })
     },
     /**
@@ -321,7 +422,7 @@ let main = {
         }
 
     },
-    pageUp: function(itemNum, dataArray, params, type) {
+    pageUp: function (itemNum, dataArray, params, type) {
         let desPage = params.pid - 1
 
         let end = itemNum * desPage
@@ -344,7 +445,7 @@ let main = {
                 },
                 {
                     text: ">",
-                    callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
+                    callback_data: `musicshare://action?action=down&pid=${desPage}&q=${params.q}&id=${params.id}`
                 }
             ])
         }
@@ -352,7 +453,7 @@ let main = {
             keys.push([
                 {
                     text: "<",
-                    callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
+                    callback_data: `musicshare://action?action=up&pid=${desPage}&q=${params.q}&id=${params.id}`
                 },
                 {
                     text: desPage,
@@ -360,25 +461,25 @@ let main = {
                 },
                 {
                     text: ">",
-                    callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
+                    callback_data: `musicshare://action?action=down&pid=${desPage}&q=${params.q}&id=${params.id}`
                 }
             ])
         }
-        return keys                        
+        return keys
     },
-    pageDown: function(itemNum, dataArray, params, type) {
+    pageDown: function (itemNum, dataArray, params, type) {
         let desPage = params.pid + 1
 
         let end = itemNum * desPage
         let start = end - itemNum
         let keys = new Array()
         let length = dataArray.length > end ? end : dataArray.length
-        let isEnd = dataArray.length > end ? false : true 
-                               
+        let isEnd = dataArray.length > end ? false : true
+
         for (let i = start; i < length; i++) {
             let key = [{
-                    text: `${dataArray[i].name} - ${dataArray[i].artist}`,
-                    callback_data: "musicshare://song?id=" + dataArray[i].id
+                text: `${dataArray[i].name} - ${dataArray[i].artist}`,
+                callback_data: "musicshare://song?id=" + dataArray[i].id
             }]
             keys.push(key)
         }
@@ -387,7 +488,7 @@ let main = {
             keys.push([
                 {
                     text: "<",
-                    callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
+                    callback_data: `musicshare://action?action=up&pid=${desPage}&q=${params.q}&id=${params.id}`
                 },
                 {
                     text: desPage,
@@ -399,7 +500,7 @@ let main = {
             keys.push([
                 {
                     text: "<",
-                    callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
+                    callback_data: `musicshare://action?action=up&pid=${desPage}&q=${params.q}&id=${params.id}`
                 },
                 {
                     text: desPage,
@@ -407,11 +508,11 @@ let main = {
                 },
                 {
                     text: ">",
-                    callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
+                    callback_data: `musicshare://action?action=down&pid=${desPage}&q=${params.q}&id=${params.id}`
                 }
             ])
         }
-        return keys        
+        return keys
     }
 }
 
@@ -419,7 +520,30 @@ exports.meta = config.components.musicshare
 
 exports.commands = {
     netease: async function (context) {
-        return "功能正在开发中哦"
+        let args = context.args
+        let type = args[0]
+
+        if (/(song)|(playlist)|(album)/i.test(type) && args.length >= 2) {
+            let keyword = new Array()
+            args.forEach(arg => keyword.push(arg))
+            keyword = keyword.join(" ")
+
+            switch (type) {
+                case "song":
+
+                    break
+                case "playlist":
+
+                    break
+                case "album":
+
+                    break
+            }
+
+            return result
+        }
+
+        return undefined
     },
     playlist: async function (context) {
         let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
@@ -456,7 +580,7 @@ exports.commands = {
                         keys.push([
                             {
                                 text: 1,
-                                callback_data: "musicshare://null?pageid=1&id=" + params.id
+                                callback_data: "musicshare://null?pid=1&q=p&id=" + params.id
                             }
                         ])
                     }
@@ -464,11 +588,11 @@ exports.commands = {
                         keys.push([
                             {
                                 text: 1,
-                                callback_data: "musicshare://null?pageid=1&id=" + params.id
+                                callback_data: "musicshare://null?pid=1&id=" + params.id
                             },
                             {
                                 text: ">",
-                                callback_data: "musicshare://action?action=down&pid=1&id=" + params.id
+                                callback_data: "musicshare://action?action=down&pid=1&q=p&id=" + params.id
                             }
                         ])
                     }
@@ -482,7 +606,71 @@ exports.commands = {
             }
         }
         else {
-            return undefined
+            return "/playlist 歌单链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease playlist 关键词"
+        }
+    },
+    album: async function (context) {
+        let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(album)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
+        let message = context.ctx.message.text
+        let link = new Array()
+
+        if (context.args[0]) {
+            context.args.forEach(item => {
+                link.push(item.match(urlCheck))
+            })
+            link = link.join("")
+            if (link == "") {
+                return "使用方法有误哦！\n/album 专辑链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease album 关键词"
+            }
+            else {
+                Compo.Interface.Log.Log.info(`${context.ctx.from.first_name} 请求专辑数据来自链接: ${link}`)
+
+                let params = main.parseArgs(link)
+                let result = await main.album(params)
+                if (result == undefined) {
+                    return undefined
+                }
+                else {
+                    let keys = new Array()
+                    let length = result.tracks.length > 6 ? 6 : result.tracks.length
+                    for (let i = 0; i < length; i++) {
+                        let key = [{
+                            text: `${result.tracks[i].name} - ${result.tracks[i].artist}`,
+                            callback_data: "musicshare://song?id=" + result.tracks[i].id
+                        }]
+                        keys.push(key)
+                    }
+                    if (result.tracks.length < 7) {
+                        keys.push([
+                            {
+                                text: 1,
+                                callback_data: "musicshare://null?pid=1&q=a&id=" + params.id
+                            }
+                        ])
+                    }
+                    else {
+                        keys.push([
+                            {
+                                text: 1,
+                                callback_data: "musicshare://null?pid=1&id=" + params.id
+                            },
+                            {
+                                text: ">",
+                                callback_data: "musicshare://action?action=down&pid=1&q=a&id=" + params.id
+                            }
+                        ])
+                    }
+                    this.telegram.sendMessage(context.ctx.message.chat.id, result.text, {
+                        reply_markup: {
+                            inline_keyboard: keys
+                        },
+                        parse_mode: "Markdown"
+                    })
+                }
+            }
+        }
+        else {
+            return "/album 歌单链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease album 关键词"
         }
     }
 }
@@ -499,14 +687,18 @@ exports.inlines = {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求歌曲来自链接: ${link}`)
 
                 let data = await main.song(params)
-                if (data.inline[0].audio_url == null) {
+                if (data instanceof Error) {
+                    this.DiagnosticLog.fatal(data)
+                    return undefined
+                }
+                else if (data == undefined) {
                     return [{
                         type: "article",
                         id: params.id,
-                        title: `${data.inline[0].title}`,
+                        title: `对不起喔`,
                         description: "我们找到了曲目，但是对不起呢，歌曲暂不可用",
                         thumb_url: "https://i.loli.net/2019/11/13/dQDxC4Nv91VYK2E.jpg",
-                        input_message_content: { message_text: `${data.inline[0].title}\n${data.inline[0].performer}\n实在是很抱歉呢，这个歌曲暂不可用，但是可以试试在 App 中打开\n#yawarakai #${params.id}` },
+                        input_message_content: { message_text: `实在是很抱歉呢，这个歌曲暂不可用，但是可以试试在 App 中打开\n#yawarakai #${params.id}` },
                         reply_markup: {
                             inline_keyboard: [[{
                                 text: "Open in App",
@@ -522,11 +714,13 @@ exports.inlines = {
             }
             else if (params.type == "album") {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询专辑来自链接: ${link}`)
-                return await main.album(params)
+                let data = await main.album(params)
+                return undefined
             }
             else if (params.type == "playlist") {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求查询歌单来自链接: ${link}`)
-                return await main.playlist(params)
+                let data = await main.playlist(params)
+                return undefined
             }
         }
         return undefined
@@ -542,7 +736,7 @@ exports.messages = {
 exports.callbackQuery = {
     main: async function (ctx) {
         const Telegram = this.telegram
-        
+
         if (!ctx.update.callback_query.data.startsWith("musicshare")) { return undefined }
 
         let callbackData = ctx.update.callback_query
@@ -555,143 +749,65 @@ exports.callbackQuery = {
          */
         if (params.type == "song") {
 
-            let message = await this.telegram.editMessageText(
+            let message = await this.telegram.sendMessage(
                 callbackData.message.chat.id,
-                callbackData.message.message_id,
-                null,
                 "稍等呢，正在获取数据"
             ).catch(err => {
-                console.error(err)
+                throw err
             })
 
-            let data = await main.song(params)
+            let data = await main.song(params, 320000, "callback").catch(err => {
+                throw err
+            })
 
-            if (data.callback.audio == null) {
+            try {
+
+                message = await Telegram.editMessageText(
+                    message.chat.id,
+                    message.message_id,
+                    null,
+                    "数据获取成功，正在更新到消息~"
+                ).catch(err => {
+                    throw err
+                })
+
+                if (data == undefined) { throw new Error() }
+                
+                Telegram.sendChatAction(callbackData.message.chat.id, "upload_audio")
+                let audioMessage = await Telegram.sendAudio(callbackData.message.chat.id, { source: fs.createReadStream(data.file.audio) }, {
+                    performer: data.callback.performer,
+                    thumb: data.callback.thumb,
+                    title: data.callback.title,
+                    caption: data.callback.caption,
+                    parse_mode: data.callback.parse_mode,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{
+                                text: "Open in App",
+                                url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
+                            }]
+                        ]
+                    }
+                }).then(res => {
+                    Telegram.deleteMessage(message.chat.id, message.message_id)
+                    return "Passed"
+                }).catch(err => {
+                    throw err
+                })
+                //Telegram.deleteMessage(message.chat.id, message.message_id)
+            }
+            catch (err) {
                 Telegram.editMessageText(
                     message.chat.id,
                     message.message_id,
                     null,
-                    "歌曲找到了，但是暂时不可用呢"
+                    "歌曲找到了，但是暂时不可用呢~\n可以稍后试试看\n如果一直出现这个问题的话，可以去 Bot 汇报错误情况呢，并且给出出错的的歌曲链接"
                 ).catch(err => {
-                    console.error(err)
+                    throw err
                 })
-                return undefined
+                throw err
             }
 
-            message = await Telegram.editMessageText(
-                message.chat.id,
-                message.message_id,
-                null,
-                "数据获取成功，正在更新到消息~"
-            ).catch(err => {
-                console.error(err)
-            })
-
-            await Telegram.sendAudio(callbackData.message.chat.id, data.callback.audio, {
-                title: data.callback.title,
-                caption: data.callback.caption,
-                performer: data.callback.performer,
-                thumb: data.callback.thumb,
-                parse_mode: data.callback.parse_mode,
-                reply_markup: {
-                    inline_keyboard: [
-                        [{
-                            text: "Open in App",
-                            url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
-                        }]
-                    ]
-                }
-            }).catch(err => {
-                console.error(err)
-            })
-            Telegram.deleteMessage(callbackData.message.chat.id, callbackData.message.message_id)
-
-            return "Passed"
-        }
-
-        /**
-         * Playlist
-         */
-        if (params.type == "playlist") {
-
-            let playlistData = await main.playlist(params)
-
-            if (playlistData == undefined) {
-                return undefined
-            }
-            else {
-                let index = 1
-                for(let i = 0; i < playlistData.tracks.length; i++) {
-                    if (playlistData.tracks[i]["id"] == params.id) {
-                        index = i
-                    }
-                }
-
-                let desPage = parseInt(index / 6)
-                let end = desPage + 1
-                let start = desPage * 6
-                end = end * 6
-                desPage = desPage == 0 ? 1 : desPage
-                let isTop = start == 0
-                let isEnd = playlistData.tracks.length > end ? false : true
-                let keys = new Array()
-                for (let i = start; i < end; i++) {
-                    let key = [{
-                            text: `${playlistData.tracks[i].name} - ${playlistData.tracks[i].artist}`,
-                            callback_data: "musicshare://song?id=" + playlistData.tracks[i].id
-                    }]
-                    keys.push(key)
-                }
-                if (isTop) {
-                    keys.push([
-                        {
-                            text: desPage,
-                            callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
-                        },
-                        {
-                            text: ">",
-                            callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
-                        }
-                    ])
-                }
-                else if (isEnd) {
-                    keys.push([
-                        {
-                            text: "<",
-                            callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
-                        },
-                        {
-                            text: desPage,
-                            callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
-                        }
-                    ])
-                }
-                else {
-                    keys.push([
-                        {
-                            text: "<",
-                            callback_data: `musicshare://action?action=up&pid=${desPage}&id=${params.id}`
-                        },
-                        {
-                            text: desPage,
-                            callback_data: `musicshare://null?pageid=${desPage}&id=${params.id}`
-                        },
-                        {
-                            text: ">",
-                            callback_data: `musicshare://action?action=down&pid=${desPage}&id=${params.id}`
-                        }
-                    ])
-                }
-
-                this.telegram.sendMessage(
-                    callbackData.message.chat.id,
-                    playlistData.text, {
-                    reply_markup: {
-                        inline_keyboard: keys
-                    },
-                    parse_mode: "Markdown"
-                })
-            }
         }
 
         /**
@@ -709,7 +825,9 @@ exports.callbackQuery = {
             )
             if (params.action == "up") {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求歌单数据来自 ID: ${params.id}`)
-                let previous = await main.playlist(params)
+                let previous
+                if (params.q == "p") { previous = await main.playlist(params) }
+                else if (params.q == "a") { previous = await main.album(params) }
                 if (previous == undefined) {
                     return undefined
                 }
@@ -731,7 +849,9 @@ exports.callbackQuery = {
             }
             else if (params.action == "down") {
                 Compo.Interface.Log.Log.info(`${ctx.from.first_name} 请求歌单数据来自 ID: ${params.id}`)
-                let next = await main.playlist(params)
+                let next
+                if (params.q == "p") { next = await main.playlist(params) }
+                else if (params.q == "a") { next = await main.album(params) }
                 if (next == undefined) {
                     return undefined
                 }
@@ -760,10 +880,16 @@ exports.register = {
     // As the example to Yawarakai Compos
     commands: [
         {
-            function: 'netease'
+            function: 'netease',
+            help: "Unavailable (Under Construction)"
         },
         {
-            function: 'playlist'
+            function: 'playlist',
+            help: "歌单链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease playlist 关键词"
+        },
+        {
+            function: 'album',
+            help: "专辑链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease album 关键词"
         }
     ],
     inlines: [

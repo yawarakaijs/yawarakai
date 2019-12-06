@@ -128,8 +128,12 @@ exports.inlines = {
 exports.register = {
     // As the example to Yawarakai Compos
     commands: [
-        { function: 'c2j' },
-        { function: "j2c" }
+        // { 
+        //     function: 'c2j' 
+        // },
+        // { 
+        //     function: "j2c" 
+        // }
     ],
     inlines: [
         { function: "dictionary" }

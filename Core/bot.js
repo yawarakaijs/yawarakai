@@ -4,7 +4,7 @@
 
 let Core = require('../core')
 let Message = require('./Bot/message')
-let Command = require('./Bot/command')
+let Command = require('./Bot/command').Command
 let Telegram = require('./Bot/telegram')
 let Component = require('../component')
 
@@ -16,93 +16,14 @@ let Nlp = require('./Bot/nlp').Nlp
 let Log = require('../Core/log').Log
 let Lang = require('./lang')
 
-let compoData = Component.Register.load()
-
-let Bot = {
-    telegram: Telegram.Bot.telegram,
-    commandParse: function (ctx, callback) {
-        let commandArgs = ctx.message.text.split(" ")
-        let command = commandArgs[0].substring(1)
-        command = command.replace(/@\w+/g, "")
-        let args = []
-        commandArgs.forEach((value, index) => {
-            if (index > 0 && value !== "") {
-                args.push(value)
-            }
-        })
-        return {
-            cmd: command,
-            args: args,
-            ctx: ctx
-        }
-    },
-    inlineDistributor: async function (ctx) {
-        let method = compoData.inline
-        let detail = new Array()
-        let result = new Array()
-        for (let i of method) {
-            try {
-                const res = await i.instance.call(this, ctx)
-                if (res != undefined) {
-                    detail.push(res)
-                }
-            } catch (err) {
-                DiagnosticLog.fatal(err)
-            }
-        }
-        if (detail.length == 1 || detail.length >= 2) {
-            detail.map(resArray => { resArray.map(item => result.push(item)) })
-            return result
-        }
-        else { return undefined }
-    },
-    callbackQueryDistributor: async function (ctx) {
-        let args = []
-        args.push(ctx)
-        let method = compoData.callbackQuery
-        let detail
-        for (let i of method) {
-            const idx = method.indexOf(i)
-            try {
-                const res = await i.instance.call(this, ctx)
-                if (res != undefined) {
-                    detail = res
-                }
-            } catch (err) {
-                DiagnosticLog.fatal(err)
-            }
-        }
-        return detail
-    },
-    commandDistributor: async function (ctx) {
-        let result = Bot.commandParse(ctx)
-        let cmd = compoData.command.find(command => {
-            return command.function === result.cmd
-        })
-        if (!cmd) { return 404 }
-        return await cmd.instance.call(this, result)
-    },
-    staticCommandDistributor: function (ctx) {
-        commandParse(ctx, (result) => {
-
-        })
-    },
-    messasgeDistributor: async function (ctx) {
-        let method = compoData.message
-        let result = undefined
-        for (let i of method) {
-            try {
-                const res = await i.instance.call(this, ctx)
-                if (res != undefined) {
-                    result = res
-                }
-            } catch (err) {
-                DiagnosticLog.fatal(err)
-            }
-        }
-        return result
-    }
+function reload() {
+    delete require.cache[require.resolve('../component')]
+    Component = require('../component')
+    Component.Register.load()
 }
+
+Component.Register.load()
+
 let DiagnosticLog = {
     info: (text) => {
         DiagnosticLog.counter(text)
@@ -138,7 +59,7 @@ let DiagnosticLog = {
                 let trimmer = new RegExp(__dirname.replace(/\/Core/gu, ""), "gu")
                 stack = JSON.stringify(text.stack).replace(trimmer, ".")
             }
-            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
+            Telegram.Bot.telegram.sendMessage(`@${config.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
         }
         Log.fatal(text)
     },
@@ -154,6 +75,100 @@ let DiagnosticLog = {
         })
     },
     count: 0
+}
+
+let Bot = {
+    telegram: Telegram.Bot.telegram,
+    DiagnosticLog: DiagnosticLog,
+    commandParse: function (ctx, callback) {
+        let commandArgs = ctx.message.text.split(" ")
+        let command = commandArgs[0].substring(1)
+        command = command.replace(/@\w+/g, "")
+        let args = []
+        commandArgs.forEach((value, index) => {
+            if (index > 0 && value !== "") {
+                args.push(value)
+            }
+        })
+        return {
+            cmd: command,
+            args: args,
+            ctx: ctx,
+            telegram: Telegram.Bot.telegram,
+            compo: Component.Compo
+        }
+    },
+    inlineDistributor: async function (ctx) {
+        let method = Component.Compo.inline
+        let detail = new Array()
+        let result = new Array()
+        for (let i of method) {
+            try {
+                const res = await i.instance.call(this, ctx)
+                if (res != undefined) {
+                    detail.push(res)
+                }
+            } catch (err) {
+                DiagnosticLog.fatal(err)
+            }
+        }
+        if (detail.length == 1 || detail.length >= 2) {
+            detail.map(resArray => { resArray.map(item => result.push(item)) })
+            return result
+        }
+        else { return undefined }
+    },
+    callbackQueryDistributor: async function (ctx) {
+        let args = []
+        args.push(ctx)
+        let method = Component.Compo.callbackQuery
+        let detail
+        for (let i of method) {
+            const idx = method.indexOf(i)
+            try {
+                const res = await i.instance.call(this, ctx)
+                if (res != undefined) {
+                    detail = res
+                }
+            } catch (err) {
+                DiagnosticLog.fatal(err)
+            }
+        }
+        return detail
+    },
+    commandDistributor: async function (ctx) {
+        let result = Bot.commandParse(ctx)
+        let cmd = Component.Compo.command.find(command => {
+            return command.function === result.cmd
+        })
+        if (!cmd) { return 404 }
+        return await cmd.instance.call(this, result)
+    },
+    staticCommandDistributor: function (ctx) {
+        let result = Bot.commandParse(ctx)
+        let data = Command.switcher(result)
+        if (data != undefined) {
+            return data
+        }
+        else {
+            return undefined
+        }
+    },
+    messasgeDistributor: async function (ctx) {
+        let method = Component.Compo.message
+        let result = undefined
+        for (let i of method) {
+            try {
+                const res = await i.instance.call(this, ctx)
+                if (res != undefined) {
+                    result = res
+                }
+            } catch (err) {
+                DiagnosticLog.fatal(err)
+            }
+        }
+        return result
+    }
 }
 
 let Control = {
@@ -227,9 +242,12 @@ let Control = {
                 if (/^\/\w+@\w+/.test(ctx.message.text) && !ctx.message.text.includes(me.username)) {
                     return
                 }
-                let data = await Bot.commandDistributor(ctx)
+                let data = Bot.staticCommandDistributor(ctx)
+                if (data == undefined) {
+                    data = await Bot.commandDistributor(ctx)
+                }
                 if(data != undefined) {
-                    ctx.reply(data)
+                    ctx.reply(data, { parse_mode: "Markdown" })
                 }
             }
 
@@ -237,24 +255,26 @@ let Control = {
              * Handle general messages
              */
             else {
-                Nlp.tag(ctx, ctx.message.text).then(res => {
-                    let text = res
-                    if (text != undefined) {
-                        Core.getKey("nlpAnalyzeIds").then(ids => {
-                            let current = JSON.parse(ids)
-                            current.map(item => {
-                                if (item == ctx.from.id) {
-                                    Telegram.Bot.telegram.sendMessage(ctx.chat.id, text, { parse_mode: "Markdown" }).catch(err => {
-                                        DiagnosticLog.fatal(err)
-                                    })
-                                }
-                            })
-                        })
-                    }
-                })
                 let data = await Bot.messasgeDistributor(ctx)
                 if (data == undefined) {
-                    Message.Message.hears(ctx)
+                    let noneMsg = await Message.Message.hears(ctx)
+                    if (noneMsg == undefined) {
+                        Nlp.tag(ctx, ctx.message.text).then(res => {
+                            let text = res
+                            if (text != undefined) {
+                                Core.getKey("nlpAnalyzeIds").then(ids => {
+                                    let current = JSON.parse(ids)
+                                    current.map(item => {
+                                        if (item == ctx.message.from.id) {
+                                            Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, text, { parse_mode: "Markdown" }).catch(err => {
+                                                DiagnosticLog.fatal(err)
+                                            })
+                                        }
+                                    })
+                                })
+                            }
+                        })
+                    }
                 }
                 else {
                     ctx.replyWithChatAction("typing")
@@ -264,7 +284,7 @@ let Control = {
         }).catch(err => DiagnosticLog(err))
 
         Telegram.Bot.on("forward", async (ctx) => {
-            console.log(ctx.message)
+            Log.debug(ctx.message)
         })
 
         // Log
@@ -276,6 +296,7 @@ let Control = {
 }
 
 exports.Core = Core
+exports.reload = reload
 exports.Control = Control
 exports.Message = Message
 exports.Command = Command

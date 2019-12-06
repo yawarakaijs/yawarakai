@@ -103,8 +103,8 @@ exports.commands = {
         let ctx = context.ctx
         let data = context.args.join(" ")
 
-        let flightNumPattern = /(([a-zA-Z])|(\d)){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /(([a-zA-Z])|(\d)){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}((-)|( ))?(\d{3,4})/gi
+        let flightNumInputPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}(-)(\d{3,4})/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -173,8 +173,8 @@ exports.inlines = {
     main: async function (ctx) {
         let data = ctx.inlineQuery.query
 
-        let flightNumPattern = /(([a-zA-Z])|(\d)){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /(([a-zA-Z])|(\d)){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}((-)|( ))?(\d{3,4})/gi
+        let flightNumInputPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}(-)(\d{3,4})/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -257,7 +257,8 @@ exports.register = {
     // As the example to Yawarakai Compos
     commands: [
         {
-            function: 'flight'
+            function: 'flight',
+            help: "AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01"
         }
     ],
     inlines: [

@@ -4,39 +4,48 @@
         "dictionary": {
             "enable": true,
             "name": "dictionary",
-            "displayNam": "Dictionary for Simplified Chinese",
-            "groupNam": "yawarakai-official",
-            "version": "v1.3.2",
+            "displayName": "Dictionary for Simplified Chinese",
+            "groupName": "yawarakai-official",
+            "version": "v1.3.3",
             "authort": ["Yawarakai Devs"],
             "description": "Find the foreign language words and Give the defination of it"
         },
         "musicshare": {
             "enable": true,
             "name": "musicshare",
-            "displayNam": "Music sharing component for music platforms",
-            "groupNam": "yawarakai-official",
-            "version": "v1.3.1",
+            "displayName": "Music share from Netease",
+            "groupName": "yawarakai-official",
+            "version": "v1.3.8",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
         },
         "wiki": {
             "enable": true,
             "name": "wiki",
-            "displayNam": "Wikipedia",
-            "groupNam": "yawarakai-official",
-            "version": "v1.2.1",
+            "displayName": "Wikipedia",
+            "groupName": "yawarakai-official",
+            "version": "v1.2.2",
             "author": ["Yawarakai Devs"],
             "description": "Search keywords on Wikipedia"
         },
         "flight": {
             "enable": true,
             "name": "flight",
-            "displayNam": "Flight Info",
-            "groupNam": "yawarakai-official",
-            "version": "v1.0.1",
+            "displayName": "Flight Info",
+            "groupName": "yawarakai-official",
+            "version": "v1.1.0",
             "author": ["Yawarakai Devs"],
             "description": "Get flight information",
             "locale": "zh-CN"
+        },
+        "comment": {
+            "enable": true,
+            "name": "comment",
+            "displayName": "Comments in channel",
+            "groupName": "yawarakai-official",
+            "version": "v1.0.0",
+            "author": ["Yawarakai Devs"],
+            "description": "Adds comments functions for channel posts"
         }
     }
 }

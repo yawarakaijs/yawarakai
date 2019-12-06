@@ -81,7 +81,7 @@ let command = (cmd) => {
             Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.webhook.url == '' ? "127.0.0.1" : config.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.webhook.port}`)
             Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
             if(config.diagnosticChannel.enable) {
-                Bot.telegram.sendMessage(config.diagnosticChannel.channel,`📄 Info\n${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.loadedPlugins.join("\n")}`)
+                Bot.telegram.sendMessage("@" + config.diagnosticChannel.channel,`📄 Info\n${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.compoInfo.join("\n")}`).catch(err => Log.Log.fatal(err))
             }
             webhookUrl != undefined ? Bot.telegram.setWebhook(webhookUrl).catch(err => Log.Log.fatal(err)) : Bot.telegram.setWebhook("127.0.0.1")
             Bot.startWebhook('/', null, webhookPort != undefined ? webhookPort : 8000)

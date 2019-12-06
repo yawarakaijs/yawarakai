@@ -36,6 +36,12 @@ exports.callbackQuery = {
     }
 }
 
+exports.channelPost = {
+    main: async function () {
+
+    }
+}
+
 // Register
 
 exports.register = {
@@ -56,6 +62,11 @@ exports.register = {
         // }
     ],
     callbackQuery: [
+        // {
+        //     function: 'main'
+        // }
+    ],
+    channelPost: [
         // {
         //     function: 'main'
         // }

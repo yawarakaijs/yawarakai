@@ -74,8 +74,6 @@ let Nlp = {
                     sentimentResult = "文本偏负面"
                 }
                 let data = `原句: *${text}*` + "\n \n" + newText + "\n \n" + `*${sentimentResult}*\n正面: ${JSON.stringify(senti.pos).slice(0,11)} \n负面: ${JSON.stringify(senti.neg).slice(0,11)}`
-
-                Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${newText.replace(/_/g, "")}`)
                 return data
             }
         })
@@ -208,18 +206,21 @@ let NlpControl = {
                     NlpControl.start()
                     Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
                 }
-                currentAdd.map(item => {
-                    if (item != userId) {
-                        currentAdd = currentAdd.filter(item => item != userId)
-                        currentAdd.push(userId)
-                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentAdd))
-                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
-                    }
-                    if (item == userId) {
-                        NlpControl.start()
-                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
-                    }
-                })
+                else {
+                    currentAdd.map(item => {
+                        if (item != userId) {
+                            currentAdd = currentAdd.filter(item => item != userId)
+                            currentAdd.push(userId)
+                            NlpControl.start()
+                            Core.setKey("nlpAnalyzeIds", JSON.stringify(currentAdd))
+                            Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                        }
+                        else if (item == userId) {
+                            NlpControl.start()
+                            Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                        }
+                    })
+                }
             }
             if(action == "remove") {
                 let currentRmv = JSON.parse(res)
@@ -229,11 +230,10 @@ let NlpControl = {
                         Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
                         Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
                     }
-                    if (item == userId) {
+                    else if (item == userId) {
                         currentRmv = currentRmv.filter(item => item != userId)
                         Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
                         Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
-                        NlpControl.stop()
                     }
                 })
                 
