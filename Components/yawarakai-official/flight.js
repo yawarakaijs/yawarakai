@@ -103,8 +103,8 @@ exports.commands = {
         let ctx = context.ctx
         let data = context.args.join(" ")
 
-        let flightNumPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /((([a-zA-Z])(\d))|((\d)([a-zA-Z])))+((-)|( ))?(\d{3,4})/gi
+        let flightNumInputPattern = /((([a-zA-Z])(\d))|((\d)([a-zA-Z])))+(-)(\d{3,4})/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -155,7 +155,7 @@ exports.commands = {
         }
 
         let info = [flight, date]
-        ctx.reply("正在申请查询航班信息: " + info[0])
+        let message = await this.telegram.sendMessage(ctx.message.chat.id, "正在申请查询航班信息: " + info[0])
         let result = await main.getData(ctx, info, data).catch(err => {
             ctx.reply("抱歉，航班查询服务目前暂不可用。")
         })
@@ -164,6 +164,7 @@ exports.commands = {
             return undefined
         }
         ctx.reply(result.data, { parse_mode: "Markdown" })
+        this.telegram.deleteMessage(message.chat.id, message.message_id)
         Compo.Interface.Log.Log.info("")
         return undefined
     }
@@ -173,8 +174,8 @@ exports.inlines = {
     main: async function (ctx) {
         let data = ctx.inlineQuery.query
 
-        let flightNumPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /((([a-zA-Z])(\d))|((\d)([a-zA-Z])))+((-)|( ))?(\d{3,4})/gi
+        let flightNumInputPattern = /((([a-zA-Z])(\d))|((\d)([a-zA-Z])))+(-)(\d{3,4})/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
