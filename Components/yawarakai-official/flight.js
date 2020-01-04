@@ -35,8 +35,8 @@ let main = {
 
         let link = linkPrefix + info[0] + "/" + info[1]
         return axios.get(link).then(htmlString => {
-            var $ = cheerio.load(htmlString.data)
-            var flightStatus = $('div.statusLines').text().split('\n')
+            let $ = cheerio.load(htmlString.data)
+            let flightStatus = $('div.statusLines').text().split('\n')
             if(flightStatus[1] == undefined) {
                 Compo.Interface.Log.Log.warning(`无该航班信息 ${info[0]}。`)
                 return undefined
@@ -103,8 +103,8 @@ exports.commands = {
         let ctx = context.ctx
         let data = context.args.join(" ")
 
-        let flightNumPattern = /((([a-zA-Z])(\d))|((\d)([a-zA-Z])))+((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /((([a-zA-Z])(\d))|((\d)([a-zA-Z])))+(-)(\d{3,4})/gi
+        let flightNumPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-| )?\d{3,4}/gi
+        let flightNumInputPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-)\d{3,4}/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -138,9 +138,8 @@ exports.commands = {
         flightNum += flightData
 
         if(!flightNumInputPattern.test(flightNum)) {
-
-            let flightNumInputPattern1 = /(([a-zA-Z])|(\d)){2}( )(\d{3,4})/gi
-            let flightNumInputPattern2 = /(([a-zA-Z])|(\d)){2}(\d{3,4})/gi
+            let flightNumInputPattern1 = /(([a-z]\d)|([a-z]+)|(\d[a-z]))( )\d{3,4}/gi
+            let flightNumInputPattern2 = /(([a-z]\d)|([a-z]+)|(\d[a-z]))\d{3,4}/gi
 
             if(flightNumInputPattern1.test(flightNum)) {
                 let array = flightNum.split(' ')
@@ -174,8 +173,8 @@ exports.inlines = {
     main: async function (ctx) {
         let data = ctx.inlineQuery.query
 
-        let flightNumPattern = /((([a-zA-Z])(\d))|((\d)([a-zA-Z])))+((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /((([a-zA-Z])(\d))|((\d)([a-zA-Z])))+(-)(\d{3,4})/gi
+        let flightNumPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-| )?\d{3,4}/gi
+        let flightNumInputPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-)\d{3,4}/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -215,8 +214,8 @@ exports.inlines = {
 
         if(!flightNumInputPattern.test(flightNum)) {
 
-            let flightNumInputPattern1 = /(([a-zA-Z])|(\d)){2}( )(\d{3,4})/gi
-            let flightNumInputPattern2 = /(([a-zA-Z])|(\d)){2}(\d{3,4})/gi
+            let flightNumInputPattern1 = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-| )\d{3,4}/gi
+            let flightNumInputPattern2 = /(([a-z]\d)|([a-z]+)|(\d[a-z]))\d{3,4}/gi
 
             if(flightNumInputPattern1.test(flightNum)) {
                 let array = flightNum.split(' ')
