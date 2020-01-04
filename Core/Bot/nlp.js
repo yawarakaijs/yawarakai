@@ -207,7 +207,7 @@ let NlpControl = {
                     })
                     NlpControl.start()
                     Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
-                        Log.Log.debug(updated[0].nlpAnalyzeIds)
+                        Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
                     })
                 }
                 else {
@@ -218,13 +218,13 @@ let NlpControl = {
                             NlpControl.start()
                             Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentAdd) }}, {}, (err, num) => {})
                             Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
-                                Log.Log.debug(updated[0].nlpAnalyzeIds)
+                                Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
                             })
                         }
                         else if (item == userId) {
                             NlpControl.start()
                             Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
-                                Log.Log.debug(updated[0].nlpAnalyzeIds)
+                                Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
                             })
                         }
                     })
@@ -237,14 +237,14 @@ let NlpControl = {
                         currentRmv = currentRmv.filter(item => item != userId)
                         Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentRmv) }}, {}, (err, num) => {})
                         Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
-                            Log.Log.debug(updated[0].nlpAnalyzeIds)
+                            Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
                         })
                     }
                     else if (item == userId) {
                         currentRmv = currentRmv.filter(item => item != userId)
                         Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentRmv) }}, {}, (err, num) => {})
                         Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
-                            Log.Log.debug(updated[0].nlpAnalyzeIds)
+                            Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
                         })
                     }
                 })
