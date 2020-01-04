@@ -3,6 +3,7 @@
 // Local Files
 
 let Core = require('../core')
+let Store = require('./storage')
 let Message = require('./Bot/message')
 let Command = require('./Bot/command').Command
 let Telegram = require('./Bot/telegram')
@@ -64,14 +65,14 @@ let DiagnosticLog = {
         Log.fatal(text)
     },
     counter: (text) => {
-        Core.getKey("logtext").then(res => {
-            if (text.message == res) {
+        Store.find({ key: "logtext" }).then(res => {
+            if (text.message == res[res.length - 1]) {
                 DiagnosticLog.count++
             }
-            if (text.message != res) {
+            if (text.message != res[res.length - 1]) {
                 DiagnosticLog.count = 0
             }
-            Core.setKey("logtext", text.message ? text.message : "", 'EX', 1 * 60)
+            Store.insert({"logtext": text.message ? text.message : "", key: "logtext"})
         })
     },
     count: 0
@@ -186,6 +187,12 @@ let Control = {
         })
 
         /**
+         * Handle new channel post
+         */
+        Telegram.Bot.on("channel_post", async (ctx) => {
+        })
+
+        /**
          * Handle callback queries
          */
         Telegram.Bot.on("callback_query", async (ctx) => {
@@ -262,8 +269,8 @@ let Control = {
                         Nlp.tag(ctx, ctx.message.text).then(res => {
                             let text = res
                             if (text != undefined) {
-                                Core.getKey("nlpAnalyzeIds").then(ids => {
-                                    let current = JSON.parse(ids)
+                                Store.find({key: "nlpAnalyzeIds"}).then(ids => {
+                                    let current = JSON.parse(ids[0].nlpAnalyzeIds)
                                     current.map(item => {
                                         if (item == ctx.message.from.id) {
                                             Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, text, { parse_mode: "Markdown" }).catch(err => {
@@ -284,7 +291,7 @@ let Control = {
         }).catch(err => DiagnosticLog(err))
 
         Telegram.Bot.on("forward", async (ctx) => {
-            Log.debug(ctx.message)
+            
         })
 
         // Log

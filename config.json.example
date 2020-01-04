@@ -16,10 +16,5 @@
         "enable": false,
         "channel": "Channel Username or Channel ID"
     },
-    "redis": {
-        "host": "Redis Hostname",
-        "port": "6379",
-        "auth": "Password of redis"
-    },
     "language": "en-US"
 }
