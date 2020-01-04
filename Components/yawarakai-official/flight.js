@@ -11,7 +11,7 @@ let config = require('./config.json')
 // main
 
 let main = {
-    getData: async function (ctx, info, flight) {
+    async getData (ctx, info, flight) {
         Compo.Interface.Log.Log.info(ctx.from.first_name + " 申请查询航班信息: " + info[0] + " " + info[1])
 
         // Link Prefix
@@ -35,8 +35,8 @@ let main = {
 
         let link = linkPrefix + info[0] + "/" + info[1]
         return axios.get(link).then(htmlString => {
-            var $ = cheerio.load(htmlString.data)
-            var flightStatus = $('div.statusLines').text().split('\n')
+            let $ = cheerio.load(htmlString.data)
+            let flightStatus = $('div.statusLines').text().split('\n')
             if(flightStatus[1] == undefined) {
                 Compo.Interface.Log.Log.warning(`无该航班信息 ${info[0]}。`)
                 return undefined
@@ -99,12 +99,12 @@ exports.meta = config.components.flight
 // Inner
 
 exports.commands = {
-    flight: async function (context) {
+    async flight (context) {
         let ctx = context.ctx
         let data = context.args.join(" ")
 
-        let flightNumPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-| )?\d{3,4}/gi
+        let flightNumInputPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-)\d{3,4}/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -138,9 +138,8 @@ exports.commands = {
         flightNum += flightData
 
         if(!flightNumInputPattern.test(flightNum)) {
-
-            let flightNumInputPattern1 = /(([a-zA-Z])|(\d)){2}( )(\d{3,4})/gi
-            let flightNumInputPattern2 = /(([a-zA-Z])|(\d)){2}(\d{3,4})/gi
+            let flightNumInputPattern1 = /(([a-z]\d)|([a-z]+)|(\d[a-z]))( )\d{3,4}/gi
+            let flightNumInputPattern2 = /(([a-z]\d)|([a-z]+)|(\d[a-z]))\d{3,4}/gi
 
             if(flightNumInputPattern1.test(flightNum)) {
                 let array = flightNum.split(' ')
@@ -155,7 +154,7 @@ exports.commands = {
         }
 
         let info = [flight, date]
-        ctx.reply("正在申请查询航班信息: " + info[0])
+        let message = await this.telegram.sendMessage(ctx.message.chat.id, "正在申请查询航班信息: " + info[0])
         let result = await main.getData(ctx, info, data).catch(err => {
             ctx.reply("抱歉，航班查询服务目前暂不可用。")
         })
@@ -164,17 +163,18 @@ exports.commands = {
             return undefined
         }
         ctx.reply(result.data, { parse_mode: "Markdown" })
+        this.telegram.deleteMessage(message.chat.id, message.message_id)
         Compo.Interface.Log.Log.info("")
         return undefined
     }
 }
 
 exports.inlines = {
-    main: async function (ctx) {
+    async main (ctx) {
         let data = ctx.inlineQuery.query
 
-        let flightNumPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}((-)|( ))?(\d{3,4})/gi
-        let flightNumInputPattern = /((([a-zA-Z])(\d))|(\d)([a-zA-Z])){2}(-)(\d{3,4})/gi
+        let flightNumPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-| )?\d{3,4}/gi
+        let flightNumInputPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-)\d{3,4}/gi
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
@@ -214,8 +214,8 @@ exports.inlines = {
 
         if(!flightNumInputPattern.test(flightNum)) {
 
-            let flightNumInputPattern1 = /(([a-zA-Z])|(\d)){2}( )(\d{3,4})/gi
-            let flightNumInputPattern2 = /(([a-zA-Z])|(\d)){2}(\d{3,4})/gi
+            let flightNumInputPattern1 = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-| )\d{3,4}/gi
+            let flightNumInputPattern2 = /(([a-z]\d)|([a-z]+)|(\d[a-z]))\d{3,4}/gi
 
             if(flightNumInputPattern1.test(flightNum)) {
                 let array = flightNum.split(' ')

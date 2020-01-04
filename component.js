@@ -16,7 +16,7 @@ let Compo = { command: [], inline: [], message: [], callbackQuery: [], channelPo
 // Body
 
 let Register = {
-    load: (extensionDir = path.join(__dirname, '/Components/')) => {
+    load (extensionDir = path.join(__dirname, '/Components/')) {
         try {
             // Init object for later storage
             /**
@@ -145,10 +145,10 @@ let Register = {
             Log.Log.fatal(error)
         }
     },
-    list: () => {
+    list () {
         return compos
     },
-    reload: () => {
+    reload () {
         compos.path.forEach(item => {
             console.log(path.join(path.join(__dirname, '/Components/'), item + ".js"))
             delete require.cache[require.resolve(path.join(path.join(__dirname, '/Components/'), item + ".js"))]
@@ -161,9 +161,8 @@ let Register = {
         Compo = { command: [], inline: [], message: [], callbackQuery: [], channelPost: [] }
 
         this.Register.load()
-        console.log(Compo.command[4].instance.call(this, undefined))
     },
-    unload: (context) => {
+    unload (context) {
 
     }
 }

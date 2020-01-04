@@ -12,7 +12,7 @@ let Component = require('../../component')
 // Main
 
 let Command = {
-    switcher: function (context) {
+    switcher (context) {
         switch(context.cmd) {
             case "help":
                 let basics = Lang.bot.command.help + "\n\n" + Lang.bot.command.start + "\n" + Lang.bot.command.info + "\n" + Lang.bot.command.settings + "\n"
@@ -28,7 +28,7 @@ let Command = {
                 return undefined
         }
     },
-    info: function (context) {
+    info (context) {
 
         let ctx = context.ctx
         let hasName = ctx.message.from.first_name != undefined || ctx.message.from.first_name != ""

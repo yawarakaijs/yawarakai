@@ -10,7 +10,7 @@ let SysTime = new Date()
 let logTime = SysTime.getFullYear() + "-" + ("0" + (SysTime.getMonth() + 1)).slice(-2) + "-" + ("0" + SysTime.getDate()).slice(-2)
 
 let coreLogFileName =
-    "./log/" +
+    "./logs/" +
     config.botname +
     "-" +
     "Core-Log" +
@@ -18,7 +18,7 @@ let coreLogFileName =
     logTime +
     ".log"
 let messageLogFileName =
-    "./log/" +
+    "./logs/" +
     config.botname +
     "-" +
     "Message-Log" +

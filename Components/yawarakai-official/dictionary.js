@@ -15,7 +15,7 @@ let thumb = "https://i.loli.net/2019/10/04/eNxTQaftWrh7Lsd.jpg"
 // Main
 
 let main = {
-    c2j: async (query) => {
+    async c2j (query) {
         return hujiang.search(query, 'cn', 'jp').then(res => {
             if (res.wordEntries) {
                 return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
@@ -28,7 +28,7 @@ let main = {
         })
     },
 
-    j2c: async (query) => {
+    async j2c (query) {
         return hujiang.search(query, 'jp', 'cn').then(res => {
             if (res.wordEntries) {
                 return res.wordEntries[0].dictEntrys[0].partOfSpeeches[0].definitions
@@ -41,7 +41,7 @@ let main = {
             Compo.Interface.Log.Log.fatal(err)
         })
     },
-    answer: (ctx, query, result, middleWord) => {
+    answer (ctx, query, result, middleWord) {
         var data = {
             type: "article",
             id: ctx.inlineQuery.id,
@@ -52,7 +52,7 @@ let main = {
         }
         return data
     },
-    answerPlain: (ctx, query, result, middleWord) => {
+    answerPlain (ctx, query, result, middleWord) {
         var data = {
             type: "article",
             id: ctx.inlineQuery.id,
@@ -74,7 +74,7 @@ exports.commands = {
 }
 
 exports.inlines = {
-    dictionary: async function (ctx) {
+    async dictionary (ctx) {
         // Send in
         var queryPlain = ctx.inlineQuery.query
         var defination

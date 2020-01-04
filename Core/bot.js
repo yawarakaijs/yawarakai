@@ -3,6 +3,7 @@
 // Local Files
 
 let Core = require('../core')
+let Store = require('./storage')
 let Message = require('./Bot/message')
 let Command = require('./Bot/command').Command
 let Telegram = require('./Bot/telegram')
@@ -64,14 +65,14 @@ let DiagnosticLog = {
         Log.fatal(text)
     },
     counter: (text) => {
-        Core.getKey("logtext").then(res => {
-            if (text.message == res) {
+        Store.find({ key: "logtext" }).then(res => {
+            if (text.message == res[0]) {
                 DiagnosticLog.count++
             }
-            if (text.message != res) {
+            if (text.message != res[0]) {
                 DiagnosticLog.count = 0
             }
-            Core.setKey("logtext", text.message ? text.message : "", 'EX', 1 * 60)
+            Store.insert({"logtext": text.message ? text.message : "", key: "logtext"})
         })
     },
     count: 0
@@ -80,7 +81,7 @@ let DiagnosticLog = {
 let Bot = {
     telegram: Telegram.Bot.telegram,
     DiagnosticLog: DiagnosticLog,
-    commandParse: function (ctx, callback) {
+    commandParse (ctx, callback) {
         let commandArgs = ctx.message.text.split(" ")
         let command = commandArgs[0].substring(1)
         command = command.replace(/@\w+/g, "")
@@ -98,7 +99,7 @@ let Bot = {
             compo: Component.Compo
         }
     },
-    inlineDistributor: async function (ctx) {
+    async inlineDistributor (ctx) {
         let method = Component.Compo.inline
         let detail = new Array()
         let result = new Array()
@@ -118,7 +119,7 @@ let Bot = {
         }
         else { return undefined }
     },
-    callbackQueryDistributor: async function (ctx) {
+    async callbackQueryDistributor (ctx) {
         let args = []
         args.push(ctx)
         let method = Component.Compo.callbackQuery
@@ -136,7 +137,7 @@ let Bot = {
         }
         return detail
     },
-    commandDistributor: async function (ctx) {
+    async commandDistributor (ctx) {
         let result = Bot.commandParse(ctx)
         let cmd = Component.Compo.command.find(command => {
             return command.function === result.cmd
@@ -144,7 +145,7 @@ let Bot = {
         if (!cmd) { return 404 }
         return await cmd.instance.call(this, result)
     },
-    staticCommandDistributor: function (ctx) {
+    staticCommandDistributor (ctx) {
         let result = Bot.commandParse(ctx)
         let data = Command.switcher(result)
         if (data != undefined) {
@@ -154,7 +155,7 @@ let Bot = {
             return undefined
         }
     },
-    messasgeDistributor: async function (ctx) {
+    async messasgeDistributor (ctx) {
         let method = Component.Compo.message
         let result = undefined
         for (let i of method) {
@@ -172,7 +173,7 @@ let Bot = {
 }
 
 let Control = {
-    start: function () {
+    start () {
         
         /**
          * Handle new chat member
@@ -183,6 +184,12 @@ let Control = {
                 let name = newMember.first_name != "" && newMember.first_name != undefined ? newMember.first_name : newMember.username ? newMember.username : newMember.id
                 Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, `欢迎新朋友 [${name}](tg://user?id=${newMember.id}) !\n如果是第一次来到乐园的话，建议和大家自我介绍一下哦（当然也不会勉强了啦）\n希望乃在花見乐园能够玩的开心呢)`, { parse_mode: "Markdown" })
             }
+        })
+
+        /**
+         * Handle new channel post
+         */
+        Telegram.Bot.on("channel_post", async (ctx) => {
         })
 
         /**
@@ -262,8 +269,8 @@ let Control = {
                         Nlp.tag(ctx, ctx.message.text).then(res => {
                             let text = res
                             if (text != undefined) {
-                                Core.getKey("nlpAnalyzeIds").then(ids => {
-                                    let current = JSON.parse(ids)
+                                Store.find({key: "nlpAnalyzeIds"}).then(ids => {
+                                    let current = JSON.parse(ids[0].nlpAnalyzeIds)
                                     current.map(item => {
                                         if (item == ctx.message.from.id) {
                                             Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, text, { parse_mode: "Markdown" }).catch(err => {
@@ -284,7 +291,7 @@ let Control = {
         }).catch(err => DiagnosticLog(err))
 
         Telegram.Bot.on("forward", async (ctx) => {
-            Log.debug(ctx.message)
+            
         })
 
         // Log

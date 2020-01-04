@@ -42,9 +42,7 @@
         }
     },
     "core": {
-        "redisAuthSuccess": "Redis 伺服器驗證成功並且已連線",
-        "redisAuthFail": "Redis 伺服器驗證失敗",
-        "redisCausedShutdown": "由於 Redis 連結失敗正在退出 Yawarakai..."
+        
     },
     "component": {
         "readIn": "已讀取 ",

@@ -7,7 +7,7 @@ var fnv = require('fnv-plus')
 // Local Packages
 
 let Log = require('../log')
-let Core = require('../../core')
+let Store = require('../storage')
 
 // Nlp
 
@@ -19,8 +19,8 @@ let Nlp = {
      * @param {string} text - The text message for tag
      */
     tag: async (ctx, text) => {
-        return await Core.getKey("nlpfeedback").then(res => {
-            let status = JSON.parse(res)
+        return await Store.find({key: "nlpfeedback"}).then(res => {
+            let status = JSON.parse(res[0].nlpfeedback)
             if (status) {
                 let stepone = nodejieba.tag(text)
                 const sentiment = new Bayes()
@@ -182,29 +182,33 @@ let Nlp = {
 
 let NlpControl = {
     start: () => {
-        Core.setKey("nlpfeedback", true)
-        Core.getKey("nlpfeedback").then(res => {
-            Log.Log.debug(`NLP set to ${res} [OK]`)
+        Store.update({ key: "nlpfeedback" }, { $set: { nlpfeedback: true }}, {}, (err, num) => {Log.Log.fatal(err)})
+        Store.find({ key: "nlpfeedback" }).then(res => {
+            Log.Log.debug(`NLP set to ${res[0].nlpfeedback} [OK]`)
         })
     },
     stop: () => {
-        Core.setKey("nlpfeedback", false)
-        Core.getKey("nlpfeedback").then(res => {
-            Log.Log.debug(`NLP set to ${res} [OK]`)
+        Store.update({ key: "nlpfeedback" }, { $set: { nlpfeedback: false }}, {}, (err, num) => {})
+        Store.find({ key: "nlpfeedback" }).then(res => {
+            Log.Log.debug(`NLP set to ${res[0].nlpfeedback} [OK]`)
         })
     },
     analyzeModeMan: (userId, action) => {
-        Core.getKey("nlpAnalyzeIds").then(res => {
+        Store.find({ key: "nlpAnalyzeIds" }).then(res => {
             if (action == "add") {
-                let currentAdd = JSON.parse(res)
+                let currentAdd = JSON.parse(res[0].nlpAnalyzeIds)
                 if(!currentAdd[0]) {
                     currentAdd.push(userId)
                     let resultData = JSON.stringify(currentAdd)
-                    Core.setKey("nlpAnalyzeIds", resultData).then(updated => {
-                        Log.Log.trace("NLP Analyzer List: ", updated)
+                    Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: resultData }}, {}, (err, num) => {}).then(updatedDoc => {
+                        Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                            Log.Log.trace("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                        })
                     })
                     NlpControl.start()
-                    Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                    Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                        Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                    })
                 }
                 else {
                     currentAdd.map(item => {
@@ -212,37 +216,45 @@ let NlpControl = {
                             currentAdd = currentAdd.filter(item => item != userId)
                             currentAdd.push(userId)
                             NlpControl.start()
-                            Core.setKey("nlpAnalyzeIds", JSON.stringify(currentAdd))
-                            Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                            Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentAdd) }}, {}, (err, num) => {})
+                            Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                                Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                            })
                         }
                         else if (item == userId) {
                             NlpControl.start()
-                            Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                            Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                                Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                            })
                         }
                     })
                 }
             }
             if(action == "remove") {
-                let currentRmv = JSON.parse(res)
+                let currentRmv = JSON.parse(res[0].nlpAnalyzeIds)
                 currentRmv.map(item => {
                     if (item != userId) {
                         currentRmv = currentRmv.filter(item => item != userId)
-                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
-                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                        Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentRmv) }}, {}, (err, num) => {})
+                        Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                            Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                        })
                     }
                     else if (item == userId) {
                         currentRmv = currentRmv.filter(item => item != userId)
-                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
-                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                        Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentRmv) }}, {}, (err, num) => {})
+                        Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                            Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                        })
                     }
                 })
                 
             }
         }).catch(err => {
             // Recreate the array if undefined
-            Log.DiagnosticLog.fatal(err)
+            Log.Log.fatal(err)
             Log.Log.info("Init data not found, re-creating...")
-            Core.setKey("nlpAnalyzeIds", `[]`).catch(err => Log.DiagnosticLog.fatal(err))
+            Store.insert({ nlpAnalyzeIds: `[]`, key: "nlpAnalyzeIds"}).catch(err => Log.Log.fatal(err))
             this.NlpControl.analyzeModeMan(userId, "add")
         })
     }

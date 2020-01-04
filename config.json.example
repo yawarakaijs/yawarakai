@@ -16,10 +16,8 @@
         "enable": false,
         "channel": "Channel Username or Channel ID"
     },
-    "redis": {
-        "host": "Redis Hostname",
-        "port": "6379",
-        "auth": "Password of redis"
+    "database": {
+        "path": "data/yawarakai.db"
     },
     "language": "en-US"
 }

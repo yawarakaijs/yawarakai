@@ -33,7 +33,7 @@
             "name": "flight",
             "displayName": "Flight Info",
             "groupName": "yawarakai-official",
-            "version": "v1.1.0",
+            "version": "v1.1.2",
             "author": ["Yawarakai Devs"],
             "description": "Get flight information",
             "locale": "zh-CN"
