@@ -161,7 +161,6 @@ let Register = {
         Compo = { command: [], inline: [], message: [], callbackQuery: [], channelPost: [] }
 
         this.Register.load()
-        console.log(Compo.command[4].instance.call(this, undefined))
     },
     unload: (context) => {
 

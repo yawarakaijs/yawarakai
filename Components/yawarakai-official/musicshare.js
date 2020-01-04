@@ -698,7 +698,7 @@ exports.inlines = {
                         title: `对不起喔`,
                         description: "我们找到了曲目，但是对不起呢，歌曲暂不可用",
                         thumb_url: "https://i.loli.net/2019/11/13/dQDxC4Nv91VYK2E.jpg",
-                        input_message_content: { message_text: `实在是很抱歉呢，这个歌曲暂不可用，但是可以试试在 App 中打开\n#yawarakai #${params.id}` },
+                        input_message_content: { message_text: `实在是很抱歉呢，这个歌曲暂不可用，但是可以试试在 App 中打开\n#yawarakai #s${params.id}` },
                         reply_markup: {
                             inline_keyboard: [[{
                                 text: "Open in App",
