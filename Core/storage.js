@@ -42,7 +42,7 @@ let find = (key) => {
     return new Promise((resolve, reject) => {
         db.find(key, (err, docs) => {
             if (err) reject(err)
-            if (docs.length == 0) reject(new Error("Cannot find query: " + JSON.stringify(key))) 
+            if (docs.length === 0) reject(new Error("Cannot find query: " + JSON.stringify(key))) 
             resolve(docs)
         })
     })

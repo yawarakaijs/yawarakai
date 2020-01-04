@@ -11,7 +11,7 @@ let MessageDictionaryControl = require('./msgprocessor').MessageDictionaryContro
 let messagectl = {
 
     //Log out the message on Message Log File
-    log: (ctx) => {
+    log (ctx) {
 
         let groupType = "supergroup"
         var isGroup = (groupType == ctx.message.chat.type)
@@ -70,7 +70,7 @@ let messagectl = {
 }
 
 let Message = {
-    hears: async function (ctx) {
+    async hears (ctx) {
 
         let meowmeow = new MessageDictionary(
             [{ reg: "(^喵～)|(^喵~)", mode: "gui" }],
@@ -106,12 +106,12 @@ let Message = {
         }
         return "Passed"
     },
-    todo: function (ctx, length) {
+    todo (ctx, length) {
         let thetimer = length * 200
         ctx.replyWithChatAction("typing")
     },
     //ctx, textReply, extra
-    reply: async function (ctx, context) {
+    async reply (ctx, context) {
         let textReply = context.reply
         if (Message.count == 0) {
             Message.count++

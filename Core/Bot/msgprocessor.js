@@ -29,7 +29,7 @@ let MessageDictionaryControl = {
  * @param {string} text -   The text that needs to be checked
  * @return {object}     -   The found dictionary item, include the index of dictionary, whether or not have functions, and the reply
  */
-    tryMatch: function (text) {
+    tryMatch (text) {
         let result = { index: 0, hasFunc: false, hasArgs: false, reply: [] }
         MessageDictionaryData.map((item, index) => {
             item.match.map((regobj) => {
@@ -55,7 +55,7 @@ let MessageDictionaryControl = {
      * Call the functions that matches
      * @param {object} context - The object that contains the information of matching 
      */
-    callFunc: function (context) {
+    callFunc (context) {
         let result = new Array()
         if (context.hasArgs) {
             let value = MessageDictionaryData[context.index]

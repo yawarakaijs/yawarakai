@@ -11,7 +11,7 @@ let config = require('./config.json')
 // main
 
 let main = {
-    getData: async function (ctx, info, flight) {
+    async getData (ctx, info, flight) {
         Compo.Interface.Log.Log.info(ctx.from.first_name + " 申请查询航班信息: " + info[0] + " " + info[1])
 
         // Link Prefix
@@ -99,7 +99,7 @@ exports.meta = config.components.flight
 // Inner
 
 exports.commands = {
-    flight: async function (context) {
+    async flight (context) {
         let ctx = context.ctx
         let data = context.args.join(" ")
 
@@ -170,7 +170,7 @@ exports.commands = {
 }
 
 exports.inlines = {
-    main: async function (ctx) {
+    async main (ctx) {
         let data = ctx.inlineQuery.query
 
         let flightNumPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-| )?\d{3,4}/gi

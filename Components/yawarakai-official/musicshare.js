@@ -31,7 +31,7 @@ let main = {
      * @param {*} bitrate   - Fixed number optionally set as the bitrate
      * @return                Array that contains only one object as the audio inline type
      */
-    song: async function (params, bitrate = 320000, type = "inline") {
+    async song (params, bitrate = 320000, type = "inline") {
         let baseUrl = "https://api.yutsuki.moe/cloudmusic"
         return Promise.all([
             axios.get(baseUrl + '/song/url', { params: { id: params.id, br: bitrate } }),
@@ -172,7 +172,7 @@ let main = {
      * 
      * @param {*} params 
      */
-    album: async function (params) {
+    async album (params) {
         let baseUrl = "https://api.yutsuki.moe/cloudmusic"
         return axios.get(baseUrl + '/album', { params: { id: params.id } }).then(res => {
 
@@ -212,7 +212,7 @@ let main = {
      * Retrive the playlist data as the object based on the params provides
      * @param {*} params    - Object of params input as id, type, userid
      */
-    playlist: async function (params) {
+    async playlist (params) {
         let baseUrl = "https://api.yutsuki.moe/cloudmusic"
         return axios.get(baseUrl + '/playlist/detail', { params: { id: params.id } }).then(res => {
 
@@ -249,7 +249,7 @@ let main = {
      * @param {*} fileId    - Number of the unique file id
      * @returns `             String of the full file name
      */
-    getSong: function (url, fileId) {
+    getSong (url, fileId) {
         return new Promise((resolve, reject) => {
 
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
@@ -271,7 +271,7 @@ let main = {
      * @param {*} fileId    - Number of the unique file id
      * @returns               String of the full file name
      */
-    getAlbumPic: function (url, fileId) {
+    getAlbumPic (url, fileId) {
         return new Promise((resolve, reject) => {
 
             let extName = url.replace(/(https?:\/\/)(.*\/)/gui, "").split(".")[1]
@@ -287,7 +287,7 @@ let main = {
             })
         })
     },
-    writeTag: async function (audioFile, picFile, info) {
+    async writeTag (audioFile, picFile, info) {
         return new Promise((resolve, reject) => {
             let file = path.join(baseDir, "/cache/data/", audioFile)
             let image = fs.readFileSync(path.join(baseDir, "/cache/data/" + picFile))
@@ -329,7 +329,7 @@ let main = {
      * @param {*} link      - String of the url that needed to be parsed
      * @returns               Object of the params that contains type, id, userid
      */
-    parseArgs: function (link) {
+    parseArgs (link) {
         // type one
         // prefix cut
         let domainName = /((^https?:\/\/)|(^))(music.163.com)/gumi
@@ -368,7 +368,7 @@ let main = {
      * @param {*} type      - String of the source type that is differed to different processing categories
      * @returns               Object of the retrived data that contains type, id, userid
      */
-    paramsDiffer: function (src, type) {
+    paramsDiffer (src, type) {
         let params = {}
         let idCheck = /^id=/gu
         let useridCheck = /userid=/gu
@@ -422,7 +422,7 @@ let main = {
         }
 
     },
-    pageUp: function (itemNum, dataArray, params, type) {
+    pageUp (itemNum, dataArray, params, type) {
         let desPage = params.pid - 1
 
         let end = itemNum * desPage
@@ -467,7 +467,7 @@ let main = {
         }
         return keys
     },
-    pageDown: function (itemNum, dataArray, params, type) {
+    pageDown (itemNum, dataArray, params, type) {
         let desPage = params.pid + 1
 
         let end = itemNum * desPage
@@ -519,7 +519,7 @@ let main = {
 exports.meta = config.components.musicshare
 
 exports.commands = {
-    netease: async function (context) {
+    async netease (context) {
         let args = context.args
         let type = args[0]
 
@@ -545,7 +545,7 @@ exports.commands = {
 
         return undefined
     },
-    playlist: async function (context) {
+    async playlist (context) {
         let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
         let message = context.ctx.message.text
         let link = new Array()
@@ -609,7 +609,7 @@ exports.commands = {
             return "/playlist 歌单链接 或者 整个分享文本\n如果想要搜索关键词可以使用 /netease playlist 关键词"
         }
     },
-    album: async function (context) {
+    async album (context) {
         let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(album)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
         let message = context.ctx.message.text
         let link = new Array()
@@ -676,7 +676,7 @@ exports.commands = {
 }
 
 exports.inlines = {
-    main: async function (ctx) {
+    async main (ctx) {
         let globalUrlPattern = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(song|album|playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
         let link = ctx.inlineQuery.query
 
@@ -728,13 +728,13 @@ exports.inlines = {
 }
 
 exports.messages = {
-    main: async function (ctx) {
+    async main (ctx) {
         let searchUser = /搜索用户/gui
     }
 }
 
 exports.callbackQuery = {
-    main: async function (ctx) {
+    async main (ctx) {
         const Telegram = this.telegram
 
         if (!ctx.update.callback_query.data.startsWith("musicshare")) { return undefined }

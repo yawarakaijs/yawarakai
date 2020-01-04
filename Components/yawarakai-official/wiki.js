@@ -9,7 +9,7 @@ let Compo = require('../../component')
 let config = require('./config.json')
 
 let main = {
-    wiki: async function (query, lang) {
+    async wiki (query, lang) {
         return axios.get(`https://${lang}.wikipedia.org/w/api.php`, {
             params: {
                 format: "json",
@@ -47,13 +47,13 @@ exports.meta = config.components.wiki
 // Inner
 
 exports.commands = {
-    main: async function () {
+    async main () {
 
     }
 }
 
 exports.inlines = {
-    main: async function (ctx) {
+    async main (ctx) {
         let globalPattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/gumi
         if (!globalPattern.test(ctx.inlineQuery.query) && ctx.inlineQuery.query != "") {
             Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了 Wikipedia 查询 ${ctx.inlineQuery.query}`)
@@ -111,13 +111,13 @@ exports.inlines = {
 }
 
 exports.messages = {
-    main: async function (ctx) {
+    async main (ctx) {
 
     }
 }
 
 exports.callbackQuery = {
-    main: async function () {
+    async main () {
 
     }
 }

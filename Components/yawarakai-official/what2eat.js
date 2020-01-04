@@ -13,31 +13,31 @@ exports.meta = config.components.componentName
 // Inner
 
 exports.commands = {
-    main: async function () {
+    async main() {
 
     }
 }
 
 exports.inlines = {
-    main: async function () {
+    async main () {
 
     }
 }
 
 exports.messages = {
-    main: async function () {
+    async main() {
 
     }
 }
 
 exports.callbackQuery = {
-    main: async function () {
+    async main () {
 
     }
 }
 
 exports.channelPost = {
-    main: async function () {
+    async main () {
 
     }
 }
