@@ -11,6 +11,86 @@ let Store = require('../storage')
 
 // Nlp
 
+let NlpLib = {
+    /**
+     * Removes the duplicates
+     * @param {Array} array - The array that contains the all elements
+     * @returns {Array} - The array that removed 
+     */
+    merge(array, array2) {
+        array = array.concat(array2)
+        let a = array.concat()
+        for (var i = 0; i < a.length; ++i) {
+            for (var j = i + 1; j < a.length; ++j) {
+                if (a[i] === a[j])
+                    a.splice(j--, 1)
+            }
+        }
+        return a
+    },
+
+    /**
+     * Count the times that these words were shown in the array
+     * Pop out the element and test it
+     * @param {Array} a - The first array of the first sentence that being cut
+     * @param {Array} b - The second array of the second sentence that being cut
+     * @param {Array} palette - The collection array that contains the two arrays' elements
+     * @returns 
+     */
+    count(a, b, palette) {
+        let x = palette.map(element => a.filter(item => element == item).length)
+        let y = palette.map(element => b.filter(item => element == item).length)
+        return hashTable = {
+            a: x,
+            b: y
+        }
+    },
+    /**
+     * Returns the fingerprint of the input word
+     * @param {string} data - The word that needs to be encoded
+     * @returns {string} - The bit fingerprint
+     */
+    toFringerPrint(data) {
+        let passto = fnv.hash(data, 64)
+        passto = parseInt(passto.hex(), 16)
+        return passto.toString(2)
+    },
+
+    /**
+     * Returns the fingerprint of all the words
+     * @param {Array} data - The array that contains all the words
+     * @returns {Array} - The array that contains all bits fingerprint
+     */
+    toFringerPrintArray(data) {
+        let store = new Array()
+        data.forEach(element => {
+            let passto = fnv.hash(element, 64)
+            passto = parseInt(passto.hex(), 16)
+            store.push(passto.toString(2))
+        })
+        return store
+    },
+
+    /**
+     * Calculate the weight for fingerprint and return the result
+     * @param {string} data - The bits that needs to be processed
+     * @param {int} weight - The weight for the word
+     * @returns {binary} - The 
+     */
+    addWeight(data, weight) {
+        let store = new Array()
+        data.split("").forEach(item => {
+            if (item == 1) {
+                store.push(item * weight)
+            }
+            if (item == 0) {
+                store.push(-1 * weight)
+            }
+        })
+        return store
+    }
+}
+
 let Nlp = {
     /**
      * Tag the words that within the sentance
@@ -257,86 +337,6 @@ let NlpControl = {
             Store.insert({ nlpAnalyzeIds: `[]`, key: "nlpAnalyzeIds"}).catch(err => Log.Log.fatal(err))
             this.NlpControl.analyzeModeMan(userId, "add")
         })
-    }
-}
-
-let NlpLib = {
-    /**
-     * Removes the duplicates
-     * @param {Array} array - The array that contains the all elements
-     * @returns {Array} - The array that removed 
-     */
-    merge(array, array2) {
-        array = array.concat(array2)
-        let a = array.concat()
-        for (var i = 0; i < a.length; ++i) {
-            for (var j = i + 1; j < a.length; ++j) {
-                if (a[i] === a[j])
-                    a.splice(j--, 1)
-            }
-        }
-        return a
-    },
-
-    /**
-     * Count the times that these words were shown in the array
-     * Pop out the element and test it
-     * @param {Array} a - The first array of the first sentence that being cut
-     * @param {Array} b - The second array of the second sentence that being cut
-     * @param {Array} palette - The collection array that contains the two arrays' elements
-     * @returns 
-     */
-    count(a, b, palette) {
-        let x = palette.map(element => a.filter(item => element == item).length)
-        let y = palette.map(element => b.filter(item => element == item).length)
-        return hashTable = {
-            a: x,
-            b: y
-        }
-    },
-    /**
-     * Returns the fingerprint of the input word
-     * @param {string} data - The word that needs to be encoded
-     * @returns {string} - The bit fingerprint
-     */
-    toFringerPrint(data) {
-        let passto = fnv.hash(data, 64)
-        passto = parseInt(passto.hex(), 16)
-        return passto.toString(2)
-    },
-
-    /**
-     * Returns the fingerprint of all the words
-     * @param {Array} data - The array that contains all the words
-     * @returns {Array} - The array that contains all bits fingerprint
-     */
-    toFringerPrintArray(data) {
-        let store = new Array()
-        data.forEach(element => {
-            let passto = fnv.hash(element, 64)
-            passto = parseInt(passto.hex(), 16)
-            store.push(passto.toString(2))
-        })
-        return store
-    },
-
-    /**
-     * Calculate the weight for fingerprint and return the result
-     * @param {string} data - The bits that needs to be processed
-     * @param {int} weight - The weight for the word
-     * @returns {binary} - The 
-     */
-    addWeight(data, weight) {
-        let store = new Array()
-        data.split("").forEach(item => {
-            if (item == 1) {
-                store.push(item * weight)
-            }
-            if (item == 0) {
-                store.push(-1 * weight)
-            }
-        })
-        return store
     }
 }
 

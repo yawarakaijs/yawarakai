@@ -150,7 +150,6 @@ let Register = {
     },
     reload () {
         compos.path.forEach(item => {
-            console.log(path.join(path.join(__dirname, '/Components/'), item + ".js"))
             delete require.cache[require.resolve(path.join(path.join(__dirname, '/Components/'), item + ".js"))]
         })
 
