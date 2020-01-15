@@ -10,17 +10,22 @@ let config = require('../config.json')
 
 // Storage
 
-let dbPath = path.resolve(config.database.path)
+let mainDbPath = path.resolve(config.database.base)
+let sessionDbPath = path.resolve(config.database.session)
+let mainDb
+let sessionDb
 let db
 
 let init = () => {
 
-    let dataDir = path.parse(dbPath).dir
+    let dataDir = path.parse(mainDbPath).dir
     if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir)
     }
 
-    db = new Datastore({ filename: dbPath, autoload: true })
+    mainDb = new Datastore({ filename: mainDbPath, autoload: true })
+    sessionDb = new Datastore({ filename: sessionDbPath, autoload: true })
+    db = new Datastore()
 }
 
 let insert = (data) => {
@@ -42,7 +47,7 @@ let find = (key) => {
     return new Promise((resolve, reject) => {
         db.find(key, (err, docs) => {
             if (err) reject(err)
-            if (docs.length === 0) reject(new Error("Cannot find query: " + JSON.stringify(key))) 
+            if (docs.length === 0) reject(new Error("Cannot find query " + JSON.stringify(key))) 
             resolve(docs)
         })
     })
@@ -55,7 +60,18 @@ let update = async (query, update, option) => {
     })
 }
 
+let remove = async (query, option) => {
+    return db.remove(query, option, (err, docs) => {
+        if (err) throw err
+        return docs
+    })
+}
+
 exports.init = init
 exports.update = update
+exports.remove = remove
 exports.insert = insert
 exports.find = find
+
+exports.yawarakai = mainDb
+exports.session = sessionDb

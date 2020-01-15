@@ -17,7 +17,9 @@
         "channel": "Channel Username or Channel ID"
     },
     "database": {
-        "path": "data/yawarakai.db"
+        "base": "data/yawarakai.db",
+        "message": "data/message.db",
+        "session": "data/session.db"
     },
     "language": "en-US"
 }
