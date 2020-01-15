@@ -108,7 +108,7 @@ exports.commands = {
         let flightNum = new String("")
         let flightData = flightNumPattern[Symbol.match](data)
         if(!flightData || flightData == null) {
-            ctx.reply("不知道你的航班号是什么了啦~ \n使用方法： /flight AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01")
+            context.telegram.sendMessage(ctx.message.chat.id, "不知道你的航班号是什么了啦~ \n使用方法： /flight AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01", { reply_to_message_id: ctx.message.message_id })
             return undefined
         }
 
@@ -129,7 +129,7 @@ exports.commands = {
             dateInfo = date[0].replace("-", "")
             let dateRange = CurrentTimeInfo + 6
             if(dateInfo > dateRange) {
-                ctx.reply("不能查询那个日期的航班喔，只能查询最近 7 天的航班呢w \n很抱歉啦，也有正在尽力寻找其他解决办法呢w")
+                context.telegram.sendMessage(ctx.message.chat.id, "不能查询那个日期的航班喔，只能查询最近 7 天的航班呢w \n很抱歉啦，也有正在尽力寻找其他解决办法呢w", { reply_to_message_id: ctx.message.message_id })
                 return undefined
             }
         }
@@ -156,13 +156,13 @@ exports.commands = {
         let info = [flight, date]
         let message = await this.telegram.sendMessage(ctx.message.chat.id, "正在申请查询航班信息: " + info[0])
         let result = await main.getData(ctx, info, data).catch(err => {
-            ctx.reply("抱歉，航班查询服务目前暂不可用。")
+            context.telegram.sendMessage(ctx.message.chat.id, "抱歉，航班查询服务目前暂不可用。", { reply_to_message_id: ctx.message.message_id })
         })
         if(result == undefined) {
-            ctx.reply("找不到这个航班呢喵 qwq\n可能是搜索的日期没有该航班呢")
+            context.telegram.sendMessage(ctx.message.chat.id, "找不到这个航班呢喵 qwq\n可能是搜索的日期没有该航班呢", { reply_to_message_id: ctx.message.message_id })
             return undefined
         }
-        ctx.reply(result.data, { parse_mode: "Markdown" })
+        context.telegram.sendMessage(ctx.message.chat.id, result.data, { reply_to_message_id: ctx.message.message_id, parse_mode: "Markdown" })
         this.telegram.deleteMessage(message.chat.id, message.message_id)
         Compo.Interface.Log.Log.info("")
         return undefined

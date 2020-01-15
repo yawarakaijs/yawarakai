@@ -37,6 +37,7 @@ let main = {
             axios.get(baseUrl + '/song/url', { params: { id: params.id, br: bitrate } }),
             axios.get(baseUrl + '/song/detail', { params: { ids: params.id } })
         ]).then(resArray => {
+            Compo.Interface.Log.Log.debug("CloudMusic Link: " + resArray[0].data.data[0].url)
             let authorText = new Array()
             let authorTag = new Array()
             let authorInfo = resArray[1].data.songs[0].ar
