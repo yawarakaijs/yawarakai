@@ -34,56 +34,85 @@ class Scene {
     enter(ctx) {
         this.now.id = ctx.message.from.id
 
-        Store.find({ key: "sceneIds" }).then(res => {
-            let arr = JSON.parse(res[0].ids)
-            arr = arr.filter(values => values != ctx.message.from.id)
-            arr.push(ctx.message.from.id)
-            Store.update({ key: "sceneIds" }, { $set: { ids: arr } }, {})
-        }).catch(err => {
-            let arr = new Array()
-            arr.push(ctx.message.from.id)
-            Store.insert({ key: "sceneIds", ids: arr })
-        })
-
-        SceneData.push(this.now)
-        Store.insert(this.now).then(res => {
-            return res
-        })
+        if (this.has(ctx)) {
+            return false
+        }
+        else {
+            SceneData.push(this.now)
+            return true
+        }
     }
 
     exit(ctx) {
-        SceneData.push(SceneData.filter(item => item.id != ctx.message.from.id))
 
-        Store.remove({ id: ctx.message.from.id }, {}).then(res => {
-            return res
-        }).catch(err => {
-            return false
+        let res = SceneData.filter(item => item.id != ctx.message.from.id)
+        SceneData = new Array()
+        res.forEach(item => {
+            SceneData.push(item)
         })
+
     }
 
     has(ctx) {
-        Store.find({ id: ctx.message.from.id }).then(res => {
+        let result = new Array()
+        for (let i = 0; i < SceneData.length; i++) {
+            if (SceneData[i].id == ctx.message.from.id) {
+                result.push(SceneData[i])
+            }
+        }
+        if (result.length > 0) {
             return true
-        }).catch(err => {
+        }
+        else {
             return false
-        })
+        }
     }
 
     status(ctx) {
-        Store.find({ id: ctx.message.from.id }).then(res => {
-            return res[0]
-        }).catch(err => {
-            return false
-        })
+        for (let i = 0; i < SceneData.length; i++) {
+            if (SceneData[i].id == ctx.message.from.id) {
+                return SceneData[i]
+            }
+        }
+        return false
     }
 
     next(ctx, last) {
-        Store.find({ id: ctx.message.from.id }).then(res => {
-            res = res[0]
-            return Store.update({ id: ctx.message.from.id }, { $set: { stage: res.stage + 1, last: last } }, {}).then(res => {
-                return res
-            })
+        let now = SceneData.filter(item => item.id == ctx.message.from.id)[0]
+        now.stage = now.stage + 1
+        now.last = last
+        this.now = now
+
+        let result = SceneData.filter(item => item.id != ctx.message.from.id)
+        result.push(now)
+        SceneData = result
+
+        return now
+    }
+
+    bind(funcArray) {
+        this.funcs = funcArray
+        let unset = SceneData.filter(item => item.tag != this.now.scene)
+        unset.push({
+            tag: this.now.scene,
+            funcs: funcArray,
+            hasArgs: this.hasArgs,
+            funcArgs: this.funcArgs
         })
+        SceneData = unset
+    }
+
+    inject(funcArgs) {
+        this.hasArgs = true
+        this.funcArgs = funcArgs
+        let unset = SceneData.filter(item => item.tag != this.now.scene)
+        unset.push({
+            tag: this.now.scene,
+            funcs: this.funcs,
+            hasArgs: true,
+            funcArgs: funcArgs
+        })
+        SceneData = unset
     }
 }
 
@@ -153,30 +182,14 @@ let SceneControl = {
         let now = { key: "scene", scene: tag, id: 0, stage: 0, last: '' }
         now.id = ctx.message.from.id
 
-        Store.find({ key: "sceneIds" }).then(res => {
-            let arr = JSON.parse(res[0].ids)
-            arr = arr.filter(values => values != ctx.message.from.id)
-            arr.push(ctx.message.from.id)
-            Store.update({ key: "sceneIds" }, { $set: { ids: arr } }, {})
-        }).catch(err => {
-            let arr = new Array()
-            arr.push(ctx.message.from.id)
-            Store.insert({ key: "sceneIds", ids: arr })
-        })
-
         SceneData.push(now)
-        Store.insert(now).then(res => {
-            return res
-        })
     },
 
     exit(ctx) {
-        SceneData.push(SceneData.filter(item => item.id != ctx.message.from.id))
-
-        Store.remove({ id: ctx.message.from.id }, {}).then(res => {
-            return res
-        }).catch(err => {
-            return false
+        let res = SceneData.filter(item => item.id != ctx.message.from.id)
+        SceneData = new Array()
+        res.forEach(item => {
+            SceneData.push(item)
         })
     }
 }
