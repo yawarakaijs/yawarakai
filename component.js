@@ -6,12 +6,13 @@ let path = require('path')
 // Local Files
 let Log = require('./Core/log')
 let Lang = require('./Core/lang')
+let Scene = require('./Core/Bot/sceneprocessor').Scene
 
 let compos = { list: [], path: [], info: [], name: [] }
 let compoInfo = new Array()
 let compoHelp = new Array()
 let compoPair = new Array()
-let Compo = { command: [], inline: [], message: [], callbackQuery: [], channelPost: [] }
+let Compo = { scene: [], command: [], inline: [], message: [], callbackQuery: [], channelPost: [] }
 
 // Body
 
@@ -113,6 +114,16 @@ let Register = {
                                             })
                                         }
 
+                                        // Check if register scene exist
+                                        if (compo.register.scene) {
+                                            compo.register.scene.map(sce => {
+                                                sce.instance = sce.function
+                                                sce.meta = compo.meta
+                                                sce.scene = new Scene(sce.name, sce.function)
+                                                Compo.scene.push(sce)
+                                            })
+                                        }
+
                                         compos.path.push(path.join(value, configValue.name))
                                         compos.list.push(`${configValue.name} \x1b[34m${configValue.version}\x1b[0m from \x1b[33m${value}\x1b[0m`)
                                         compos.name.push(configValue.name)
@@ -167,7 +178,8 @@ let Register = {
 }
 
 let Interface = {
-    Log: Log
+    Log: Log,
+    Scene: Scene
 }
 
 // Exports

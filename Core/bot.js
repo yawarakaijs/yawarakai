@@ -173,8 +173,12 @@ let Bot = {
         }
         return result
     },
-    async sceneDistributor(ctx) {
-
+    async sceneDistributor(context) {
+        let sce = Component.Compo.scene.find(scene => {
+            return scene.name === SceneControl.scene(context.ctx.message.from.id)
+        })
+        if (!sce) { return undefined }
+        return await sce.instance.call(this, context, sce.scene)
     }
 }
 
@@ -273,7 +277,10 @@ let Control = {
                 if (SceneControl.has(ctx.message.from.id)) {
                     let context = { ctx: ctx, telegram: Telegram.Bot.telegram }
                     console.log(`ID ${ctx.message.from.id} in scene ${SceneControl.scene(ctx.message.from.id)}`)
-                    Scene.switcher(context, SceneControl.scene(ctx.message.from.id))
+                    let sceData = Scene.switcher(context, SceneControl.scene(ctx.message.from.id))
+                    if (!sceData) {
+                        Bot.sceneDistributor(context)
+                    }
                 }
                 else {
                     let data = await Bot.messasgeDistributor(ctx)

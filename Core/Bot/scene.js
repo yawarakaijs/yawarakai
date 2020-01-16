@@ -18,7 +18,7 @@ function switcher(context, tag) {
         case "nlpmatch":
             return standBy(context, 'basic')
         default:
-            return undefined
+            return false
     }
 }
 
