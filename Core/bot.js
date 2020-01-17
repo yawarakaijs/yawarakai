@@ -75,6 +75,8 @@ let DiagnosticLog = {
                 DiagnosticLog.count = 0
             }
             Store.insert({ "logtext": text.message ? text.message : "", key: "logtext" })
+        }).catch(err => {
+            Store.insert({ "logtext": text.message ? text.message : "", key: "logtext" })
         })
     },
     count: 0
@@ -105,13 +107,15 @@ let Bot = {
         let method = Component.Compo.inline
         let detail = new Array()
         let result = new Array()
+
         for (let i of method) {
             try {
                 const res = await i.instance.call(this, ctx)
                 if (res != undefined) {
                     detail.push(res)
                 }
-            } catch (err) {
+            } 
+            catch (err) {
                 DiagnosticLog.fatal(err)
             }
         }
@@ -178,7 +182,7 @@ let Bot = {
             return scene.name === SceneControl.scene(context.ctx.message.from.id)
         })
         if (!sce) { return undefined }
-        return await sce.instance.call(this, context, sce.scene)
+        return await sce.function.call(this, context)
     }
 }
 
@@ -276,7 +280,7 @@ let Control = {
                 // otherwise forbidden
                 if (SceneControl.has(ctx.message.from.id)) {
                     let context = { ctx: ctx, telegram: Telegram.Bot.telegram }
-                    console.log(`ID ${ctx.message.from.id} in scene ${SceneControl.scene(ctx.message.from.id)}`)
+                    Log.debug(`${ctx.message.from.username} ${ctx.message.from.id} in scene: ${SceneControl.scene(ctx.message.from.id)}`)
                     let sceData = Scene.switcher(context, SceneControl.scene(ctx.message.from.id))
                     if (!sceData) {
                         Bot.sceneDistributor(context)

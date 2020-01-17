@@ -14,8 +14,10 @@ function basic(context) {
 }
 
 function switcher(context, tag) {
+    // match the set for each scene
     switch(tag) {
         case "nlpmatch":
+            // call the scene name
             return standBy(context, 'basic')
         default:
             return false
@@ -33,7 +35,6 @@ function standBy(context, tag) {
         SceneControl.callFunc(matchResult, context)
     }
     else {
-        //SceneControl.enter(ctx.message.from.id, 'basic')
         SceneControl.enter(ctx, tag)
         context.telegram.sendMessage(ctx.message.chat.id, `First time to see you, ${ctx.message.from.username}`)
     }
