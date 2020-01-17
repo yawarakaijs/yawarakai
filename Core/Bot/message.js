@@ -75,7 +75,7 @@ let Message = {
         let meowmeow = new MessageDictionary(
             [{ reg: "(^喵～)|(^喵~)", mode: "gui" }],
             ["喵～"]
-        ).push()
+        )
 
         let startnlp = new MessageDictionary(
             [{ reg: "((^悠月，)|(^))打开分析模式$", mode: "gui" }],
@@ -83,7 +83,7 @@ let Message = {
             [NlpControl.analyzeModeMan],
             true,
             [[ctx.from.id, "add"]]
-        ).push()
+        )
 
         let stopnlp = new MessageDictionary(
             [{ reg: "((^悠月)|(^))关闭分析模式$", mode: "gui" }],
@@ -91,7 +91,7 @@ let Message = {
             [NlpControl.analyzeModeMan],
             true,
             [[ctx.from.id, "remove"]]
-        ).push()
+        )
 
         let matchResult = MessageDictionaryControl.tryMatch(ctx.message.text)
         if (matchResult.reply.length != 0) {
