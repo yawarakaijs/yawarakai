@@ -5,6 +5,7 @@ let path = require('path')
 
 // Local Files
 let Log = require('./Core/log')
+let Nlp = require('./Core/Bot/nlp')
 let Lang = require('./Core/lang')
 let Scene = require('./Core/Bot/sceneprocessor').Scene
 
@@ -117,9 +118,9 @@ let Register = {
                                         // Check if register scene exist
                                         if (compo.register.scene) {
                                             compo.register.scene.map(sce => {
-                                                sce.instance = sce.function
+                                                sce.instance = compo.scenes[sce.name]
+                                                sce.function = sce.function
                                                 sce.meta = compo.meta
-                                                sce.scene = new Scene(sce.name, sce.function)
                                                 Compo.scene.push(sce)
                                             })
                                         }
@@ -179,6 +180,7 @@ let Register = {
 
 let Interface = {
     Log: Log,
+    Nlp: Nlp,
     Scene: Scene
 }
 
