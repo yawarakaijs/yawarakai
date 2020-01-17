@@ -1,19 +1,19 @@
-// Basic strategy
-// Try to match and return the value for processing
-// Use middleware to check if needed to call function
-// Call CallFunc if needed
-// If not, keep processing this data until finished
-
-// This is a global message trigger system
-// A bit different with components one, the components
-// message trigger was designed only for match the text and
-// Yawarakai to call the Components to process it
-// This global message trigger is for the system to process
-// any info as many as possible and along with the functions
-// that needs to be executed
-
 /**
- * let template = {
+ * Basic strategy   
+ * Try to match and return the value for processing   
+ * Use middleware to check if needed to call function    
+ * Call CallFunc if needed   
+ * If not, keep processing this data until finished   
+ * 
+ * This is a global message trigger system.
+ * A bit different with components one, the components
+ * message trigger was designed only for match the text and
+ * Yawarakai to call the Components to process it.
+ * This global message trigger is for the system to process
+ * any info as many as possible and along with the functions
+ * that needs to be executed.
+ * 
+ * @example {
  *     match: [{ reg: "beep|Beep", mode: "gui" }],
  *     reply: `["Boop"]`,
  *     funcs: [prints.ArgsA, prints.ArgsB],
@@ -69,20 +69,20 @@ let MessageDictionaryControl = {
 
 let MessageDictionaryData = new Array()
 
+/**
+ * Create a dictionary object for the message matching with multiple usage for function calling and stage processing
+ * @param {Array} matchArray    - Objects that contains regex and regex mode key for matching
+ * @example [{reg: "a.*", mode: "gui"}]
+ * @param {Array} replyArray    - Messages needs to be replied
+ * @example ["reply message", "reply message two"]
+ * @param {Array} funcnameArray - Function names without brackets
+ * @example [className.functionName, className.functionName2] 
+ * @param {Boolean} hasArgs       - Switch for whether to use args
+ * @example false
+ * @param {Array} funcArgsArray - Arguments for functions, for multi functions
+ * @example [["arg1", "args2", false], ["args3", 42]
+ */
 class MessageDictionary {
-    /**
-     * Construct a Dictionary class to interact with DictionaryData
-     * @param {Array} matchArray    - Objects that contains regex and regex mode key for matching
-     * @example [{reg: "a.*", mode: "gui"}]
-     * @param {Array} replyArray    - Messages needs to be replied
-     * @example ["reply message", "reply message two"]
-     * @param {Array} funcnameArray - Function names without brackets
-     * @example [className.functionName, className.functionName2] 
-     * @param {Boolean} hasArgs       - Switch for whether to use args
-     * @example false
-     * @param {Array} funcArgsArray - Arguments for functions, for multi functions
-     * @example [["arg1", "args2", false], ["args3", 42] 
-     */
     constructor(matchArray, replyArray = new Array(), funcnameArray = new Array(), hasArgs = false, funcArgsArray = new Array) {
         this.match = matchArray
         this.reply = replyArray
@@ -96,8 +96,6 @@ class MessageDictionary {
             hasArgs: this.hasArgs,
             funcArgs: this.funcArgs,
         }
-    }
-    push() {
         MessageDictionaryData.push(this.merge)
     }
 }
