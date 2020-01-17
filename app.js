@@ -20,7 +20,7 @@
 
 /**
  * @author Hanami Yuna
- * @copyright
+ * @copyright 2019 - 2020
  */
 
 // Local Packages
