@@ -5,13 +5,15 @@ let path = require('path')
 
 // Local Files
 let Log = require('./Core/log')
+let Nlp = require('./Core/Bot/nlp')
 let Lang = require('./Core/lang')
+let Scene = require('./Core/Bot/sceneprocessor').Scene
 
 let compos = { list: [], path: [], info: [], name: [] }
 let compoInfo = new Array()
 let compoHelp = new Array()
 let compoPair = new Array()
-let Compo = { command: [], inline: [], message: [], callbackQuery: [], channelPost: [] }
+let Compo = { scene: [], command: [], inline: [], message: [], callbackQuery: [], channelPost: [] }
 
 // Body
 
@@ -113,6 +115,16 @@ let Register = {
                                             })
                                         }
 
+                                        // Check if register scene exist
+                                        if (compo.register.scene) {
+                                            compo.register.scene.map(sce => {
+                                                sce.instance = compo.scenes[sce.name]
+                                                sce.function = sce.function
+                                                sce.meta = compo.meta
+                                                Compo.scene.push(sce)
+                                            })
+                                        }
+
                                         compos.path.push(path.join(value, configValue.name))
                                         compos.list.push(`${configValue.name} \x1b[34m${configValue.version}\x1b[0m from \x1b[33m${value}\x1b[0m`)
                                         compos.name.push(configValue.name)
@@ -150,7 +162,6 @@ let Register = {
     },
     reload () {
         compos.path.forEach(item => {
-            console.log(path.join(path.join(__dirname, '/Components/'), item + ".js"))
             delete require.cache[require.resolve(path.join(path.join(__dirname, '/Components/'), item + ".js"))]
         })
 
@@ -168,7 +179,9 @@ let Register = {
 }
 
 let Interface = {
-    Log: Log
+    Log,
+    Nlp,
+    Scene
 }
 
 // Exports

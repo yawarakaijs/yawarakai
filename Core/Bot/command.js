@@ -8,6 +8,8 @@ let Lang = require('../lang')
 let config = require('../../config.json')
 let packageInfo = require('../../package.json')
 let Component = require('../../component')
+let Scene = require('./scene')
+let SceneControl = require('./sceneprocessor').SceneControl
 
 // Main
 
@@ -24,6 +26,14 @@ let Command = {
                 return info
             case "settings":
                 return "暂时不可用呢。"
+            case "meow":
+                return "meow"
+            case "cancel":
+                SceneControl.exit(context.ctx)
+                return undefined
+            case "match":
+                Scene.switcher(context, 'nlpmatch')
+                return undefined
             default:
                 return undefined
         }

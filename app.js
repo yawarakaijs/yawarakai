@@ -20,7 +20,7 @@
 
 /**
  * @author Hanami Yuna
- * @copyright
+ * @copyright 2019 - 2020
  */
 
 // Local Packages
@@ -28,6 +28,7 @@
 let Log = require('./Core/log').Log
 let Lang = require('./Core/lang')
 let Store = require('./Core/storage')
+let Scene = require('./Core/Bot/scene')
 let config = require('./config.json')
 let Component = require('./component')
 let packageInfo = require('./package.json')
@@ -81,6 +82,11 @@ if(args.length != 0) {
             }
             else {
                 Bot.Telegram.command("/telegram start")
+                Store.find({key: "nlpfeedback"}).then(res => {
+                    Log.debug(`NLP set to ${res[0].nlpfeedback}`)
+                }).catch(err => {
+                    Store.insert({nlpfeedback: false, key: "nlpfeedback"})
+                })
                 Store.find({key: "nlpAnalyzeIds"}).catch(err => {
                     Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
                 })
@@ -104,6 +110,11 @@ else {
         })
     }
     else {
+        Store.find({key: "nlpfeedback"}).then(res => {
+            Log.debug(`NLP set to ${res[0].nlpfeedback}`)
+        }).catch(err => {
+            Store.insert({nlpfeedback: false, key: "nlpfeedback"})
+        })
         Store.find({key: "nlpAnalyzeIds"}).catch(err => {
             Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
         })

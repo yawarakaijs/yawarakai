@@ -15,7 +15,7 @@
             "name": "musicshare",
             "displayName": "Music share from Netease",
             "groupName": "yawarakai-official",
-            "version": "v1.3.8",
+            "version": "v1.3.9",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
         },
@@ -28,16 +28,6 @@
             "author": ["Yawarakai Devs"],
             "description": "Search keywords on Wikipedia"
         },
-        "flight": {
-            "enable": true,
-            "name": "flight",
-            "displayName": "Flight Info",
-            "groupName": "yawarakai-official",
-            "version": "v1.1.2",
-            "author": ["Yawarakai Devs"],
-            "description": "Get flight information",
-            "locale": "zh-CN"
-        },
         "comment": {
             "enable": true,
             "name": "comment",
@@ -46,6 +36,16 @@
             "version": "v1.0.0",
             "author": ["Yawarakai Devs"],
             "description": "Adds comments functions for channel posts"
+        },
+        "flight": {
+            "enable": true,
+            "name": "flight",
+            "displayName": "Flight Info (beta)",
+            "groupName": "yawarakai-official",
+            "version": "v1.2.0",
+            "author": ["Yawarakai Devs"],
+            "description": "Get flight information",
+            "locale": "zh-CN"
         }
     }
 }
