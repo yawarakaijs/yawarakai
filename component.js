@@ -179,9 +179,9 @@ let Register = {
 }
 
 let Interface = {
-    Log: Log,
-    Nlp: Nlp,
-    Scene: Scene
+    Log,
+    Nlp,
+    Scene
 }
 
 // Exports

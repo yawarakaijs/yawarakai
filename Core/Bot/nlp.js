@@ -80,10 +80,10 @@ let NlpLib = {
     addWeight(data, weight) {
         let store = new Array()
         data.split("").forEach(item => {
-            if (item == 1) {
+            if (item === 1) {
                 store.push(item * weight)
             }
-            if (item == 0) {
+            if (item === 0) {
                 store.push(-1 * weight)
             }
         })

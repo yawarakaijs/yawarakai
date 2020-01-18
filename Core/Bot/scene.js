@@ -29,7 +29,7 @@ function standBy(context, tag) {
     // check if has
     if (SceneControl.has(ctx.message.from.id)) {
         let matchResult = SceneControl.tryMatch(ctx.message.text)
-        if (matchResult.length == 0) {
+        if (matchResult.length === 0) {
             return undefined
         }
         SceneControl.callFunc(matchResult, context)

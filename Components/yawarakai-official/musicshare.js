@@ -613,11 +613,11 @@ exports.commands = {
                     main.enterCount++
                     return "喵？把链接直接粘贴到聊天框并且回复就好了呀"
                 }
-                else if (main.enterCount == 2) {
+                else if (main.enterCount === 2) {
                     main.enterCount++
                     return "是不是遇到了什么困难呢？"
                 }
-                else if (main.enterCount == 3) {
+                else if (main.enterCount === 3) {
                     return "点开网易云音乐，点击分享，点击复制链接，然后粘贴回复给我就好啦 QAQ"
                 }
                 else {
@@ -698,14 +698,14 @@ exports.commands = {
                     main.enterCount++
                     return "喵？把链接直接粘贴到聊天框并且回复就好了呀"
                 }
-                else if (main.enterCount == 2) {
+                else if (main.enterCount === 2) {
                     main.enterCount++
                     return "是不是遇到了什么困难呢？"
                 }
-                else if (main.enterCount == 3) {
+                else if (main.enterCount === 3) {
                     return "点开网易云音乐，找到专辑，点击分享，点击复制链接，然后回复给我就好啦www"
                 }
-                else if (main.enterCount == 10) {
+                else if (main.enterCount === 10) {
                     main.enterCount = 0
                     this.telegram.sendMessage(context.ctx.message.chat.id, "喵！")
                     this.telegram.sendMessage(context.ctx.message.chat.id, "网易云分享出来的整个文本 或者 专辑链接回复给我就好了...")

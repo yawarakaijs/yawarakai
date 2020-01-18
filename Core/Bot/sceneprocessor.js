@@ -167,7 +167,7 @@ class Scene {
         funcArray.forEach(item => {
             newFuncs.push(item)
         })
-        let unset = SceneData.filter(item => item.tag != this.now.scene)
+        let unset = SceneData.filter(item => item.tag !== this.now.scene)
         unset.push({
             tag: this.now.scene,
             funcs: newFuncs,
@@ -188,7 +188,7 @@ class Scene {
         funcArgs.forEach(item => {
             newFuncArgs.push(item)
         })
-        let unset = SceneData.filter(item => item.tag != this.now.scene)
+        let unset = SceneData.filter(item => item.tag !== this.now.scene)
         unset.push({
             tag: this.now.scene,
             funcs: this.funcs,
@@ -221,9 +221,9 @@ let SceneControl = {
      * Call the functions that matches
      * @param {object} context - The object that contains the information of matching 
      */
-    callFunc(context, arg = undefined) {
+    callFunc(context, arg = "") {
         let result = new Array()
-        if (arg != undefined) {
+        if (arg !== "") {
             let value = SceneDictionaryData[context.index]
             value.funcs.map((funcname) => {
                 result.push(funcname.apply(this, [arg]))
@@ -251,7 +251,7 @@ let SceneControl = {
                 return SceneData[i].scene
             }
             else {
-                false
+                return false
             }
         }
     },
@@ -268,7 +268,7 @@ let SceneControl = {
                 return true
             }
             else {
-                false
+                return false
             }
         }
     },

@@ -11,8 +11,8 @@ let config = require('./config.json')
 // main
 
 let main = {
-    async getData(ctx, flightNum, flightData, date) {
-
+    async getData (ctx, flightNum, flightData, date) {
+        let flight
         flightNum += flightData
 
         let flightNumInputPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-)\d{3,4}/gi
@@ -126,7 +126,7 @@ exports.meta = config.components.flight
 // Inner
 
 exports.commands = {
-    async flight(context) {
+    async flight (context) {
 
         let ctx = context.ctx
         let data = context.args.join(" ")
@@ -141,29 +141,29 @@ exports.commands = {
                     main.sceneEnterCount++
                     return "输入上面说的信息就好啦"
                 }
-                else if (main.sceneEnterCount == 2) {
+                else if (main.sceneEnterCount === 2) {
                     main.sceneEnterCount++
                     return "按照指示来就好了呀 qwq"
                 }
-                else if (main.sceneEnterCount == 3) {
+                else if (main.sceneEnterCount === 3) {
                     main.sceneEnterCount++
                     this.telegram.sendMessage(context.ctx.message.chat.id, "是不是没有理解呢...")
                     this.telegram.sendMessage(context.ctx.message.chat.id, "请按照以下格式输入要查询的航班: \n/flight AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01", { reply_to_message_id: context.ctx.message.message_id })
                 }
-                else if (main.sceneEnterCount == 4) {
+                else if (main.sceneEnterCount === 4) {
                     main.sceneEnterCount++
                     return "好烦了啦，不理你了（哼"
                 }
-                else if (main.sceneEnterCount == 5) {
+                else if (main.sceneEnterCount === 5) {
                     main.sceneEnterCount++
                     return "说了不理你了啦。\n就不能看看上面怎么说的嘛？"
                 }
-                else if (main.sceneEnterCount == 6) {
+                else if (main.sceneEnterCount === 6) {
                     main.sceneEnterCount++
                     this.telegram.sendMessage(context.ctx.message.chat.id, "呜呜呜，能不能好好交流嘛 QAQ，你这样调戏人家，主人看到会很不开心的！")
                     this.telegram.sendMessage(context.ctx.message.chat.id, "请按照以下格式输入要查询的航班！！！: \n/flight AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01", { reply_to_message_id: context.ctx.message.message_id })
                 }
-                else if (main.sceneEnterCount == 7 || main.sceneEnterCount == 8) {
+                else if (main.sceneEnterCount === 7 || main.sceneEnterCount === 8) {
                     main.sceneEnterCount++
                     return "（呜）"
                 }
@@ -220,7 +220,7 @@ exports.commands = {
 }
 
 exports.scenes = {
-    async flight(context) {
+    async flight (context) {
 
         let status = scene.status(context.ctx)
         let stage = status.stage
@@ -289,7 +289,7 @@ exports.scenes = {
 }
 
 exports.inlines = {
-    async main(ctx) {
+    async main (ctx) {
         let data = ctx.inlineQuery.query
 
         let flightNumPattern = /(([a-z]\d)|([a-z]+)|(\d[a-z]))(-| )?\d{3,4}/gi

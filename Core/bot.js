@@ -280,7 +280,7 @@ let Control = {
                 // otherwise forbidden
                 if (SceneControl.has(ctx.message.from.id)) {
                     let context = { ctx: ctx, telegram: Telegram.Bot.telegram }
-                    Log.debug(`${ctx.message.from.username} ${ctx.message.from.id} in scene: ${SceneControl.scene(ctx.message.from.id)}`)
+                    Log.debug(`@${ctx.message.from.username} [${ctx.message.from.id}] in scene: ${SceneControl.scene(ctx.message.from.id)}`)
                     let sceData = Scene.switcher(context, SceneControl.scene(ctx.message.from.id))
                     if (!sceData) {
                         Bot.sceneDistributor(context)
