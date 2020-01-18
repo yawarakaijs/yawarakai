@@ -251,7 +251,7 @@ let Control = {
         /**
          * Handle all text like messages
          */
-        Telegram.Bot.on("message", async (ctx) => {
+        Telegram.Bot.on("text", async (ctx) => {
             Message.messagectl.log(ctx)
 
             /**
