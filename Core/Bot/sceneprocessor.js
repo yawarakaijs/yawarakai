@@ -118,9 +118,7 @@ class Scene {
         if (result.length > 0) {
             return true
         }
-        else {
-            return false
-        }
+        return false
     }
 
     /**
@@ -250,9 +248,7 @@ let SceneControl = {
             if (SceneData[i].id == id) {
                 return SceneData[i].scene
             }
-            else {
-                return false
-            }
+            return false
         }
     },
 
@@ -267,9 +263,7 @@ let SceneControl = {
             if (SceneData[i].id == id) {
                 return true
             }
-            else {
-                return false
-            }
+            return false
         }
     },
 

@@ -738,7 +738,7 @@ exports.scenes = {
 
                 let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(playlist)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
 
-                link = message.match(urlCheck)
+                let link = message.match(urlCheck)
                 if (link == null) {
                     this.telegram.sendMessage(chatId, "东西不对啦！没有有效的链接呢。")
                     break
@@ -806,7 +806,7 @@ exports.scenes = {
 
                 let urlCheck = /((https?)?((:\/\/))?)(music.163.com)(\/)(#\/)?(m\/)?(album)((\/\d+)|(\?id=\d+))((&userid=\d+)|(\/\?userid=\d+)|(\/\d+\/(\?userid=\d+)?)|(\/\d+\/)|(\/))?/gui
 
-                link = message.match(urlCheck)
+                let link = message.match(urlCheck)
                 if (link == null) {
                     this.telegram.sendMessage(chatId, "东西不对啦！没有有效的链接呢。")
                     break
