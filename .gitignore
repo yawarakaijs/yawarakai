@@ -4,9 +4,10 @@ yawarakai.code-workspace
 .env/
 cache/
 log/
+logs/
 .vscode/
 node_modules/
-Components/
+data/
 
 yarn*
 .eslintrc.json

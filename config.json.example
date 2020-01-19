@@ -3,6 +3,7 @@
     "coreName": "Yawarakai",
     "botname": "Bot Display Name",
     "token": "Bot API Token",
+    "admin": 915672797,
     "webhook": {
         "url": "",
         "port" : 8000
@@ -15,10 +16,10 @@
         "enable": false,
         "channel": "Channel Username or Channel ID"
     },
-    "redis": {
-        "host": "Redis Hostname",
-        "port": "6379",
-        "auth": "Password of redis"
+    "database": {
+        "base": "data/yawarakai.db",
+        "message": "data/message.db",
+        "session": "data/session.db"
     },
     "language": "en-US"
 }

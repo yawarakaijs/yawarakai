@@ -8,18 +8,18 @@ let config = require('./config.json')
 
 // Change the Component Name according to the config.json
 
-exports.meta = config.components.componentName
+exports.meta = config.components.comment
 
 // Inner
 
 exports.commands = {
     async main() {
-
+        
     }
 }
 
 exports.inlines = {
-    async main () {
+    async main() {
 
     }
 }
@@ -31,13 +31,13 @@ exports.messages = {
 }
 
 exports.callbackQuery = {
-    async main () {
+    async main() {
 
     }
 }
 
 exports.channelPost = {
-    async main () {
+    async main() {
 
     }
 }
@@ -47,14 +47,14 @@ exports.channelPost = {
 exports.register = {
     // As the example to Yawarakai Compos
     commands: [
-        {
-            // function: 'main'
-        }
+        // {
+        //     function: 'main'
+        // }
     ],
     inlines: [
-        {
+        // {
             // function: "main"
-        }
+        // }
     ],
     messages: [
         // {

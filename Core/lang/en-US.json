@@ -42,9 +42,7 @@
         }
     },
     "core": {
-        "redisAuthSuccess": "Redis Authentication Successful and Connected",
-        "redisAuthFail": "Redis Authentication Failed",
-        "redisCausedShutdown": "Exiting Yawarakai due to the failure of redis server authentication"
+        
     },
     "component": {
         "readIn": "Scaned ",

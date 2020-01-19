@@ -13,9 +13,9 @@
         "musicshare": {
             "enable": true,
             "name": "musicshare",
-            "displayName": "Music sharing component for music platforms",
+            "displayName": "Music share from Netease",
             "groupName": "yawarakai-official",
-            "version": "v1.3.3",
+            "version": "v1.3.9",
             "author": ["Yawarakai Devs"],
             "description": "Sharing music and directly download for listen"
         },
@@ -24,16 +24,25 @@
             "name": "wiki",
             "displayName": "Wikipedia",
             "groupName": "yawarakai-official",
-            "version": "v1.2.1",
+            "version": "v1.2.2",
             "author": ["Yawarakai Devs"],
             "description": "Search keywords on Wikipedia"
+        },
+        "comment": {
+            "enable": true,
+            "name": "comment",
+            "displayName": "Comments in channel",
+            "groupName": "yawarakai-official",
+            "version": "v1.0.0",
+            "author": ["Yawarakai Devs"],
+            "description": "Adds comments functions for channel posts"
         },
         "flight": {
             "enable": true,
             "name": "flight",
-            "displayName": "Flight Info",
+            "displayName": "Flight Info (beta)",
             "groupName": "yawarakai-official",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "author": ["Yawarakai Devs"],
             "description": "Get flight information",
             "locale": "zh-CN"

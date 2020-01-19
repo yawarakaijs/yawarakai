@@ -42,9 +42,7 @@
         }
     },
     "core": {
-        "redisAuthSuccess": "Redisサーバー認証が成功して接続されました",
-        "redisAuthFail": "Redisサーバーの検証に失敗しました",
-        "redisCausedShutdown": "Redis接続に失敗したため、ヤワラカイを終了する..."
+        
     },
     "component": {
         "readIn": "読む ",

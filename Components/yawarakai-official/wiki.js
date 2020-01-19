@@ -9,7 +9,7 @@ let Compo = require('../../component')
 let config = require('./config.json')
 
 let main = {
-    wiki: async function (query, lang) {
+    async wiki (query, lang) {
         return axios.get(`https://${lang}.wikipedia.org/w/api.php`, {
             params: {
                 format: "json",
@@ -35,8 +35,7 @@ let main = {
                 return undefined
             }
         }).catch(err => {
-            console.error(err)
-            return undefined
+            return err
         })
     }
 }
@@ -48,21 +47,25 @@ exports.meta = config.components.wiki
 // Inner
 
 exports.commands = {
-    main: async function () {
+    async main () {
 
     }
 }
 
 exports.inlines = {
-    main: async function (ctx) {
+    async main (ctx) {
         let globalPattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/gumi
         if (!globalPattern.test(ctx.inlineQuery.query) && ctx.inlineQuery.query != "") {
             Compo.Interface.Log.Log.info(`${ctx.from.first_name} 发起了 Wikipedia 查询 ${ctx.inlineQuery.query}`)
             let data = await main.wiki(ctx.inlineQuery.query, "zh").catch(err => {
-                Compo.Interface.Log.Log.fatal(err)
+                this.DiagnosticLog.fatal(err)
                 return undefined
             })
-            if (data != undefined) {
+            if (data instanceof Error) {
+                this.DiagnosticLog.fatal(err)
+                return undefined
+            }
+            else if (data != undefined) {
                 return [{
                     type: "article",
                     id: ctx.inlineQuery.id,
@@ -108,13 +111,13 @@ exports.inlines = {
 }
 
 exports.messages = {
-    main: async function (ctx) {
+    async main (ctx) {
 
     }
 }
 
 exports.callbackQuery = {
-    main: async function () {
+    async main () {
 
     }
 }

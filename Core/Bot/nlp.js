@@ -7,9 +7,89 @@ var fnv = require('fnv-plus')
 // Local Packages
 
 let Log = require('../log')
-let Core = require('../../core')
+let Store = require('../storage')
 
 // Nlp
+
+let NlpLib = {
+    /**
+     * Removes the duplicates
+     * @param {Array} array - The array that contains the all elements
+     * @returns {Array} - The array that removed 
+     */
+    merge(array, array2) {
+        array = array.concat(array2)
+        let a = array.concat()
+        for (var i = 0; i < a.length; ++i) {
+            for (var j = i + 1; j < a.length; ++j) {
+                if (a[i] === a[j])
+                    a.splice(j--, 1)
+            }
+        }
+        return a
+    },
+
+    /**
+     * Count the times that these words were shown in the array
+     * Pop out the element and test it
+     * @param {Array} a - The first array of the first sentence that being cut
+     * @param {Array} b - The second array of the second sentence that being cut
+     * @param {Array} palette - The collection array that contains the two arrays' elements
+     * @returns 
+     */
+    count(a, b, palette) {
+        let x = palette.map(element => a.filter(item => element == item).length)
+        let y = palette.map(element => b.filter(item => element == item).length)
+        return hashTable = {
+            a: x,
+            b: y
+        }
+    },
+    /**
+     * Returns the fingerprint of the input word
+     * @param {string} data - The word that needs to be encoded
+     * @returns {string} - The bit fingerprint
+     */
+    toFringerPrint(data) {
+        let passto = fnv.hash(data, 64)
+        passto = parseInt(passto.hex(), 16)
+        return passto.toString(2)
+    },
+
+    /**
+     * Returns the fingerprint of all the words
+     * @param {Array} data - The array that contains all the words
+     * @returns {Array} - The array that contains all bits fingerprint
+     */
+    toFringerPrintArray(data) {
+        let store = new Array()
+        data.forEach(element => {
+            let passto = fnv.hash(element, 64)
+            passto = parseInt(passto.hex(), 16)
+            store.push(passto.toString(2))
+        })
+        return store
+    },
+
+    /**
+     * Calculate the weight for fingerprint and return the result
+     * @param {string} data - The bits that needs to be processed
+     * @param {int} weight - The weight for the word
+     * @returns {binary} - The 
+     */
+    addWeight(data, weight) {
+        let store = new Array()
+        data.split("").forEach(item => {
+            if (item === 1) {
+                store.push(item * weight)
+            }
+            if (item === 0) {
+                store.push(-1 * weight)
+            }
+        })
+        return store
+    }
+}
 
 let Nlp = {
     /**
@@ -19,8 +99,8 @@ let Nlp = {
      * @param {string} text - The text message for tag
      */
     tag: async (ctx, text) => {
-        return await Core.getKey("nlpfeedback").then(res => {
-            let status = JSON.parse(res)
+        return await Store.find({key: "nlpfeedback"}).then(res => {
+            let status = JSON.parse(res[0].nlpfeedback)
             if (status) {
                 let stepone = nodejieba.tag(text)
                 const sentiment = new Bayes()
@@ -74,8 +154,6 @@ let Nlp = {
                     sentimentResult = "文本偏负面"
                 }
                 let data = `原句: *${text}*` + "\n \n" + newText + "\n \n" + `*${sentimentResult}*\n正面: ${JSON.stringify(senti.pos).slice(0,11)} \n负面: ${JSON.stringify(senti.neg).slice(0,11)}`
-
-                Log.Log.debug(`User[${ctx.message.from.id}] NLP Data: ${newText.replace(/_/g, "")}`)
                 return data
             }
         })
@@ -184,147 +262,81 @@ let Nlp = {
 
 let NlpControl = {
     start: () => {
-        Core.setKey("nlpfeedback", true)
-        Core.getKey("nlpfeedback").then(res => {
-            Log.Log.debug(`NLP set to ${res} [OK]`)
+        Store.update({ key: "nlpfeedback" }, { $set: { nlpfeedback: true }}, {}, (err, num) => {Log.Log.fatal(err)})
+        Store.find({ key: "nlpfeedback" }).then(res => {
+            Log.Log.debug(`NLP set to ${res[0].nlpfeedback} [OK]`)
         })
     },
     stop: () => {
-        Core.setKey("nlpfeedback", false)
-        Core.getKey("nlpfeedback").then(res => {
-            Log.Log.debug(`NLP set to ${res} [OK]`)
+        Store.update({ key: "nlpfeedback" }, { $set: { nlpfeedback: false }}, {}, (err, num) => {})
+        Store.find({ key: "nlpfeedback" }).then(res => {
+            Log.Log.debug(`NLP set to ${res[0].nlpfeedback} [OK]`)
         })
     },
     analyzeModeMan: (userId, action) => {
-        Core.getKey("nlpAnalyzeIds").then(res => {
+        Store.find({ key: "nlpAnalyzeIds" }).then(res => {
             if (action == "add") {
-                let currentAdd = JSON.parse(res)
+                let currentAdd = JSON.parse(res[0].nlpAnalyzeIds)
                 if(!currentAdd[0]) {
                     currentAdd.push(userId)
                     let resultData = JSON.stringify(currentAdd)
-                    Core.setKey("nlpAnalyzeIds", resultData).then(updated => {
-                        Log.Log.trace("NLP Analyzer List: ", updated)
+                    Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: resultData }}, {}, (err, num) => {}).then(updatedDoc => {
+                        Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                            Log.Log.trace("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                        })
                     })
                     NlpControl.start()
-                    Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                    Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                        Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                    })
                 }
-                currentAdd.map(item => {
-                    if (item != userId) {
-                        currentAdd = currentAdd.filter(item => item != userId)
-                        currentAdd.push(userId)
-                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentAdd))
-                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
-                    }
-                    if (item == userId) {
-                        NlpControl.start()
-                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
-                    }
-                })
+                else {
+                    currentAdd.map(item => {
+                        if (item != userId) {
+                            currentAdd = currentAdd.filter(item => item != userId)
+                            currentAdd.push(userId)
+                            NlpControl.start()
+                            Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentAdd) }}, {}, (err, num) => {})
+                            Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                                Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                            })
+                        }
+                        else if (item == userId) {
+                            NlpControl.start()
+                            Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                                Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                            })
+                        }
+                    })
+                }
             }
             if(action == "remove") {
-                let currentRmv = JSON.parse(res)
+                let currentRmv = JSON.parse(res[0].nlpAnalyzeIds)
                 currentRmv.map(item => {
                     if (item != userId) {
                         currentRmv = currentRmv.filter(item => item != userId)
-                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
-                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
+                        Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentRmv) }}, {}, (err, num) => {})
+                        Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                            Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                        })
                     }
-                    if (item == userId) {
+                    else if (item == userId) {
                         currentRmv = currentRmv.filter(item => item != userId)
-                        Core.setKey("nlpAnalyzeIds", JSON.stringify(currentRmv))
-                        Core.getKey("nlpAnalyzeIds").then(res => Log.Log.debug(res))
-                        NlpControl.stop()
+                        Store.update({ key: "nlpAnalyzeIds" }, { $set: { nlpAnalyzeIds: JSON.stringify(currentRmv) }}, {}, (err, num) => {})
+                        Store.find({ key: "nlpAnalyzeIds" }).then(updated => {
+                            Log.Log.debug("NLP Analyzer List: ", updated[0].nlpAnalyzeIds)
+                        })
                     }
                 })
                 
             }
         }).catch(err => {
             // Recreate the array if undefined
-            Log.DiagnosticLog.fatal(err)
+            Log.Log.fatal(err)
             Log.Log.info("Init data not found, re-creating...")
-            Core.setKey("nlpAnalyzeIds", `[]`).catch(err => Log.DiagnosticLog.fatal(err))
+            Store.insert({ nlpAnalyzeIds: `[]`, key: "nlpAnalyzeIds"}).catch(err => Log.Log.fatal(err))
             this.NlpControl.analyzeModeMan(userId, "add")
         })
-    }
-}
-
-let NlpLib = {
-    /**
-     * Removes the duplicates
-     * @param {Array} array - The array that contains the all elements
-     * @returns {Array} - The array that removed 
-     */
-    merge(array, array2) {
-        array = array.concat(array2)
-        let a = array.concat()
-        for (var i = 0; i < a.length; ++i) {
-            for (var j = i + 1; j < a.length; ++j) {
-                if (a[i] === a[j])
-                    a.splice(j--, 1)
-            }
-        }
-        return a
-    },
-
-    /**
-     * Count the times that these words were shown in the array
-     * Pop out the element and test it
-     * @param {Array} a - The first array of the first sentence that being cut
-     * @param {Array} b - The second array of the second sentence that being cut
-     * @param {Array} palette - The collection array that contains the two arrays' elements
-     * @returns 
-     */
-    count(a, b, palette) {
-        let x = palette.map(element => a.filter(item => element == item).length)
-        let y = palette.map(element => b.filter(item => element == item).length)
-        return hashTable = {
-            a: x,
-            b: y
-        }
-    },
-    /**
-     * Returns the fingerprint of the input word
-     * @param {string} data - The word that needs to be encoded
-     * @returns {string} - The bit fingerprint
-     */
-    toFringerPrint(data) {
-        let passto = fnv.hash(data, 64)
-        passto = parseInt(passto.hex(), 16)
-        return passto.toString(2)
-    },
-
-    /**
-     * Returns the fingerprint of all the words
-     * @param {Array} data - The array that contains all the words
-     * @returns {Array} - The array that contains all bits fingerprint
-     */
-    toFringerPrintArray(data) {
-        let store = new Array()
-        data.forEach(element => {
-            let passto = fnv.hash(element, 64)
-            passto = parseInt(passto.hex(), 16)
-            store.push(passto.toString(2))
-        })
-        return store
-    },
-
-    /**
-     * Calculate the weight for fingerprint and return the result
-     * @param {string} data - The bits that needs to be processed
-     * @param {int} weight - The weight for the word
-     * @returns {binary} - The 
-     */
-    addWeight(data, weight) {
-        let store = new Array()
-        data.split("").forEach(item => {
-            if (item == 1) {
-                store.push(item * weight)
-            }
-            if (item == 0) {
-                store.push(-1 * weight)
-            }
-        })
-        return store
     }
 }
 
