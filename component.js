@@ -7,7 +7,8 @@ let path = require('path')
 let Log = require('./Core/log')
 let Nlp = require('./Core/Bot/nlp')
 let Lang = require('./Core/lang')
-let Scene = require('./Core/Bot/sceneprocessor').Scene
+let Session = require('./Core/session')
+let Scene = require('./Core/Bot/processor/sceneprocessor').Scene
 
 let compos = { list: [], path: [], info: [], name: [] }
 let compoInfo = new Array()
@@ -117,7 +118,7 @@ let Register = {
 
                                         // Check if register scene exist
                                         if (compo.register.scene) {
-                                            compo.register.scene.map(sce => {
+                                            compo.register.scenes.map(sce => {
                                                 sce.instance = compo.scenes[sce.name]
                                                 sce.function = sce.function
                                                 sce.meta = compo.meta
@@ -181,7 +182,8 @@ let Register = {
 let Interface = {
     Log,
     Nlp,
-    Scene
+    Scene,
+    Session
 }
 
 // Exports

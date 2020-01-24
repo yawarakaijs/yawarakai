@@ -12,21 +12,16 @@ let config = require('../config.json')
 
 let mainDbPath = path.resolve(config.database.base)
 let sessionDbPath = path.resolve(config.database.session)
-let mainDb
-let sessionDb
-let db
 
-let init = () => {
-
-    let dataDir = path.parse(mainDbPath).dir
-    if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir)
-    }
-
-    mainDb = new Datastore({ filename: mainDbPath, autoload: true })
-    sessionDb = new Datastore({ filename: sessionDbPath, autoload: true })
-    db = new Datastore()
+let dataDir = path.parse(mainDbPath).dir
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir)
 }
+
+let mainDb = new Datastore({ filename: mainDbPath, autoload: true })
+// let sessionDb = new Datastore({ filename: sessionDbPath, autoload: true })
+let sessionDb = new Datastore()
+let db = new Datastore()
 
 let insert = (data) => {
     return new Promise((resolve, reject) => {
@@ -47,7 +42,7 @@ let find = (key) => {
     return new Promise((resolve, reject) => {
         db.find(key, (err, docs) => {
             if (err) reject(err)
-            if (docs.length === 0) reject(new Error("Cannot find query " + JSON.stringify(key))) 
+            if (docs.length === 0) reject(new Error("Cannot find query " + JSON.stringify(key)))
             resolve(docs)
         })
     })
@@ -67,7 +62,6 @@ let remove = async (query, option) => {
     })
 }
 
-exports.init = init
 exports.update = update
 exports.remove = remove
 exports.insert = insert

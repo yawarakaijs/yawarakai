@@ -27,5 +27,9 @@ function promptInput(prompt, handler) {
   })
 }
 
+let offline = {
+  
+}
+
 exports.cliInput = promptInput
 exports.Time = Time

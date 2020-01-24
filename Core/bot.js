@@ -6,10 +6,12 @@ let Core = require('../core')
 let Store = require('./storage')
 let Scene = require('./Bot/scene')
 let Message = require('./Bot/message')
+let Session = require('./session')
 let Command = require('./Bot/command').Command
 let Telegram = require('./Bot/telegram')
 let Component = require('../component')
-let SceneControl = require('./Bot/sceneprocessor').SceneControl
+let CallbackQuery = require('./Bot/callbackquery')
+let SceneControl = require('./Bot/processor/sceneprocessor').SceneControl
 
 let config = require('../config.json')
 
@@ -18,6 +20,7 @@ let config = require('../config.json')
 let Nlp = require('./Bot/nlp').Nlp
 let Log = require('../Core/log').Log
 let Lang = require('./lang')
+let DiagnosticLog = require('./Bot/diagnosticlog')
 
 function reload() {
     delete require.cache[require.resolve('../component')]
@@ -27,65 +30,10 @@ function reload() {
 
 Component.Register.load()
 
-let DiagnosticLog = {
-    info: (text) => {
-        DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable) {
-            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "📄 Info\n" + text)
-        }
-    },
-    debug: (text) => {
-        DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
-            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚙️ Debug\n" + text)
-        }
-        Log.debug(text)
-    },
-    warning: (text) => {
-        DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
-            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚠️ Warning\n" + text)
-        }
-        Log.warning(text)
-    },
-    fatal: (text) => {
-        DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
-            let stack
-            if (__dirname.includes(":\\")) {
-                let trimmer = __dirname.replace(/\\Core/gu, "")
-                trimmer = trimmer.replace(/\\/gmui, `\\\\\\\\`)
-                trimmer = new RegExp(trimmer, "gu")
-                stack = JSON.stringify(text.stack).replace(trimmer, ".")
-            }
-            else {
-                let trimmer = new RegExp(__dirname.replace(/\/Core/gu, ""), "gu")
-                stack = JSON.stringify(text.stack).replace(trimmer, ".")
-            }
-            Telegram.Bot.telegram.sendMessage(`@${config.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
-        }
-        Log.fatal(text)
-    },
-    counter: (text) => {
-        Store.find({ key: "logtext" }).then(res => {
-            if (text.message == res[0]) {
-                DiagnosticLog.count++
-            }
-            if (text.message != res[0]) {
-                DiagnosticLog.count = 0
-            }
-            Store.insert({ "logtext": text.message ? text.message : "", key: "logtext" })
-        }).catch(err => {
-            Store.insert({ "logtext": text.message ? text.message : "", key: "logtext" })
-        })
-    },
-    count: 0
-}
-
 let Bot = {
     telegram: Telegram.Bot.telegram,
     DiagnosticLog: DiagnosticLog,
-    commandParse(ctx, callback) {
+    commandParse(ctx) {
         let commandArgs = ctx.message.text.split(" ")
         let command = commandArgs[0].substring(1)
         command = command.replace(/@\w+/g, "")
@@ -114,7 +62,7 @@ let Bot = {
                 if (res != undefined) {
                     detail.push(res)
                 }
-            } 
+            }
             catch (err) {
                 DiagnosticLog.fatal(err)
             }
@@ -212,7 +160,14 @@ let Control = {
         Telegram.Bot.on("callback_query", async (ctx) => {
             let user = ctx.callbackQuery.from
             Log.info(`${Lang.bot.callbackQuery.from}: ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${user.id}] ${Lang.bot.callbackQuery.callback} ${ctx.callbackQuery.data}`)
-            let data = await Bot.callbackQueryDistributor(ctx)
+
+            let context = { telegram: Telegram.Bot.telegram, ctx: ctx }
+
+            let data = CallbackQuery.Control.switcher(context)
+            console.log(data)
+            if (!data) {
+                data = await Bot.callbackQueryDistributor(ctx)
+            }
             Log.info(`${Lang.bot.callbackQuery.answerto}: ${ctx.callbackQuery.from.id} - ${Lang.bot.callbackQuery.success}`)
         })
 
@@ -252,65 +207,112 @@ let Control = {
          * Handle all text like messages
          */
         Telegram.Bot.on("text", async (ctx) => {
-            Message.messagectl.log(ctx)
+            let user
+            let me = await Telegram.Bot.telegram.getMe()
+            let botname = config.botname != "" ? config.botname : me.first_name
 
-            /**
-             * Handle commands
-             */
+            let isFirst = await Session.User.isFirst(ctx.message.from.id)
 
-            if (/^\/\w+/gui.test(ctx.message.text)) {
-                let me = await Telegram.Bot.telegram.getMe()
-                if (/^\/\w+@\w+/.test(ctx.message.text) && !ctx.message.text.includes(me.username)) {
-                    return
-                }
-                let data = Bot.staticCommandDistributor(ctx)
-                if (data == undefined) {
-                    data = await Bot.commandDistributor(ctx)
-                }
-                if (data != undefined) {
-                    ctx.reply(data, { reply_to_message_id: ctx.message.message_id, parse_mode: "Markdown" })
-                }
+            if (isFirst) {
+                user = new Session.UserSession(ctx.message.from.id)
+
+                let tos = `感谢你选择使用${botname}！` + "\n\n" +
+                    "真的很抱歉打扰你的使用，为了你的数据安全和我的法律责任，必须声明一" +
+                    "些注意事项，也需要你同意之后才能正常使用全部的功能。\n" +
+                    "本 Bot 使用的开源项目位于 https://github.com/hanamiyuna/yawarakai\n\n" +
+                    `以下称为 **本 Bot** 的内容均等同于描述本 Telegram Bot **@${me.username}**\n\n` +
+                    "使用本 Bot 提供的功能和服务所造成的一切对现实世界所产生的后果，本 Bot 和开发者不负责，" +
+                    "因为使用了不同的组件，部分功能可能来源于第三方开发者，所产生的数据和流量，以及个人信息数" +
+                    "据信息的使用和记录方法应该是被你所知悉和理解的。\n\n" +
+                    "使用本 Bot 的功能代表了你已经知悉你的数据源可能会有以下误差：\n" +
+                    "1. 查询的数据和回复可能不会来源我们开发者认证的数据" +
+                    "2. 查询的数据和回复所描述的时间和地点可能不是准确有效的" +
+                    "3. 查询的数据和回复过程中产生的信息使用可能会因为第三方组件而泄漏" +
+                    "4. 在使用了第三方组件的时候，可能会有意外的个人信息使用和记录，这些数据本 Bot 并不负责\n" +
+                    "我们在提供服务的过程中不会造成计划打扰，但是有额外的大数据分析可能会产生\n\n" +
+                    "即便如此，你也可以拒绝我们进行数据访问。\n" +
+                    "**如果你同意以上的内容，可以选择接受以继续**"
+
+                Telegram.Bot.telegram.sendMessage(ctx.message.from.id, tos,
+                    {
+                        reply_to_message_id: ctx.message.message_id,
+                        parse_mode: "Markdown",
+                        reply_markup: {
+                            inline_keyboard: [[
+                                {
+
+                                    text: "接受",
+                                    callback_data: "tosagree"
+                                },
+                                {
+                                    text: "拒绝",
+                                    callback_data: "tosdisagree"
+                                }
+                            ]]
+                        },
+                        disable_web_page_preview: true,
+                    })
             }
-
-            /**
-             * Handle general messages
-             */
             else {
-                // if userid is in scene go to scene
-                // otherwise forbidden
-                if (SceneControl.has(ctx.message.from.id)) {
-                    let context = { ctx: ctx, telegram: Telegram.Bot.telegram }
-                    Log.debug(`@${ctx.message.from.username} [${ctx.message.from.id}] in scene: ${SceneControl.scene(ctx.message.from.id)}`)
-                    let sceData = Scene.switcher(context, SceneControl.scene(ctx.message.from.id))
-                    if (!sceData) {
-                        Bot.sceneDistributor(context)
+                Message.messagectl.log(ctx)
+
+                /**
+                 * Handle commands
+                 */
+
+                if (/^\/\w+/gui.test(ctx.message.text)) {
+                    if (/^\/\w+@\w+/.test(ctx.message.text) && !ctx.message.text.includes(me.username)) {
+                        return
+                    }
+                    let data = Bot.staticCommandDistributor(ctx)
+                    if (data == undefined) {
+                        data = await Bot.commandDistributor(ctx)
+                    }
+                    if (data != undefined) {
+                        ctx.reply(data, { reply_to_message_id: ctx.message.message_id, parse_mode: "Markdown" })
                     }
                 }
+
+                /**
+                 * Handle general messages
+                 */
                 else {
-                    let data = await Bot.messasgeDistributor(ctx)
-                    if (data == undefined) {
-                        let noneMsg = await Message.Message.hears(ctx)
-                        if (noneMsg == undefined) {
-                            Nlp.tag(ctx, ctx.message.text).then(res => {
-                                let text = res
-                                if (text != undefined) {
-                                    Store.find({ key: "nlpAnalyzeIds" }).then(ids => {
-                                        let current = JSON.parse(ids[0].nlpAnalyzeIds)
-                                        current.map(item => {
-                                            if (item == ctx.message.from.id) {
-                                                Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, text, { reply_to_message_id: ctx.message.message_id, parse_mode: "Markdown" }).catch(err => {
-                                                    DiagnosticLog.fatal(err)
-                                                })
-                                            }
-                                        })
-                                    })
-                                }
-                            })
+                    // if userid is in scene go to scene
+                    // otherwise forbidden
+                    if (SceneControl.has(ctx.message.from.id)) {
+                        let context = { ctx: ctx, telegram: Telegram.Bot.telegram }
+                        Log.debug(`@${ctx.message.from.username} [${ctx.message.from.id}] in scene: ${SceneControl.scene(ctx.message.from.id)}`)
+                        let sceData = Scene.switcher(context, SceneControl.scene(ctx.message.from.id))
+                        if (!sceData) {
+                            Bot.sceneDistributor(context)
                         }
                     }
                     else {
-                        ctx.replyWithChatAction("typing")
-                        ctx.reply(data, { reply_to_message_id: ctx.message.message_id })
+                        let data = await Bot.messasgeDistributor(ctx)
+                        if (data == undefined) {
+                            let noneMsg = await Message.Message.hears(ctx)
+                            if (noneMsg == undefined) {
+                                Nlp.tag(ctx, ctx.message.text).then(res => {
+                                    let text = res
+                                    if (text != undefined) {
+                                        Store.find({ key: "nlpAnalyzeIds" }).then(ids => {
+                                            let current = JSON.parse(ids[0].nlpAnalyzeIds)
+                                            current.map(item => {
+                                                if (item == ctx.message.from.id) {
+                                                    Telegram.Bot.telegram.sendMessage(ctx.message.chat.id, text, { reply_to_message_id: ctx.message.message_id, parse_mode: "Markdown" }).catch(err => {
+                                                        DiagnosticLog.fatal(err)
+                                                    })
+                                                }
+                                            })
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                        else {
+                            ctx.replyWithChatAction("typing")
+                            ctx.reply(data, { reply_to_message_id: ctx.message.message_id })
+                        }
                     }
                 }
             }

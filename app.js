@@ -54,42 +54,67 @@ console.log("Yawarakai  Copyright (C) 2019  Yuna Hanami")
 console.log(startInfo)
 AnonymousLog.info(startInfo)
 
-Store.init()
-
 // Initilization
 
 let Bot = require('./Core/bot')
 let Core = require('./core')
 Bot.Control.start()
 
+// online
+
 let args = process.argv.slice(2)
+
+let mode = {
+    debug() {
+
+        this.init()
+
+        Store.find({ key: "nlpAnalyzeIds" }).then(res => {
+            Log.trace(`NLP Analyzer List: ${res[0].nlpAnalyzeIds}`)
+        }).catch(err => {
+            Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
+        })
+    },
+    
+    base() {
+
+        this.init()
+
+        Store.find({key: "nlpAnalyzeIds"}).catch(err => {
+            Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
+        })
+    },
+
+    init() {
+
+        // init nlpfeedback
+        Store.find({key: "nlpfeedback"}).then(res => {
+            Log.debug(`NLP set to ${res[0].nlpfeedback}`)
+        }).catch(err => {
+            Store.insert({nlpfeedback: false, key: "nlpfeedback"})
+        })
+
+        // init users array
+        Store.session.find({ key: "activeUser" }, (err, doc) => {
+            if (doc.length === 0) {
+                Log.info("First run, init database for user session")
+                Store.session.insert({ key: "activeUser", users: new Array() })
+            }
+        })
+
+    }
+}
 
 if(args.length != 0) {
     switch(args[0]) {
         case "start":
             if (args.length > 1 && (args[1] == "--debug" || args[1] == "--d")) {
                 Bot.Telegram.command("/telegram debug")
-                Store.find({key: "nlpfeedback"}).then(res => {
-                    Log.debug(`NLP set to ${res[0].nlpfeedback}`)
-                }).catch(err => {
-                    Store.insert({nlpfeedback: false, key: "nlpfeedback"})
-                })
-                Store.find({ key: "nlpAnalyzeIds" }).then(res => {
-                    Log.trace(`NLP Analyzer List: ${res[0].nlpAnalyzeIds}`)
-                }).catch(err => {
-                    Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
-                })
+                mode.debug()
             }
             else {
                 Bot.Telegram.command("/telegram start")
-                Store.find({key: "nlpfeedback"}).then(res => {
-                    Log.debug(`NLP set to ${res[0].nlpfeedback}`)
-                }).catch(err => {
-                    Store.insert({nlpfeedback: false, key: "nlpfeedback"})
-                })
-                Store.find({key: "nlpAnalyzeIds"}).catch(err => {
-                    Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
-                })
+                mode.base()
             }
             break
     }
@@ -98,28 +123,11 @@ else {
     // Debug block
     if (config.debugmode) {
         Bot.Telegram.command("/telegram debug")
-        Store.find({key: "nlpfeedback"}).then(res => {
-            Log.debug(`NLP set to ${res[0].nlpfeedback}`)
-        }).catch(err => {
-            Store.insert({nlpfeedback: false, key: "nlpfeedback"})
-        })
-        Store.find({ key: "nlpAnalyzeIds" }).then(res => {
-            Log.trace(`NLP Analyzer List: ${res[0].nlpAnalyzeIds}`)
-        }).catch(err => {
-            Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
-        })
-    }
-    else {
-        Store.find({key: "nlpfeedback"}).then(res => {
-            Log.debug(`NLP set to ${res[0].nlpfeedback}`)
-        }).catch(err => {
-            Store.insert({nlpfeedback: false, key: "nlpfeedback"})
-        })
-        Store.find({key: "nlpAnalyzeIds"}).catch(err => {
-            Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
-        })
+        mode.debug()
     }
 }
+
+// offline
 
 function commandParse (input) {
     let commandArgs = input.split(" ")

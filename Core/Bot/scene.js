@@ -4,8 +4,8 @@
 
 // Local Package
 
-let Scene = require('./sceneprocessor').Scene
-let SceneControl = require('./sceneprocessor').SceneControl
+let Scene = require('./processor/sceneprocessor').Scene
+let SceneControl = require('./processor/sceneprocessor').SceneControl
 
 let basicScene = new Scene("basic", [basic])
 
