@@ -148,7 +148,7 @@ exports.commands = {
                 else if (main.sceneEnterCount === 3) {
                     main.sceneEnterCount++
                     this.telegram.sendMessage(context.ctx.message.chat.id, "是不是没有理解呢...")
-                    this.telegram.sendMessage(context.ctx.message.chat.id, "请按照以下格式输入要查询的航班: \n/flight AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01", { reply_to_message_id: context.ctx.message.message_id })
+                    this.telegram.sendMessage(context.ctx.message.chat.id, "请按照以下格式输入要查询的航班: \nAR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01", { reply_to_message_id: context.ctx.message.message_id })
                 }
                 else if (main.sceneEnterCount === 4) {
                     main.sceneEnterCount++
@@ -161,7 +161,7 @@ exports.commands = {
                 else if (main.sceneEnterCount === 6) {
                     main.sceneEnterCount++
                     this.telegram.sendMessage(context.ctx.message.chat.id, "呜呜呜，能不能好好交流嘛 QAQ，你这样调戏人家，主人看到会很不开心的！")
-                    this.telegram.sendMessage(context.ctx.message.chat.id, "请按照以下格式输入要查询的航班！！！: \n/flight AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01", { reply_to_message_id: context.ctx.message.message_id })
+                    this.telegram.sendMessage(context.ctx.message.chat.id, "请按照以下格式输入要查询的航班！！！: \nAR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01", { reply_to_message_id: context.ctx.message.message_id })
                 }
                 else if (main.sceneEnterCount === 7 || main.sceneEnterCount === 8) {
                     main.sceneEnterCount++
@@ -175,7 +175,7 @@ exports.commands = {
                 main.sceneEnterCount = 0
                 scene.enter(context.ctx)
                 this.telegram.sendMessage(context.ctx.message.chat.id, "把你想要查找的航班号发给我吧w", { reply_to_message_id: context.ctx.message.message_id })
-                this.telegram.sendMessage(context.ctx.message.chat.id, "请按照以下格式输入要查询的航班: \n/flight AR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01")
+                this.telegram.sendMessage(context.ctx.message.chat.id, "请按照以下格式输入要查询的航班: \nAR-NUMB YYYY-MM-DD \nAR 是航空公司短标识，NUMB 是航线标识，日期格式应为：1970-01-01")
                 main.sceneEnterCount = 1
             }
         }
@@ -378,7 +378,7 @@ exports.register = {
         //     function: 'main'
         // }
     ],
-    scene: [
+    scenes: [
         {
             name: 'flight',
             function: this.scenes.flight

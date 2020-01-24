@@ -1102,7 +1102,7 @@ exports.register = {
             function: 'main'
         }
     ],
-    scene: [
+    scenes: [
         {
             name: "playlist",
             function: this.scenes.playlist

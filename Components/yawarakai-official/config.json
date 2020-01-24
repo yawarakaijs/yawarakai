@@ -46,6 +46,15 @@
             "author": ["Yawarakai Devs"],
             "description": "Get flight information",
             "locale": "zh-CN"
+        },
+        "moodjournal": {
+            "enable": true,
+            "name": "moodjournal",
+            "displayName": "Mood Journal",
+            "groupName": "yawarakai-official",
+            "version": "v1.0.0",
+            "author": ["Yawarakai Devs"],
+            "description": "Make journals of your mood with bot"
         }
     }
 }
