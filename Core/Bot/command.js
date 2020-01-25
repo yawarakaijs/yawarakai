@@ -5,10 +5,11 @@
 // Local Packages
 
 let Lang = require('../lang')
-let config = require('../../config.json')
-let packageInfo = require('../../package.json')
-let Component = require('../../component')
 let Scene = require('./scene')
+let Admin = require('./admin')
+let config = require('../../config.json')
+let Component = require('../../component')
+let packageInfo = require('../../package.json')
 let SceneControl = require('./processor/sceneprocessor').SceneControl
 
 // Main
@@ -33,6 +34,9 @@ let Command = {
             case "cancel":
                 SceneControl.exit(context.ctx)
                 return undefined
+            case "admin":
+                Admin.Control.start(context)
+                return true
             case "match":
                 Scene.switcher(context, 'nlpmatch')
                 return undefined
