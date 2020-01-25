@@ -164,7 +164,6 @@ let Control = {
             let context = { telegram: Telegram.Bot.telegram, ctx: ctx }
 
             let data = CallbackQuery.Control.switcher(context)
-            console.log(data)
             if (!data) {
                 data = await Bot.callbackQueryDistributor(ctx)
             }
@@ -240,13 +239,8 @@ let Control = {
                         reply_markup: {
                             inline_keyboard: [[
                                 {
-
                                     text: "接受",
                                     callback_data: "tosagree"
-                                },
-                                {
-                                    text: "拒绝",
-                                    callback_data: "tosdisagree"
                                 }
                             ]]
                         },

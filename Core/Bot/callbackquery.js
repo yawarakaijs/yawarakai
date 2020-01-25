@@ -8,8 +8,6 @@ let Control = {
         let ctx = context.ctx
         let callback = context.ctx.update.callback_query
 
-        console.log(callback.data)
-
         switch (callback.data) {
             case "tosagree":
                 tos.agree(context)

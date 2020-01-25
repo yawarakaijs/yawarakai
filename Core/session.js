@@ -82,9 +82,7 @@ let User = {
     },
 
     exist(id, key, set = "yawarakai") {
-        console.log("Checking...")
         return new Promise((resolve, reject) => {
-            console.log("Checking: " + key, " in " + set)
             Store.session.find({ key: "user", userId: id, set: set, property: key }, (err, doc) => {
                 let result
 
@@ -105,17 +103,34 @@ let User = {
         })
     },
 
-    allowEula() {
-
+    allowEula(id, set = "yawarakai") {
+        return new Promise((resolve, reject) => {
+            Store.session.find({ key: "user", userId: id, set: set, property: "tosagreement" }, (err, doc) => {
+                if (err) reject(err)
+                if (doc.length === 0) resolve(false)
+                else {
+                    if (e.key === true) resolve(true)
+                    else resolve(false)
+                }
+            })
+        })
     },
 
-    allowDataAnalyze() {
-
+    allowDataAnalyze(id, set = "yawarakai") {
+        return new Promise((resolve, reject) => {
+            Store.session.find({ key: "user", userId: id, set: set, property: "ppagreement" }, (err, doc) => {
+                if (err) reject(err)
+                if (doc.length === 0) resolve(false)
+                else {
+                    if (e.key === true) resolve(true)
+                    else resolve(false)
+                }
+            })
+        })
     },
 
     append(id, key, value = "", set = "yawarakai") {
         return new Promise((resolve, reject) => {
-            console.log("Appending: " + key, "in " + set + " to " + value)
             Store.session.find({ key: "user", userId: id, set: set }, (err, doc) => {
                 if (err) reject(false)
                 if (doc.length === 0) resolve(false)
@@ -127,7 +142,6 @@ let User = {
 
     update(id, key, value, set = "yawarakai") {
         return new Promise((resolve, reject) => {
-            console.log("Updating: " + key, "in " + set + " to " + value)
             Store.session.find({ key: "user", userId: id, set: set, property: key }, (err, doc) => {
                 if (err) reject(false)
                 if (doc.length === 0) resolve(false)
@@ -149,9 +163,93 @@ let Group = {
 
 }
 
+let Component = {
+    User: {
+        isFirst(id, set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "user", userId: id, set: set }, (err, doc) => {
+                    if (err) reject(err)
+                    if (doc.length === 0) resolve(true)
+                    else resolve(false)
+                })
+            })
+        },
+        exist(id, key, set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                User.exist(id, key, set).then(res => {
+                    resolve(res)
+                }).catch(err => {
+                    reject(err)
+                })
+            })
+        },
+        query(id, key, set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "user", userId: id, set: set }, (err, doc) => {
+                    if (err) reject(false)
+                    if (doc.length === 0) resolve(false)
+                    doc.forEach(e => {
+                        if (e.property === key) resolve({ property: e.property, value: e.value, set: e.set })
+                        else reject(false)
+                    })
+                })
+            })
+        },
+        detail(id, set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "user", userId: id, set: set }, (err, doc) => {
+                    if (err) reject(false)
+                    if (doc) resolve(doc)
+                })
+            })
+        },
+        allowEula(id, set) {
+            if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+            User.allowEula(id, set).then(res => {
+                resolve(res)
+            }).catch(err => {
+                reject(err)
+            })
+        },
+        allowDataAnalyze(id, set) {
+            if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+            User.allowDataAnalyze(id, set).then(res => {
+                resolve(res)
+            }).catch(err => {
+                reject(err)
+            })
+        },
+        append(id, key, value, set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                User.append(id, key, value, set).then(res => {
+                    resolve(res)
+                }).catch(err => {
+                    reject(err)
+                })
+            })
+        },
+        update(id, key, value, set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                User.update(id, key, value, set).then(res => {
+                    resolve(res)
+                }).catch(err => {
+                    reject(err)
+                })
+            })
+        }
+    }
+}
+
 module.exports = {
     User,
     Group,
     UserSession,
-    GroupSession
+    GroupSession,
+    Component
 }

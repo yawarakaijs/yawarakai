@@ -183,7 +183,7 @@ let Interface = {
     Log,
     Nlp,
     Scene,
-    Session
+    Session: Session.Component
 }
 
 // Exports
