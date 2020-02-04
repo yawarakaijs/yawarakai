@@ -12,32 +12,38 @@ exports.meta = config.components.componentName
 
 // Inner
 
+exports.scenes = {
+    async scenePerformFunction(context) {
+
+    }
+}
+
 exports.commands = {
-    async main() {
+    async main(context) {
 
     }
 }
 
 exports.inlines = {
-    async main () {
+    async main (ctx) {
 
     }
 }
 
 exports.messages = {
-    async main() {
+    async main(ctx) {
 
     }
 }
 
 exports.callbackQuery = {
-    async main () {
+    async main (context) {
 
     }
 }
 
 exports.channelPost = {
-    async main () {
+    async main (context) {
 
     }
 }
@@ -69,6 +75,12 @@ exports.register = {
     channelPost: [
         // {
         //     function: 'main'
+        // }
+    ],
+    scenes: [
+        // {
+        //     name: 'sceneName',
+        //     function: 'scenePerformFunction'
         // }
     ]
 }
