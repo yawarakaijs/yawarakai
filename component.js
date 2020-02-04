@@ -7,7 +7,9 @@ let path = require('path')
 let Log = require('./Core/log')
 let Nlp = require('./Core/Bot/nlp')
 let Lang = require('./Core/lang')
+let config = require('./config.json')
 let Session = require('./Core/session')
+let Telegram = require("./Core/Bot/telegram").Bot
 let Scene = require('./Core/Bot/processor/sceneprocessor').Scene
 
 let compos = { list: [], path: [], info: [], name: [] }
@@ -183,7 +185,12 @@ let Interface = {
     Log,
     Nlp,
     Scene,
-    Session: Session.Component
+    Session: Session.Component,
+    Telegram
+}
+
+let Data = {
+    admin: config.admin
 }
 
 // Exports
@@ -194,3 +201,4 @@ exports.compoHelp = compoHelp
 exports.compoInfo = compoInfo
 exports.Interface = Interface
 exports.Register = Register
+exports.Data = Data

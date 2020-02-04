@@ -109,11 +109,11 @@ if(args.length != 0) {
     switch(args[0]) {
         case "start":
             if (args.length > 1 && (args[1] == "--debug" || args[1] == "--d")) {
-                Bot.Telegram.command("/telegram debug")
+                Core.command("/telegram debug")
                 mode.debug()
             }
             else {
-                Bot.Telegram.command("/telegram start")
+                Core.command("/telegram start")
                 mode.base()
             }
             break
@@ -122,7 +122,7 @@ if(args.length != 0) {
 else {
     // Debug block
     if (config.debugmode) {
-        Bot.Telegram.command("/telegram debug")
+        Core.command("/telegram debug")
         mode.debug()
     }
 }
