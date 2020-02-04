@@ -173,7 +173,7 @@ let Control = {
         /**
          * Handle inline queries
          */
-        Telegram.Bot.on("inline_query", async ctx => {
+        Telegram.Bot.on("inline_query", async (ctx) => {
             let user = ctx.inlineQuery.from
             Log.info(`${Lang.bot.inlineQuery.from}: ${user.first_name != "" && user.first_name != undefined ? user.first_name : user.username ? user.username : user.id} [${ctx.inlineQuery.from.id}] ${Lang.bot.inlineQuery.query}`)
             let data = await Bot.inlineDistributor(ctx)
@@ -206,6 +206,7 @@ let Control = {
          * Handle all text like messages
          */
         Telegram.Bot.on("text", async (ctx) => {
+
             let user
             let me = await Telegram.Bot.telegram.getMe()
             let botname = config.botname != "" ? config.botname : me.first_name
@@ -248,6 +249,7 @@ let Control = {
                     })
             }
             else {
+                
                 Message.messagectl.log(ctx)
 
                 /**

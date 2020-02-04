@@ -163,7 +163,95 @@ let Group = {
 
 }
 
+let Global = {
+
+}
+
 let Component = {
+    Global : {
+        isFirst(set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "component", set: set }, (err, doc) => {
+                    if (err) reject(err)
+                    if (doc.length === 0) resolve(true)
+                    else resolve(false)
+                })
+            })
+        },
+
+        exist(key, set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "component", set: set, property: key }, (err, doc) => {
+                    let result
+                    if (err) reject(err)
+                    if (doc.length === 0) result = false
+                    else result = true
+                    resolve(result)
+                })
+            })
+        },
+
+        query(key, set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "component", set: set, property: key }, (err, doc) => {
+                    if (err) reject(false)
+                    if (doc.length === 0) resolve(false)
+                    doc.forEach(e => {
+                        if (e.property === key) resolve({ property: e.property, value: e.value, set: e.set })
+                        else reject(false)
+                    })
+                })
+            })
+        },
+
+        detail(set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "component", set: set }, (err, doc) => {
+                    if (err) reject(false)
+                    if (doc) resolve(doc)
+                })
+            })
+        },
+    
+        append(key, value = "", set) {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "component", set: set }, (err, doc) => {
+                    if (err) reject(false)
+                    if (doc.length === 0) resolve(false)
+    
+                    Store.session.insert({ key: "component", set: set, roperty: key, value: value })
+                })
+            })
+        },
+    
+        update(key, value, set, mode = "set") {
+            return new Promise((resolve, reject) => {
+                if (set === "yawarakai") reject(new Error("Permission Rejected: Cannot edit yawarakai database"))
+                Store.session.find({ key: "component", set: set, property: key }, (err, doc) => {
+                    if (err) reject(false)
+                    if (doc.length === 0) resolve(false)
+    
+                    let operation = {}
+                    if (mode === "push") operation = { $addToSet: { value: value } }
+                    else if (mode === "set") operation = { $set: { value: value } }
+
+                    let res = doc.pop()
+                    if (res.property === key) {
+                        Store.session.update({ key: "component", set: set, property: key }, operation, {})
+                        resolve(true)
+                    }
+                    else {
+                        resolve(false)
+                    }
+                })
+            })
+        }
+    },
     User: {
         isFirst(id, set) {
             return new Promise((resolve, reject) => {

@@ -18,10 +18,19 @@ if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir)
 }
 
-let mainDb = new Datastore({ filename: mainDbPath, autoload: true })
-// let sessionDb = new Datastore({ filename: sessionDbPath, autoload: true })
-let sessionDb = new Datastore()
+let mainDb
+let sessionDb
+// let sessionDb = new Datastore()
 let db = new Datastore()
+
+if (config.debugmode) {
+    mainDb = new Datastore()
+    sessionDb = new Datastore()
+}
+else {
+    mainDb = new Datastore({ filename: mainDbPath, autoload: true })
+    sessionDb = new Datastore({ filename: sessionDbPath, autoload: true })
+}
 
 let insert = (data) => {
     return new Promise((resolve, reject) => {
