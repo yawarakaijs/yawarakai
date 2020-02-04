@@ -88,6 +88,10 @@ let main = {
                             reply_markup: {
                                 inline_keyboard: [[
                                     {
+                                        text: "Open in Browser",
+                                        url: `https://music.163.com/song/?id=${params.id}`
+                                    },
+                                    {
                                         text: "Open in CloudMusic",
                                         url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
                                     }
@@ -98,6 +102,9 @@ let main = {
                             id: resArray[1].data.songs[0].al.id
                         }
                     }
+
+                    Compo.Interface.Log.Log.trace(data.inline[0].audio_url)
+
                     return data
 
                 }).catch(err => {
@@ -157,6 +164,7 @@ let main = {
                             audio: path.join(baseDir, "/cache/music/", dataArray[1])
                         }
                     }
+
                     return data
 
                 }).catch(err => {
@@ -727,7 +735,7 @@ exports.commands = {
 
 exports.scenes = {
     async playlist(context) {
-        
+
         let stage = playlistScene.status(context.ctx).stage
 
         switch (stage) {
@@ -795,7 +803,7 @@ exports.scenes = {
                 break
         }
     },
-    async album (context) {
+    async album(context) {
         let stage = playlistScene.status(context.ctx).stage
 
         switch (stage) {
@@ -890,10 +898,16 @@ exports.inlines = {
                         thumb_url: "https://i.loli.net/2019/11/13/dQDxC4Nv91VYK2E.jpg",
                         input_message_content: { message_text: `实在是很抱歉呢，这个歌曲暂不可用，但是可以试试在 App 中打开\n#yawarakai #s${params.id}` },
                         reply_markup: {
-                            inline_keyboard: [[{
-                                text: "Open in App",
-                                url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
-                            }]]
+                            inline_keyboard: [[
+                                {
+                                    text: "Open in Browser",
+                                    url: `https://music.163.com/song/?id=${params.id}`
+                                },
+                                {
+                                    text: "Open in App",
+                                    url: `https://m.music.163.com/m/applink/?scheme=orpheus://song/${params.id}`
+                                }
+                            ]]
                         }
                     }]
                 }
