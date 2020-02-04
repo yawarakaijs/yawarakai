@@ -55,6 +55,20 @@
             "version": "v1.0.0",
             "author": ["Yawarakai Devs"],
             "description": "Make journals of your mood with bot"
+        },
+        "minecraft": {
+            "enable": false,
+            "name": "minecraft",
+            "displayName": "Minecraft Chat",
+            "groupName": "yawarakai-official",
+            "version": "v0.0.1",
+            "author": ["Yawarakai Devs"],
+            "description": "Connect to Minecraft Servers",
+            "hostname": "",
+            "port": "",
+            "username": "",
+            "password": "",
+            "authpassword": ""
         }
     }
 }

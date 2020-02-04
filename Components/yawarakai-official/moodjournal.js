@@ -3,26 +3,6 @@
  * @author HanamiYuna
  * @copyright 2020
  * 
- * 这个组建的目的是为了让用户能够存储和登记他们的情绪状态和心理状态
- * 为了保证能够在任何情况下都能够完成记录，我们设置了七个不同的情绪
- * 喜怒哀乐忧恨怕
- * 
- * /emotelog <= entering scene emotelog
- * 请选择比较适合你的状态 <= sendMessage
- * inline_keyboard_markup: emoji emoji emoji emoji emoji none
- * map on base to 0 1 2 3 4
- * [user choice] <= redirect to scene emotelog
- * 
- * if(none) {
- *     请选择你现在比较准确的舒适程度
- *     inline_keyboard_markup: -4 -3 -2 -1 0 1 2 3 4
- *     map on weight to 1 2 3 4 5 6 7 8 9
- * }
- * else {
- *     
- *     还有什么其他需要添加的吗？
- * }
- * 
  * 悠月本身的目的是为了能够处理每一个用户的情绪并且建立一个模型，在这样的情况下，
  * 情绪计算本身所需要的 tag 系统就来自用户们所提交的数据，
  */
@@ -37,6 +17,46 @@ let config = require('./config.json')
 
 // Guidelines
 
+let emotes = {
+    inlove: {
+        text: "😍",
+        callbackData: "moodjournal:inlove"
+    },
+    veryhappy: {
+        text: "🤣",
+        callbackData: "moodjournal:veryhappy"
+    },
+    happy: {
+        text: "😄",
+        callbackData: "moodjournal:happy"
+    },
+    quitehappy: {
+        text: "😊",
+        callbackData: "moodjournal:quitehappy"
+    },
+    normal: {
+        text: "😐",
+        callbackData: "moodjournal:normal"
+    },
+    kindlysad: {
+        text: "😣",
+        callbackData: "moodjournal:kindlysad"
+    },
+    crying: {
+        text: "😭",
+        callbackData: "moodjournal:crying"
+    },
+    feelsbad: {
+        text: "🤮",
+        callbackData: "moodjournal:feelsbad"
+    },
+    angry: {
+        text: "😡",
+        callbackData: "moodjournal:angry"
+    }
+
+}
+
 // Main
 
 let callbackQuery = {
@@ -46,40 +66,40 @@ let callbackQuery = {
             reply_markup: {
                 inline_keyboard: [[
                     {
-                        text: "😍",
-                        callback_data: "moodjournal:inlove"
+                        text: emotes.inlove.text,
+                        callback_data: emotes.inlove.callbackData
                     },
                     {
-                        text: "🤣",
-                        callback_data: "moodjournal:veryhappy"
+                        text: emotes.veryhappy.text,
+                        callback_data: emotes.veryhappy.callbackData
                     },
                     {
-                        text: "😄",
-                        callback_data: "moodjournal:happy"
+                        text: emotes.happy.text,
+                        callback_data: emotes.happy.callbackData
                     },
                     {
-                        text: "😊",
-                        callback_data: "moodjournal:quitehappy"
+                        text: emotes.quitehappy.text,
+                        callback_data: emotes.quitehappy.callbackData
                     },
                     {
-                        text: "😐",
-                        callback_data: "moodjournal:normal"
+                        text: emotes.normal.text,
+                        callback_data: emotes.normal.callbackData
                     },
                     {
-                        text: "😣",
-                        callback_data: "moodjournal:kindlysad"
+                        text: emotes.kindlysad.text,
+                        callback_data: emotes.kindlysad.callbackData
                     },
                     {
-                        text: "😭",
-                        callback_data: "moodjournal:crying"
+                        text: emotes.crying.text,
+                        callback_data: emotes.crying.callbackData
                     },
                     {
-                        text: "🤮",
-                        callback_data: "moodjournal:feelsbad"
+                        text: emotes.feelsbad.text,
+                        callback_data: emotes.feelsbad.callbackData
                     },
                     {
-                        text: "😡",
-                        callback_data: "moodjournal:angry"
+                        text: emotes.angry.text,
+                        callback_data: emotes.angry.callbackData
                     }
 
                 ]]
@@ -148,6 +168,7 @@ exports.callbackQuery = {
         else {
             let id = ctx.update.callback_query.message.chat.id
             let data = ctx.update.callback_query.data
+            let replied = false
 
             data = data.replace(/moodjournal:/, "")
             context = { telegram: this.telegram, ctx: ctx }
@@ -163,9 +184,14 @@ exports.callbackQuery = {
                         }
                     })
                     callbackQuery.mlogStart(context)
+                    replied = true
                     break
                 default:
-                    this.telegram.sendMessage(id, ctx.update.callback_query.message.text)
+                    this.telegram.sendMessage(id, emotes[data].text)
+            }
+
+            if (!replied) {
+                this.telegram.sendMessage(id, emotes[data].text)
             }
         }
     }
