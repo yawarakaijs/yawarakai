@@ -606,6 +606,10 @@ exports.commands = {
                             }
                         ])
                     }
+                    keys.push([{
+                        text: "Open in App",
+                        url: `https://music.163.com/playlist?id=${params.id}`
+                    }])
                     this.telegram.sendMessage(context.ctx.message.chat.id, result.text, {
                         reply_markup: {
                             inline_keyboard: keys
@@ -691,6 +695,11 @@ exports.commands = {
                             }
                         ])
                     }
+
+                    keys.push([{
+                        text: "Open in App",
+                        url: `https://music.163.com/album?id=${params.id}`
+                    }])
                     this.telegram.sendMessage(context.ctx.message.chat.id, result.text, {
                         reply_markup: {
                             inline_keyboard: keys
