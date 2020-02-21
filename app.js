@@ -55,10 +55,8 @@ console.log(startInfo)
 AnonymousLog.info(startInfo)
 
 // Initilization
-
 let Bot = require('./Core/bot')
 let Core = require('./core')
-Bot.Control.start()
 
 // online
 
