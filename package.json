@@ -43,7 +43,9 @@
     "request-promise": "^4.2.4",
     "socks-proxy-agent": "^4.0.2",
     "telegraf": "^3.32.0",
-    "zh-classify": "^0.1.1"
+    "zh-classify": "^0.1.1",
+    "minimist": ">=1.2.2",
+    "acorn": "^7.1.1"
   },
   "devDependencies": {
     "eslint": "^6.4.0"
