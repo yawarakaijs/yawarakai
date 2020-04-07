@@ -154,7 +154,7 @@ Core.cliInput('> ', input => {
                 AnonymousLog.trace(Lang.app.commandExecution + ": " + input)
                 break
             case '/telegram':
-                Bot.Telegram.command(input)
+                Core.command(input)
                 break
             case '/help':
                 console.log(Lang.app.cliAvailiableCommand + ": /telegram | /help | /[exit|stop]")
