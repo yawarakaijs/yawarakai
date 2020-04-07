@@ -75,56 +75,68 @@ let Register = {
                                         // Check if register commands exist
                                         if (compo.register.commands) {
                                             compo.register.commands.map(cmd => {
-                                                cmd.instance = compo.commands[cmd.function]
-                                                cmd.meta = compo.meta
-                                                Compo.command.push(cmd)
+                                                if (cmd.function !== undefined) {
+                                                    cmd.instance = compo.commands[cmd.function]
+                                                    cmd.meta = compo.meta
+                                                    Compo.command.push(cmd)
 
-                                                // Append the help text to compoHelp
-                                                compoPair.push(`/${cmd.function}`)
-                                                compoHelp.push(`/${cmd.function} ${cmd.help}`)
+                                                    // Append the help text to compoHelp
+                                                    compoPair.push(`/${cmd.function}`)
+                                                    compoHelp.push(`/${cmd.function} ${cmd.help}`)
+                                                }
                                             })
                                         }
                                         // Check if register inlines exist
                                         if (compo.register.inlines) {
                                             compo.register.inlines.map(iln => {
-                                                iln.instance = compo.inlines[iln.function]
-                                                iln.meta = compo.meta
-                                                Compo.inline.push(iln)
+                                                if (iln.function !== undefined) {
+                                                    iln.instance = compo.inlines[iln.function]
+                                                    iln.meta = compo.meta
+                                                    Compo.inline.push(iln)
+                                                }
                                             })
                                         }
                                         // Check if register message exist
                                         if (compo.register.messages) {
                                             compo.register.messages.map(msg => {
-                                                msg.instance = compo.messages[msg.function]
-                                                msg.meta = compo.meta
-                                                Compo.message.push(msg)
+                                                if (msg.function !== undefined) {
+                                                    msg.instance = compo.messages[msg.function]
+                                                    msg.meta = compo.meta
+                                                    Compo.message.push(msg)
+                                                }
                                             })
                                         }
                                         // Check if register callback Query exist
                                         if (compo.register.callbackQuery) {
                                             compo.register.callbackQuery.map(cbq => {
-                                                cbq.instance = compo.callbackQuery[cbq.function]
-                                                cbq.meta = compo.meta
-                                                Compo.callbackQuery.push(cbq)
+                                                if (cbq.function !== undefined) {
+                                                    cbq.instance = compo.callbackQuery[cbq.function]
+                                                    cbq.meta = compo.meta
+                                                    Compo.callbackQuery.push(cbq)
+                                                }
                                             })
                                         }
 
                                         // Check if register channel post exist
                                         if (compo.register.channelPost) {
                                             compo.register.channelPost.map(chp => {
-                                                chp.instance = compo.channelPost[chp.function]
-                                                chp.meta = compo.meta
-                                                Compo.channelPost.push(chp)
+                                                if (chp.function !== undefined) {
+                                                    chp.instance = compo.channelPost[chp.function]
+                                                    chp.meta = compo.meta
+                                                    Compo.channelPost.push(chp)
+                                                }
                                             })
                                         }
 
                                         // Check if register scene exist
                                         if (compo.register.scene) {
                                             compo.register.scenes.map(sce => {
-                                                sce.instance = compo.scenes[sce.name]
-                                                sce.function = sce.function
-                                                sce.meta = compo.meta
-                                                Compo.scene.push(sce)
+                                                if (sce.function !== undefined) {
+                                                    sce.instance = compo.scenes[sce.name]
+                                                    sce.function = sce.function
+                                                    sce.meta = compo.meta
+                                                    Compo.scene.push(sce)
+                                                }
                                             })
                                         }
 
