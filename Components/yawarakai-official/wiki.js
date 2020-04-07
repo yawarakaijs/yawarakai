@@ -11,7 +11,7 @@ let config = require('./config.json')
 
 let main = {
     async wiki (query, lang) {
-        return await axios.get(`https://${lang}.wikipedia.org/w/api.php`, {
+        return axios.get(`https://${lang}.wikipedia.org/w/api.php`, {
             params: {
                 format: "json",
                 action: "opensearch",
