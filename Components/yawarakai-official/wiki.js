@@ -1,6 +1,7 @@
 // Dependecies
 
 const axios = require('axios')
+const pMap = require('p-map');
 
 let Compo = require('../../component')
 
@@ -21,19 +22,23 @@ let main = {
                 limit: config.components.wiki.limit,
             }
         }).then(res => {
-            if (res.data instanceof Array && res.data.length === 4 && res.data[0] === query) {
-                return {
-                    titles: res.data[1],
-                    urls: res.data[3]
+            if (res.data instanceof Array && res.data.length === 4 && res.data[0] === query &&
+                res.data[1] instanceof Array && res.data[1].length > 0 && 
+                res.data[3] instanceof Array && res.data[3].length === res.data[1].length) {
+                let entries = new Array()
+                for (var i = 0; i < res.data[1].length; i++) {
+                    entries.push({
+                        title: res.data[1][i],
+                        url: res.data[3][i],
+                    })
                 }
+                return entries
             } else {
                 return undefined
             }
-        }).then(async res => {
-            if (res.titles instanceof Array && res.titles.length > 0 && 
-                res.urls instanceof Array && res.urls.length === res.titles.length) {
-                let result = new Array()
-                for (var i = 0; i < res.titles.length; i++) {
+        }).then(async entries => {
+            if (entries !== undefined) {
+                const mapper = async entry => {
                     const resp = await axios.get(`https://${lang}.wikipedia.org/w/api.php`, {
                         params: {
                             format: "json",
@@ -42,24 +47,26 @@ let main = {
                             exintro: true,
                             explaintext: true,
                             redirects: 1,
-                            titles: res.titles[i]
+                            titles: entry.title
                         }
                     })
                     if (resp.data.hasOwnProperty("query")) {
                         let pages = resp.data.query.pages
                         if (!pages.hasOwnProperty("-1")) {
                             let pageNum = Object.keys(pages).map(item => item.match(/\d+/)).pop()
-                            result.push({
+                            return {
                                 lang: lang,
                                 title: pages[pageNum].title,
                                 caption: pages[pageNum].extract.slice(0, 25) + "...",
                                 content: `*${pages[pageNum].title}* [@Wikipedia](https://${lang}.wikipedia.org/wiki/${query})` + "\n" + pages[pageNum].extract,
-                                url: res.urls[i]
-                            })
+                                url: entry.url
+                            }
                         }
                     }
+                    return undefined
                 }
-                return result
+                let result = await pMap(entries, mapper, {concurrency: 4})
+                return result.filter(elt => elt !== undefined)
             } else {
                 return undefined
             }
