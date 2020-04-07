@@ -11,7 +11,7 @@ npm install # or yarn install
 
 ## Configuration
 ```
-cp config.js.example config.json
+cp config.json.example config.json
 # Edit the info inside config.json
 ```
 
