@@ -30,6 +30,7 @@ Yawarakai provides a dynamical and powerful API for users to control the message
 
 ## Credits
 
+Query feature of Wiki and Component loader by [BlueCocoa](https://github.com/BlueCocoa)
 zh-CN, zh-TW, zh-HK, jp-JP Translation by [KagurazakaIzumi](https://github.com/KagurazakaIzumi)
 
 ## Change log
