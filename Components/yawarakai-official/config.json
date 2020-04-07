@@ -36,7 +36,8 @@
             "groupName": "yawarakai-official",
             "version": "v1.2.2",
             "author": ["Yawarakai Devs"],
-            "description": "Search keywords on Wikipedia"
+            "description": "Search keywords on Wikipedia",
+            "limit": 3
         },
         "comment": {
             "enable": true,
