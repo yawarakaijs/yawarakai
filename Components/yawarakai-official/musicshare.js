@@ -413,7 +413,7 @@ let main = {
             }
             else if (/^(\d+)(\/)?/gu) {
                 params["type"] = type
-                params["id"] = parseInt(src.replace("/", ""))
+                params["id"] = parseInt(src.replace("\/\d+", ""))
                 return params
             }
         }
