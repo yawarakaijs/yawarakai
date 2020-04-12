@@ -71,6 +71,19 @@ let remove = async (query, option) => {
     })
 }
 
+let Data = {
+    async createUserDatabase(set, userid) {
+        let path = "data/user/" + set + "/" + "u" + userid
+        let userDataPath = path.resolve(path)
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir)
+        }
+
+        let database = new Datastore({ filename: userDataPath, autoload: true })
+        return path
+    }
+}
+
 exports.update = update
 exports.remove = remove
 exports.insert = insert
