@@ -269,8 +269,9 @@ let main = {
                 if (response.statusCode != 200) {
                     reject()
                 }
-                response.pipe(file)
-                resolve(fileName)
+                response.pipe(file).on('close', () => {
+                    resolve(fileName)
+                })
             })
         })
     },
@@ -291,12 +292,13 @@ let main = {
                 if (response.statusCode != 200) {
                     reject()
                 }
-                response.pipe(file)
-                resolve(fileName)
+                response.pipe(file).on('close', () => {
+                    resolve(fileName)
+                })
             })
         })
     },
-    async writeTag(audioFile, picFile, info) {
+    writeTag(audioFile, picFile, info) {
         return new Promise((resolve, reject) => {
             let file = path.join(baseDir, "/cache/data/", audioFile)
             let image = fs.readFileSync(path.join(baseDir, "/cache/data/" + picFile))
