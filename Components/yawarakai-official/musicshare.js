@@ -630,6 +630,7 @@ exports.commands = {
                     return "是不是遇到了什么困难呢？"
                 }
                 else if (main.enterCount === 3) {
+                    main.enterCount++
                     return "点开网易云音乐，点击分享，点击复制链接，然后粘贴回复给我就好啦 QAQ"
                 }
                 else {
