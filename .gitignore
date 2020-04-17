@@ -7,10 +7,10 @@ log/
 logs/
 .vscode/
 node_modules/
+Components/
 data/
 
 yarn
 .eslintrc.json
-config.json
-!Components/*/config.json
+./config.json
 .DS_Store
