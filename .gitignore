@@ -12,5 +12,5 @@ data/
 
 yarn
 .eslintrc.json
-./config.json
+/config.json
 .DS_Store
