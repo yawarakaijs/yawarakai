@@ -50,7 +50,7 @@ catch (err) {
 
 let startInfo = Lang.app.startTime + "：" + Date() + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
 
-console.log("Yawarakai  Copyright (C) 2019  Yuna Hanami")
+console.log("Yawarakai  Copyright (C) 2019-2020  Yuna Hanami")
 console.log(startInfo)
 AnonymousLog.info(startInfo)
 
