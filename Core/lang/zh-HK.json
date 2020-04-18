@@ -51,7 +51,7 @@
         "disabled": "已禁用 ",
         "reloaded": "已重載 ",
         "component": "組件",
-        "noComponentFound": ["沒有加載部分組件","如果有安裝組件，請檢查 Components 資料夾是否存在於根目錄下"],
+        "noComponentFound": ["沒有加載部分組件","如果有安裝組件，請檢查 node_modules 資料夾是否存在於根目錄下"],
         "noValidConfigFound": ["沒有加載部分組件", "找到了組件目錄，如果安裝了組件，請檢查組件是否有 config.json 文件"],
         "configFileInvalid": ["ConfigFileInvalidError: \n", " 配置文件不正確或是無效"]
     }

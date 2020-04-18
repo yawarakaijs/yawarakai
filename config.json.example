@@ -1,5 +1,7 @@
 {
+    "offline": false,
     "debugmode": false,
+    "development": true,
     "coreName": "Yawarakai",
     "botname": "Bot Display Name",
     "token": "Bot API Token",

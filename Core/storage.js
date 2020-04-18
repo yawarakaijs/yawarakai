@@ -12,20 +12,24 @@ let config = require('../config.json')
 
 let mainDbPath = path.resolve(config.database.base)
 let sessionDbPath = path.resolve(config.database.session)
+
+let dataDir = path.parse(mainDbPath).dir
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir)
+}
+
 let mainDb
 let sessionDb
-let db
+// let sessionDb = new Datastore()
+let db = new Datastore()
 
-let init = () => {
-
-    let dataDir = path.parse(mainDbPath).dir
-    if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir)
-    }
-
+if (config.debugmode) {
+    mainDb = new Datastore()
+    sessionDb = new Datastore()
+}
+else {
     mainDb = new Datastore({ filename: mainDbPath, autoload: true })
     sessionDb = new Datastore({ filename: sessionDbPath, autoload: true })
-    db = new Datastore()
 }
 
 let insert = (data) => {
@@ -47,7 +51,7 @@ let find = (key) => {
     return new Promise((resolve, reject) => {
         db.find(key, (err, docs) => {
             if (err) reject(err)
-            if (docs.length === 0) reject(new Error("Cannot find query " + JSON.stringify(key))) 
+            if (docs.length === 0) reject(new Error("Cannot find query " + JSON.stringify(key)))
             resolve(docs)
         })
     })
@@ -67,7 +71,19 @@ let remove = async (query, option) => {
     })
 }
 
-exports.init = init
+let Data = {
+    async createUserDatabase(set, userid) {
+        let path = "data/user/" + set + "/" + "u" + userid
+        let userDataPath = path.resolve(path)
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir)
+        }
+
+        let database = new Datastore({ filename: userDataPath, autoload: true })
+        return path
+    }
+}
+
 exports.update = update
 exports.remove = remove
 exports.insert = insert

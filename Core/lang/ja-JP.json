@@ -38,7 +38,7 @@
             "commandParameterMissing": ["無効なパラメーター：","，必要なパラメーターが欠落していないか確認してください："],
             "commandInvalid": "パラメータコマンドが正しくありません \nエグゼクティブ /telegram h または /telegram help ヘルプを得るには",
             "helpCommand": "telegram コマンドは、開始および管理に使用されます Telegram Bot そして Telegram Client \n start     開始する Telegram Bot \n stop      やめて Telegram Bot",
-            "webhookSettingsWarning": "外部サーバーのコマンドラインモードを使用してWebhookを設定する場合、ここに表示されるWebhookは、Telegramサーバーに登録されたWebhookアドレスではない場合があります。"
+            "webhookSettingsWarning": "外部サーバーのコマンドラインモードを使用して Webhook を設定する場合、ここに表示される Webhook は、Telegram サーバーに登録された Webhook アドレスではない場合があります。"
         }
     },
     "core": {
@@ -51,8 +51,8 @@
         "disabled": "無効 ",
         "reloaded": "過負荷 ",
         "component": "部品",
-        "noComponentFound": ["一部のコンポーネントがロードされていません","コンポーネントがインストールされている場合は、ルートディレクトリにComponentsフォルダーが存在するかどうかを確認します。"],
-        "noValidConfigFound": ["一部のコンポーネントがロードされていません", "コンポーネントディレクトリが見つかりました。コンポーネントがインストールされている場合は、コンポーネントにconfig.jsonファイルがあるかどうかを確認してください"],
+        "noComponentFound": ["一部のコンポーネントがロードされていません","コンポーネントがインストールされている場合は、ルートディレクトリに node_modules フォルダーが存在するかどうかを確認します。"],
+        "noValidConfigFound": ["一部のコンポーネントがロードされていません", "コンポーネントディレクトリが見つかりました。コンポーネントがインストールされている場合は、コンポーネントに config.json ファイルがあるかどうかを確認してください"],
         "configFileInvalid": ["ConfigFileInvalidError: \n", " プロファイルが正しくないか無効です"]
     }
 }
