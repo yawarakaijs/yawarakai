@@ -111,3 +111,4 @@ let AnonymousLog = {
 exports.AnonymousLog = AnonymousLog
 exports.msgLog = messageStdout
 exports.Log = Log
+exports.LogFiles = [coreLogFileName, messageLogFileName]
