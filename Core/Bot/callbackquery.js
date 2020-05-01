@@ -130,6 +130,12 @@ let pp = {
     }
 }
 
+let broadcast = {
+    start(context) {
+
+    }
+}
+
 module.exports = {
     Control
 }
