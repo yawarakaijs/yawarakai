@@ -77,6 +77,7 @@ let Register = {
                     let compoDescription
                     let compoGroup
                     let compoVersion = compoPackageInfo.version
+                    let compoMetadataInfo
                     if (!fs.existsSync(path.resolve(folder + "/metadata.json"))) {
                         Log.Log.warning("No valid metadata.json found in component" + ` "${value}" ` + ", all names and alias will be processed as default value")
                         Log.Log.warning("If you are the developer of this component, you should consider add a metadata.json file for better context control.")
@@ -88,7 +89,7 @@ let Register = {
                     }
                     else {
                         delete require.cache[require.resolve(folder + "/metadata.json")]
-                        let compoMetadataInfo = require(folder + "/metadata.json")
+                        compoMetadataInfo = require(folder + "/metadata.json")
 
                         compoName = compoPackageInfo.name
                         compoDescription = compoMetadataInfo.description
@@ -165,7 +166,7 @@ let Register = {
                             }
 
                             // Check if register scene exist
-                            if (compo.register.scene) {
+                            if (compo.register.scenes) {
                                 compo.register.scenes.map(sce => {
                                     if (sce.function !== undefined) {
                                         sce.instance = compo.scenes[sce.name]
@@ -178,7 +179,6 @@ let Register = {
 
                             compos.path.push(path.join(value, compoName))
                             compos.entry.push(path.resolve(compoPath))
-                            console.log(compos)
                             compos.list.push(`${value} \x1b[34m${compoVersion}\x1b[0m from \x1b[33m${value}\x1b[0m`)
                             compos.name.push(compoName)
                             compoInfo.push(`${compoGroup}/${compoName}@${compoVersion}`)
