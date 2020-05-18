@@ -11,6 +11,7 @@ let Telegram = require("./Core/Bot/telegram")
 let Lang = require('./Core/lang')
 let packageInfo = require('./package.json')
 let Component = require('./component')
+let Admin = require('./Core/Bot/admin')
 
 let channelTime = new Date()
 let Bot = Telegram.Bot
@@ -102,6 +103,9 @@ let command = (cmd) => {
           break
       case 'stop':
           Bot.stop()
+          break
+      case 'admin':
+          Admin.cli(args)
           break
   }
 }

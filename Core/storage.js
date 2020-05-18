@@ -6,6 +6,7 @@ let Datastore = require('nedb')
 
 // Local Files
 
+let Log = require('../Core/log').Log
 let config = require('../config.json')
 
 // Storage
@@ -84,10 +85,27 @@ let Data = {
     }
 }
 
+let getAdmins = () => {
+    return new Promise ((resolve, reject) => {
+        mainDb.find({key: admin}, (err, docs) => {
+            if (err) Log.fatal(err)
+            if (docs.length === 0) {
+                let adminsDatabaseMissingError = new Error("Admin database encountered an error, check your files permissions and integrity")
+                adminsDatabaseMissingError.name = AdminDatabaseFatalError
+                reject(AdminDatabaseFatalError)
+            }
+            else {
+                resolve(docs.pop().users)
+            }
+        })
+    })
+}
+
 exports.update = update
 exports.remove = remove
 exports.insert = insert
 exports.find = find
+exports.getAdmins = getAdmins
 
 exports.yawarakai = mainDb
 exports.session = sessionDb

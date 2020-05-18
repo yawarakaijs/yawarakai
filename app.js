@@ -100,6 +100,17 @@ let mode = {
             }
         })
 
+        // init admin users array
+        Store.yawarakai.find({ key: "admins" }, (err, docs) => {
+            if (err) {
+                Log.fatal(err)
+                return
+            }
+            if (docs.length === 0) Store.yawarakai.insert({ key: "admins", users: [] }, (err, newDocs) => {
+                Log.info("Creating new admins user list sheet...")
+                if (err) Log.fatal(err)
+            })
+        })
     }
 }
 
