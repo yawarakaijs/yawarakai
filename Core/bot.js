@@ -9,6 +9,7 @@ let Message = require('./Bot/message')
 let Session = require('./session')
 let Command = require('./Bot/command').Command
 let Telegram = require('./Bot/telegram')
+let Discord = require('./Bot/discord')
 let Component = require('../component')
 let Composer = require('./manage/composer').Composer
 let CallbackQuery = require('./Bot/callbackquery')
@@ -33,6 +34,7 @@ Component.Register.load()
 
 let Bot = {
     telegram: Telegram.Bot.telegram,
+    discord: Discord.Bot,
     DiagnosticLog: DiagnosticLog,
     commandParse(ctx) {
         let commandArgs = ctx.message.text.split(" ")
@@ -134,52 +136,6 @@ let Bot = {
         return await sce.function.call(this, context)
     }
 }
-
-// Component Management
-
-Telegram.Bot.use(async (ctx, next) => {
-
-    // todo: read admin id from a secure data source
-    if (ctx.updateSubTypes[0] != 'text' || ctx.from.id != config.admin) {
-        await next()
-        return
-    }
-
-    let message = ctx.message.text.trim()
-    let packageCommandMatches = message.match(/^\/(add|remove)[\s]+([^\s]+)$/i)
-    let resultMessage = undefined
-    if (packageCommandMatches) {
-        let action = packageCommandMatches[1]
-        let package = packageCommandMatches[2]
-        Log.debug(`admin ${ctx.from.username}[${ctx.from.id}] wants to ${action} ${package}`)
-        
-        let actionFunc = Composer.add
-        if (action === 'remove') {
-            actionFunc = Composer.remove
-        }
-
-        Telegram.Bot.telegram.sendMessage(ctx.message.from.id, `${action}ing ${package}...`, {
-            reply_to_message_id: ctx.message.message_id,
-            parse_mode: "Markdown"
-        })
-        let code = await actionFunc(package)
-        if (code == 0) {
-            resultMessage = `${package} has been successfully ${action == 'add' ? "installed" : "removed"}!`
-        } else {
-            resultMessage = `Failed to ${action} ${package}: ${code}`
-        }
-
-        Log.info(resultMessage)
-        Telegram.Bot.telegram.sendMessage(ctx.message.from.id, resultMessage, {
-            reply_to_message_id: ctx.message.message_id,
-            parse_mode: "Markdown"
-        })
-
-        return
-    }
-
-    await next()
-})
 
 // Message Log
 
@@ -290,6 +246,77 @@ Telegram.Bot.use(async (ctx, next) => {
         else {
             ctx.replyWithChatAction("typing")
             ctx.reply(data, { reply_to_message_id: ctx.message.message_id })
+        }
+    }
+
+    await next()
+})
+
+// Component Management
+
+Telegram.Bot.use(async (ctx, next) => {
+    if (ctx.updateSubTypes[0] != 'text') {
+        await next()
+        return
+    }
+
+    let getAdmin = () => {
+        return new Promise((resolve, reject) => {
+            Store.yawarakai.find({ key: "admins" }, (err, docs) => {
+                if (err) {
+                    Log.fatal(`Cannot get admins from database`)
+                }
+                let admins = docs.pop().users
+                if (admins.length === 0) {
+                    reject(new Error("Cannot find admins, please set admins in cli first"))
+                } else {
+                    resolve(admins)
+                }
+            })
+        })
+    }
+
+    let admins = await getAdmin().catch(e => {
+        Log.fatal(e)
+        Telegram.Bot.telegram.sendMessage(ctx.message.from.id, "Cannot find admins, please set admins in cli first", {
+            reply_to_message_id: ctx.message.message_id,
+            parse_mode: "Markdown"
+        })
+    })
+    
+    
+    if (admins.includes(context.from.id)) {
+        let message = ctx.message.text.trim()
+        let packageCommandMatches = message.match(/^\/(add|remove)[\s]+([^\s]+)$/i)
+        let resultMessage = undefined
+        if (packageCommandMatches) {
+            let action = packageCommandMatches[1]
+            let package = packageCommandMatches[2]
+            Log.debug(`admin ${ctx.from.username}[${ctx.from.id}] wants to ${action} ${package}`)
+
+            let actionFunc = Composer.add
+            if (action === 'remove') {
+                actionFunc = Composer.remove
+            }
+
+            Telegram.Bot.telegram.sendMessage(ctx.message.from.id, `${action}ing ${package}...`, {
+                reply_to_message_id: ctx.message.message_id,
+                parse_mode: "Markdown"
+            })
+            let code = await actionFunc(package)
+            if (code == 0) {
+                resultMessage = `${package} has been successfully ${action == 'add' ? "installed" : "removed"}!`
+            } else {
+                resultMessage = `Failed to ${action} ${package}: ${code}`
+            }
+
+            Log.info(resultMessage)
+            Telegram.Bot.telegram.sendMessage(ctx.message.from.id, resultMessage, {
+                reply_to_message_id: ctx.message.message_id,
+                parse_mode: "Markdown"
+            })
+
+            return
         }
     }
 

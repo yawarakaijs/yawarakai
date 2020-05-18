@@ -228,7 +228,7 @@ let Interface = {
 }
 
 let Data = {
-    admin: config.admin
+    telegramAdmin: config.telegram.admin
 }
 
 // Exports

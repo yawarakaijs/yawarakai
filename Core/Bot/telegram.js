@@ -21,12 +21,12 @@ let agent = new SocksProxyAgent(proxy)
 let Bot
 
 if(config.proxy.enable) {
-    Bot = new Telegraf(config.token, { telegram: { agent: agent } }).catch(err => {
+    Bot = new Telegraf(config.telegram.token, { telegram: { agent: agent } }).catch(err => {
         Log.DiagnosticLog.fatal(err)
     })
 }
 else {
-    Bot = new Telegraf(config.token).catch(err => {
+    Bot = new Telegraf(config.telegram.token).catch(err => {
         Log.DiagnosticLog.fatal(err)
     })
 }

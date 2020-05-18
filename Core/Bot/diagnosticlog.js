@@ -14,30 +14,30 @@ const LogFiles = require('../log').LogFiles
 let DiagnosticLog = {
     info: (text) => {
         DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable) {
-            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "📄 Info\n" + text)
+        if (config.telegram.diagnosticChannel.enable) {
+            Telegram.Bot.telegram.sendMessage(`${config.telegram.diagnosticChannel.channel}`, "📄 Info\n" + text)
             DiagnosticLog.attachLog()
         }
     },
     debug: (text) => {
         DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
-            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚙️ Debug\n" + text)
+        if (config.telegram.diagnosticChannel.enable && DiagnosticLog.count == 0) {
+            Telegram.Bot.telegram.sendMessage(`${config.telegram.diagnosticChannel.channel}`, "⚙️ Debug\n" + text)
             DiagnosticLog.attachLog()
         }
         Log.debug(text)
     },
     warning: (text) => {
         DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
-            Telegram.Bot.telegram.sendMessage(`${config.diagnosticChannel.channel}`, "⚠️ Warning\n" + text)
+        if (config.telegram.diagnosticChannel.enable && DiagnosticLog.count == 0) {
+            Telegram.Bot.telegram.sendMessage(`${config.telegram.diagnosticChannel.channel}`, "⚠️ Warning\n" + text)
             DiagnosticLog.attachLog()
         }
         Log.warning(text)
     },
     fatal: (text) => {
         DiagnosticLog.counter(text)
-        if (config.diagnosticChannel.enable && DiagnosticLog.count == 0) {
+        if (config.telegram.diagnosticChannel.enable && DiagnosticLog.count == 0) {
             let stack
             if (__dirname.includes(":\\")) {
                 let trimmer = __dirname.replace(/\\Core/gu, "")
@@ -49,7 +49,7 @@ let DiagnosticLog = {
                 let trimmer = new RegExp(__dirname.replace(/\/Core/gu, ""), "gu")
                 stack = JSON.stringify(text.stack).replace(trimmer, ".")
             }
-            Telegram.Bot.telegram.sendMessage(`@${config.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
+            Telegram.Bot.telegram.sendMessage(`@${config.telegram.diagnosticChannel.channel}`, "🚨 Fatal\n" + JSON.parse(stack))
             DiagnosticLog.attachLog()
         }
         Log.fatal(text)
@@ -69,8 +69,8 @@ let DiagnosticLog = {
     },
     count: 0,
     attachLog: async () => {
-        if (config.diagnosticChannel.enable && config.diagnosticChannel.attachLog.enable) {
-            let numberOfLines = parseInt(config.diagnosticChannel.attachLog.line)
+        if (config.telegram.diagnosticChannel.enable && config.telegram.diagnosticChannel.attachLog.enable) {
+            let numberOfLines = parseInt(config.telegram.diagnosticChannel.attachLog.line)
             if (!isNaN(numberOfLines)) {
                 for (let logFile of LogFiles) {
                     let snapshot = await DiagnosticLog.snapshotLogFile(logFile).catch(err => {
@@ -88,7 +88,7 @@ let DiagnosticLog = {
                         fs.writeSync(fd, "\n")
                     }
                     fs.close(fd)
-                    Telegram.Bot.telegram.sendDocument(`@${config.diagnosticChannel.channel}`, {
+                    Telegram.Bot.telegram.sendDocument(`@${config.telegram.diagnosticChannel.channel}`, {
                         source: fs.readFileSync(partialSnapshotFile),
                         filename: path.basename(partialSnapshotFile)
                     })
