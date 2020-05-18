@@ -9,7 +9,6 @@ let Control = {
         args = args.slice(2)
         switch (args[0]) {
             case "--set":
-                console.log(args)
                 Store.yawarakai.find({ key: "admins" }, (err, docs) => {
                     if (err) Log.fatal(err)
                     if (docs.length === 0) {
@@ -21,9 +20,6 @@ let Control = {
                                 Log.fatal("Database encountered error, check your file permissions and integrity")
                                 return undefined
                             }
-                            Store.yawarakai.find({ key: "admins" }, (err, docs) => {
-                                if (docs.length !== 0) console.log(docs)
-                            })
                             Log.info(`Successfully set user ${args[1]} as admin`)
                             Store.yawarakai.find({ key: "admins" }, (err, docs) => {
                                 if (docs.length !== 0) Log.info(`Now admins: ${docs.pop().users}`)

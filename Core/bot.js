@@ -128,6 +128,7 @@ let Bot = {
     },
     async sceneDistributor(context) {
         let sce = Component.Compo.scene.find(scene => {
+            if (scene.name === SceneControl.scene(context.ctx.message.from.id))
             return scene.name === SceneControl.scene(context.ctx.message.from.id)
         })
         if (!sce) { return undefined }
@@ -204,18 +205,16 @@ Telegram.Bot.use(async (ctx, next) => {
         return
     }
 
-    let user
     let me = await Telegram.Bot.telegram.getMe()
     let botname = config.botname != "" ? config.botname : me.first_name
 
     let isFirst = await Session.User.isFirst(ctx.message.from.id)
     if (isFirst) {
-        user = new Session.UserSession(ctx.message.from.id)
 
         let tos = `感谢你选择使用${botname}！` + "\n\n" +
             "真的很抱歉打扰你的使用，为了你的数据安全和我的法律责任，必须声明一" +
             "些注意事项，也需要你同意之后才能正常使用全部的功能。\n" +
-            "本 Bot 使用的开源项目位于 https://github.com/hanamiyuna/yawarakai\n\n" +
+            "本 Bot 使用的开源项目位于 https://github.com/yawarakaijs/yawarakai\n\n" +
             `以下称为 **本 Bot** 的内容均等同于描述本 Telegram Bot **@${me.username}**\n\n` +
             "使用本 Bot 提供的功能和服务所造成的一切对现实世界所产生的后果，本 Bot 和开发者不负责，" +
             "因为使用了不同的组件，部分功能可能来源于第三方开发者，所产生的数据和流量，以及个人信息数" +
@@ -244,8 +243,9 @@ Telegram.Bot.use(async (ctx, next) => {
                 disable_web_page_preview: true
             })
     }
-
-    await next()
+    else {
+        await next()
+    }
 })
 
 // Scene Check
