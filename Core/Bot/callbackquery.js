@@ -39,11 +39,11 @@ let tos = {
             }
 
             context.telegram.deleteMessage(
-                context.ctx.update.callback_query.message.chat.id,
+                id,
                 context.ctx.update.callback_query.message.message_id
             )
-            context.telegram.sendMessage(context.ctx.update.callback_query.message.chat.id, "谢谢你w")
-            context.telegram.sendMessage(context.ctx.update.callback_query.message.chat.id, pp.pp, {
+            context.telegram.sendMessage(id, "谢谢你w")
+            context.telegram.sendMessage(id, pp.pp, {
                 parse_mode: "Markdown",
                 reply_markup: {
                     inline_keyboard: [[
@@ -61,7 +61,7 @@ let tos = {
                 disable_web_page_preview: true,
             })
         })
-
+        let user = new Session.UserSession(context.ctx.update.callback_query.from.id)
         return true
     },
     disagree(context) {
