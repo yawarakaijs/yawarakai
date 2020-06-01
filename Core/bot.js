@@ -136,6 +136,8 @@ let Bot = {
     }
 }
 
+// Cencel Scene
+
 // Component Management
 
 Telegram.Bot.use(async (ctx, next) => {
@@ -264,6 +266,7 @@ Telegram.Bot.use(async (ctx, next) => {
         if (!sceData) {
             Bot.sceneDistributor(context)
         }
+        ctx.sceneEntered = true
     }
     else {
         let data = await Bot.messasgeDistributor(ctx)
@@ -305,7 +308,7 @@ Telegram.Bot.use(async (ctx, next) => {
         return
     }
 
-    if (/^\/\w+/gui.test(ctx.message.text)) {
+    if (!ctx.sceneEntered && /^\/\w+/gui.test(ctx.message.text)) {
         if (/^\/\w+@\w+/.test(ctx.message.text) && !ctx.message.text.includes(me.username)) {
             return
         }
