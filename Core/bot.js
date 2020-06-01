@@ -316,8 +316,9 @@ Telegram.Bot.use(async (ctx, next) => {
                     Log.fatal(`Cannot get admins from database`)
                 }
                 let admins = docs.pop().users
+
                 if (admins.length === 0) {
-                    reject(new Error("Cannot find admins, please set admins in cli first"))
+                    resolve([])
                 } else {
                     resolve(admins)
                 }
@@ -325,16 +326,13 @@ Telegram.Bot.use(async (ctx, next) => {
         })
     }
 
-    let admins = await getAdmin().catch(e => {
-        Log.fatal(e)
-        Telegram.Bot.telegram.sendMessage(ctx.message.from.id, "Cannot find admins, please set admins in cli first", {
-            reply_to_message_id: ctx.message.message_id,
-            parse_mode: "Markdown"
-        })
-    })
-    
-    
-    if (admins.includes(context.from.id)) {
+    let admins = await getAdmin()
+    if (!admins.includes(ctx.from.id))
+    {
+        await next()
+    }
+    else
+    {
         let message = ctx.message.text.trim()
         let packageCommandMatches = message.match(/^\/(add|remove)[\s]+([^\s]+)$/i)
         let resultMessage = undefined
@@ -367,9 +365,8 @@ Telegram.Bot.use(async (ctx, next) => {
 
             return
         }
+        await next()
     }
-
-    await next()
 })
 
 // Command
