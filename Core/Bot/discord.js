@@ -12,6 +12,8 @@ client.on('message', msg => {
   }
 });
 
-client.login(config.discord.token);
+if (config.discord.enable) {
+  client.login(config.discord.token);
+}
 
 exports.Bot = client

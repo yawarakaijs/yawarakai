@@ -138,6 +138,54 @@ let Bot = {
     }
 }
 
+// Cencel Scene
+
+// Component Management
+
+Telegram.Bot.use(async (ctx, next) => {
+
+    // todo: read admin id from a secure data source
+    if (ctx.updateSubTypes[0] != 'text' || ctx.from.id != config.admin) {
+        await next()
+        return
+    }
+
+    let message = ctx.message.text.trim()
+    let packageCommandMatches = message.match(/^\/(add|remove)[\s]+([^\s]+)$/i)
+    let resultMessage = undefined
+    if (packageCommandMatches) {
+        let action = packageCommandMatches[1]
+        let package = packageCommandMatches[2]
+        Log.debug(`admin ${ctx.from.username}[${ctx.from.id}] wants to ${action} ${package}`)
+        
+        let actionFunc = Composer.add
+        if (action === 'remove') {
+            actionFunc = Composer.remove
+        }
+
+        Telegram.Bot.telegram.sendMessage(ctx.message.from.id, `${action}ing ${package}...`, {
+            reply_to_message_id: ctx.message.message_id,
+            parse_mode: "Markdown"
+        })
+        let code = await actionFunc(package)
+        if (code == 0) {
+            resultMessage = `${package} has been successfully ${action == 'add' ? "installed" : "removed"}!`
+        } else {
+            resultMessage = `Failed to ${action} ${package}: ${code}`
+        }
+
+        Log.info(resultMessage)
+        Telegram.Bot.telegram.sendMessage(ctx.message.from.id, resultMessage, {
+            reply_to_message_id: ctx.message.message_id,
+            parse_mode: "Markdown"
+        })
+
+        return
+    }
+
+    await next()
+})
+
 // Message Log
 
 Telegram.Bot.use(async (ctx, next) => {
@@ -220,6 +268,7 @@ Telegram.Bot.use(async (ctx, next) => {
         if (!sceData) {
             Bot.sceneDistributor(context)
         }
+        ctx.sceneEntered = true
     }
     else {
         let data = await Bot.messasgeDistributor(ctx)
@@ -332,7 +381,7 @@ Telegram.Bot.use(async (ctx, next) => {
         return
     }
 
-    if (/^\/\w+/gui.test(ctx.message.text)) {
+    if (!ctx.sceneEntered && /^\/\w+/gui.test(ctx.message.text)) {
         if (/^\/\w+@\w+/.test(ctx.message.text) && !ctx.message.text.includes(me.username)) {
             return
         }
