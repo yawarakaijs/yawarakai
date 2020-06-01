@@ -25,6 +25,7 @@
         },
     },
     "discord": {
+        "enable": false,
         "token": "",
     },
     "database": {
