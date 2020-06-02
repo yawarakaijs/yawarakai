@@ -8,6 +8,7 @@ let Lang = require('../lang')
 let Scene = require('./scene')
 let Admin = require('./admin')
 let config = require('../../config.json')
+let Broadcast = require('./broadcast')
 let Component = require('../../component')
 let packageInfo = require('../../package.json')
 let SceneControl = require('./processor/sceneprocessor').SceneControl
@@ -18,7 +19,7 @@ let Command = {
     switcher (context) {
         switch(context.cmd) {
             case "help":
-                let basics = Lang.bot.command.help + "\n\n" + Lang.bot.command.start + "\n" + Lang.bot.command.info + "\n" + Lang.bot.command.settings + "\n"
+                let basics = Lang.bot.command.help + "\n\n" + Lang.bot.command.start + "\n" + Lang.bot.command.info + "\n" + Lang.bot.command.settings + "\n" + Lang.bot.command.cancel + "\n"
                 return basics + "\n" + Component.compoHelp.join("\n")
             case "start":
                 return `你好哦，感谢使用${config.botname}呢。\n如果不知道怎么使用的话，可以使用 /help 查阅相关的帮助信息`
@@ -31,11 +32,14 @@ let Command = {
                 return "meow"
             case "hug":
                 return "抱抱"
+            case "broadcast":
+                // Broadcast.start(context)
+                return true
             case "cancel":
                 SceneControl.exit(context.ctx)
                 return undefined
             case "admin":
-                Admin.Control.start(context)
+                // Admin.start(context)
                 return true
             case "match":
                 Scene.switcher(context, 'nlpmatch')

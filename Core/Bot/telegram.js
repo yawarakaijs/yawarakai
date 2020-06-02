@@ -10,7 +10,7 @@ let Log = require('../log')
 
 // Proxy
 // SOCKS proxy to connect to
-let proxy = process.env.socks_proxy || config.proxy.url
+let proxy = process.env.socks_proxy || config.telegram.proxy.url
 
 // create an instance of the `SocksProxyAgent` class with the proxy server information
 let agent = new SocksProxyAgent(proxy)
@@ -20,13 +20,13 @@ let agent = new SocksProxyAgent(proxy)
 
 let Bot
 
-if(config.proxy.enable) {
-    Bot = new Telegraf(config.token, { telegram: { agent: agent } }).catch(err => {
+if(config.telegram.proxy.enable) {
+    Bot = new Telegraf(config.telegram.token, { telegram: { agent: agent } }).catch(err => {
         Log.DiagnosticLog.fatal(err)
     })
 }
 else {
-    Bot = new Telegraf(config.token).catch(err => {
+    Bot = new Telegraf(config.telegram.token).catch(err => {
         Log.DiagnosticLog.fatal(err)
     })
 }

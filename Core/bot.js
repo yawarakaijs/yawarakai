@@ -9,7 +9,9 @@ let Message = require('./Bot/message')
 let Session = require('./session')
 let Command = require('./Bot/command').Command
 let Telegram = require('./Bot/telegram')
+let Discord = require('./Bot/discord')
 let Component = require('../component')
+let Composer = require('./manage/composer').Composer
 let CallbackQuery = require('./Bot/callbackquery')
 let SceneControl = require('./Bot/processor/sceneprocessor').SceneControl
 
@@ -32,6 +34,7 @@ Component.Register.load()
 
 let Bot = {
     telegram: Telegram.Bot.telegram,
+    discord: Discord.Bot,
     DiagnosticLog: DiagnosticLog,
     commandParse(ctx) {
         let commandArgs = ctx.message.text.split(" ")
@@ -127,12 +130,14 @@ let Bot = {
     },
     async sceneDistributor(context) {
         let sce = Component.Compo.scene.find(scene => {
-            return scene.name === SceneControl.scene(context.ctx.message.from.id)
+            if (scene.name === SceneControl.scene(context.ctx.message.from.id))
+                return scene.name === SceneControl.scene(context.ctx.message.from.id)
         })
         if (!sce) { return undefined }
         return await sce.function.call(this, context)
     }
 }
+
 
 // Message Log
 
@@ -148,6 +153,77 @@ Telegram.Bot.use(async (ctx, next) => {
     await next()
 })
 
+// Cancel Scene
+
+Telegram.Bot.use(async (ctx, next) => {
+    if (ctx.updateSubTypes[0] != 'text') {
+        await next()
+    }
+    else if (Bot.commandParse(ctx).cmd == "cancel") {
+        if (SceneControl.has(ctx.from.id)) {
+            SceneControl.exit(ctx)
+            Telegram.Bot.telegram.sendMessage(ctx.from.id, "所有在进行的进程都取消了呢。")
+        }
+        else {
+            Telegram.Bot.telegram.sendMessage(ctx.from.id, "没有任何在进行的活动可以取消了哦。")
+        }
+    }
+    else if (Bot.commandParse(ctx).cmd == "help") {
+        let basics = Lang.bot.command.help + "\n\n" + Lang.bot.command.start + "\n" + Lang.bot.command.info + "\n" + Lang.bot.command.settings + "\n" + Lang.bot.command.cancel + "\n"
+        basics = basics + "\n" + Component.compoHelp.join("\n")
+        Telegram.Bot.telegram.sendMessage(ctx.from.id, basics)
+    }
+    else {
+        await next()
+    }
+})
+
+// Component Management
+
+Telegram.Bot.use(async (ctx, next) => {
+
+    // todo: read admin id from a secure data source
+    if (ctx.updateSubTypes[0] != 'text' || ctx.from.id != config.admin) {
+        await next()
+        return
+    }
+
+    let message = ctx.message.text.trim()
+    let packageCommandMatches = message.match(/^\/(add|remove)[\s]+([^\s]+)$/i)
+    let resultMessage = undefined
+    if (packageCommandMatches) {
+        let action = packageCommandMatches[1]
+        let package = packageCommandMatches[2]
+        Log.debug(`admin ${ctx.from.username}[${ctx.from.id}] wants to ${action} ${package}`)
+
+        let actionFunc = Composer.add
+        if (action === 'remove') {
+            actionFunc = Composer.remove
+        }
+
+        Telegram.Bot.telegram.sendMessage(ctx.message.from.id, `${action}ing ${package}...`, {
+            reply_to_message_id: ctx.message.message_id,
+            parse_mode: "Markdown"
+        })
+        let code = await actionFunc(package)
+        if (code == 0) {
+            resultMessage = `${package} has been successfully ${action == 'add' ? "installed" : "removed"}!`
+        } else {
+            resultMessage = `Failed to ${action} ${package}: ${code}`
+        }
+
+        Log.info(resultMessage)
+        Telegram.Bot.telegram.sendMessage(ctx.message.from.id, resultMessage, {
+            reply_to_message_id: ctx.message.message_id,
+            parse_mode: "Markdown"
+        })
+
+        return
+    }
+
+    await next()
+})
+
 // ToS Check and Session Check
 
 Telegram.Bot.use(async (ctx, next) => {
@@ -157,18 +233,16 @@ Telegram.Bot.use(async (ctx, next) => {
         return
     }
 
-    let user
     let me = await Telegram.Bot.telegram.getMe()
     let botname = config.botname != "" ? config.botname : me.first_name
 
     let isFirst = await Session.User.isFirst(ctx.message.from.id)
     if (isFirst) {
-        user = new Session.UserSession(ctx.message.from.id)
 
         let tos = `感谢你选择使用${botname}！` + "\n\n" +
             "真的很抱歉打扰你的使用，为了你的数据安全和我的法律责任，必须声明一" +
             "些注意事项，也需要你同意之后才能正常使用全部的功能。\n" +
-            "本 Bot 使用的开源项目位于 https://github.com/hanamiyuna/yawarakai\n\n" +
+            "本 Bot 使用的开源项目位于 https://github.com/yawarakaijs/yawarakai\n\n" +
             `以下称为 **本 Bot** 的内容均等同于描述本 Telegram Bot **@${me.username}**\n\n` +
             "使用本 Bot 提供的功能和服务所造成的一切对现实世界所产生的后果，本 Bot 和开发者不负责，" +
             "因为使用了不同的组件，部分功能可能来源于第三方开发者，所产生的数据和流量，以及个人信息数" +
@@ -197,8 +271,9 @@ Telegram.Bot.use(async (ctx, next) => {
                 disable_web_page_preview: true
             })
     }
-
-    await next()
+    else {
+        await next()
+    }
 })
 
 // Scene Check
@@ -217,6 +292,7 @@ Telegram.Bot.use(async (ctx, next) => {
         if (!sceData) {
             Bot.sceneDistributor(context)
         }
+        ctx.sceneEntered = true
     }
     else {
         let data = await Bot.messasgeDistributor(ctx)
@@ -249,6 +325,72 @@ Telegram.Bot.use(async (ctx, next) => {
     await next()
 })
 
+// Component Management
+
+Telegram.Bot.use(async (ctx, next) => {
+    if (ctx.updateSubTypes[0] != 'text') {
+        await next()
+        return
+    }
+
+    let getAdmin = () => {
+        return new Promise((resolve, reject) => {
+            Store.yawarakai.find({ key: "admins" }, (err, docs) => {
+                if (err) {
+                    Log.fatal(`Cannot get admins from database`)
+                }
+                let admins = docs.pop().users
+
+                if (admins.length === 0) {
+                    resolve([])
+                } else {
+                    resolve(admins)
+                }
+            })
+        })
+    }
+
+    let admins = await getAdmin()
+    if (!admins.includes(ctx.from.id)) {
+        await next()
+    }
+    else {
+        let message = ctx.message.text.trim()
+        let packageCommandMatches = message.match(/^\/(add|remove)[\s]+([^\s]+)$/i)
+        let resultMessage = undefined
+        if (packageCommandMatches) {
+            let action = packageCommandMatches[1]
+            let package = packageCommandMatches[2]
+            Log.debug(`admin ${ctx.from.username}[${ctx.from.id}] wants to ${action} ${package}`)
+
+            let actionFunc = Composer.add
+            if (action === 'remove') {
+                actionFunc = Composer.remove
+            }
+
+            Telegram.Bot.telegram.sendMessage(ctx.message.from.id, `${action}ing ${package}...`, {
+                reply_to_message_id: ctx.message.message_id,
+                parse_mode: "Markdown"
+            })
+            let code = await actionFunc(package)
+            if (code == 0) {
+                resultMessage = `${package} has been successfully ${action == 'add' ? "installed" : "removed"}!`
+            } else {
+                resultMessage = `Failed to ${action} ${package}: ${code}`
+            }
+
+            Log.info(resultMessage)
+            Telegram.Bot.telegram.sendMessage(ctx.message.from.id, resultMessage, {
+                reply_to_message_id: ctx.message.message_id,
+                parse_mode: "Markdown"
+            })
+
+            return
+        }
+        await next()
+    }
+})
+
 // Command
 
 Telegram.Bot.use(async (ctx, next) => {
@@ -258,7 +400,7 @@ Telegram.Bot.use(async (ctx, next) => {
         return
     }
 
-    if (/^\/\w+/gui.test(ctx.message.text)) {
+    if (!ctx.sceneEntered && /^\/\w+/gui.test(ctx.message.text)) {
         if (/^\/\w+@\w+/.test(ctx.message.text) && !ctx.message.text.includes(me.username)) {
             return
         }

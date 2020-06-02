@@ -5,3 +5,12 @@
 // Local Packages
 
 let Store = require('../storage')
+
+let Control = {
+    start(context) {
+        
+    }
+}
+
+exports.start = Control.start
+exports.Control = Control

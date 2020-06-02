@@ -48,7 +48,7 @@ catch (err) {
     process.exit(1)
 }
 
-let startInfo = Lang.app.startTime + "：" + Date() + " - " + config.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
+let startInfo = Lang.app.startTime + "：" + Date() + " - " + config.telegram.botname + " " + Lang.app.coreVersion + ": " + packageInfo.version
 
 console.log("Yawarakai  Copyright (C) 2019-2020  Yuna Hanami")
 console.log(startInfo)
@@ -100,6 +100,17 @@ let mode = {
             }
         })
 
+        // init admin users array
+        Store.yawarakai.find({ key: "admins" }, (err, docs) => {
+            if (err) {
+                Log.fatal(err)
+                return
+            }
+            if (docs.length === 0) Store.yawarakai.insert({ key: "admins", users: [] }, (err, newDocs) => {
+                Log.info("Creating new admins user list sheet...")
+                if (err) Log.fatal(err)
+            })
+        })
     }
 }
 

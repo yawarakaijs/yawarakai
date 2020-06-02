@@ -3,20 +3,30 @@
     "debugmode": false,
     "development": true,
     "coreName": "Yawarakai",
-    "botname": "Bot Display Name",
-    "token": "Bot API Token",
-    "admin": 915672797,
-    "webhook": {
-        "url": "",
-        "port" : 8000
+    "telegram": {
+        "botname": "Bot Display Name",
+        "token": "Bot API Token",
+        "admin": 915672797,
+        "webhook": {
+            "url": "",
+            "port" : 8000
+        },
+        "proxy": {
+            "enable": false,
+            "url": "socks://127.0.0.1:1080"
+        },
+        "diagnosticChannel": {
+            "enable": false,
+            "channel": "Channel Username or Channel ID",
+            "attachLog": {
+                "enable": false,
+                "line": 100
+            }
+        },
     },
-    "proxy": {
+    "discord": {
         "enable": false,
-        "url": "socks://127.0.0.1:1080"
-    },
-    "diagnosticChannel": {
-        "enable": false,
-        "channel": "Channel Username or Channel ID"
+        "token": "",
     },
     "database": {
         "base": "data/yawarakai.db",
