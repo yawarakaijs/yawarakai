@@ -85,17 +85,44 @@ let Data = {
     }
 }
 
+let adminsDatabaseMissingError = new Error("Admin database encountered an error, check your files permissions and integrity")
+adminsDatabaseMissingError.name = "AdminDatabaseFatalError"
+
 let getAdmins = () => {
-    return new Promise ((resolve, reject) => {
-        mainDb.find({key: admin}, (err, docs) => {
+    return new Promise((resolve, reject) => {
+        mainDb.find({ key: admin }, (err, docs) => {
             if (err) Log.fatal(err)
             if (docs.length === 0) {
-                let adminsDatabaseMissingError = new Error("Admin database encountered an error, check your files permissions and integrity")
-                adminsDatabaseMissingError.name = AdminDatabaseFatalError
-                reject(AdminDatabaseFatalError)
+                reject(adminsDatabaseMissingError)
             }
             else {
                 resolve(docs.pop().users)
+            }
+        })
+    })
+}
+
+let isAdmin = (id) => {
+    id = id + ""
+    return new Promise((resolve, reject) => {
+        mainDb.find({ key: "admins" }, (err, docs) => {
+            if (err) Log.fatal(err)
+            if (docs.length === 0) {
+                reject(adminsDatabaseMissingError)
+            }
+            else {
+                let users = docs.pop().users
+                try {
+                    if (users.includes(id)) {
+                        resolve(true)
+                    }
+                    else {
+                        resolve(false)
+                    }
+                }
+                catch (err) {
+                    Log.fatal(err)
+                }
             }
         })
     })
@@ -106,6 +133,7 @@ exports.remove = remove
 exports.insert = insert
 exports.find = find
 exports.getAdmins = getAdmins
+exports.isAdmin = isAdmin
 
 exports.yawarakai = mainDb
 exports.session = sessionDb
