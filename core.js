@@ -85,17 +85,17 @@ let command = (cmd) => {
           }
           break
       case 'start':
-          Log.Log.info("Telegram Bot: " + config.botname + Lang.app.starting)
+          Log.Log.info("Telegram Bot: " + config.telegram.botname + Lang.app.starting)
           Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.telegram.webhook.url == '' ? "127.0.0.1" : config.telegram.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.telegram.webhook.port}`)
           Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
           if(config.telegram.diagnosticChannel.enable) {
-              Bot.telegram.sendMessage("@" + config.telegram.diagnosticChannel.channel,`📄 Info\n${config.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.compoInfo.join("\n")}`).catch(err => Log.Log.fatal(err))
+              Bot.telegram.sendMessage("@" + config.telegram.diagnosticChannel.channel,`📄 Info\n${config.telegram.botname} ${packageInfo.version} Connected to Telegram\n${channelTime.toISOString()}\n${Component.compoInfo.join("\n")}`).catch(err => Log.Log.fatal(err))
           }
           webhookUrl != undefined ? Bot.telegram.setWebhook(webhookUrl).catch(err => Log.Log.fatal(err)) : Bot.telegram.setWebhook("127.0.0.1")
           Bot.startWebhook('/', null, webhookPort != undefined ? webhookPort : 8000)
           break
       case 'debug':
-          Log.Log.info("Telegram Bot: " + config.botname + Lang.app.starting)
+          Log.Log.info("Telegram Bot: " + config.telegram.botname + Lang.app.starting)
           Log.Log.info(`Webhook: ${webhookUrl = webhookUrl ? webhookUrl : config.telegram.webhook.url == '' ? "127.0.0.1" : config.telegram.webhook.url}:${webhookPort = webhookPort ? webhookPort : config.telegram.webhook.port}`)
           Log.Log.warning(`${Lang.bot.telegram.webhookSettingsWarning}`)
           config.telegram.webhook.url != undefined || config.telegram.webhook.url != "" ? Bot.telegram.setWebhook(config.telegram.webhook.url).catch(err => Log.Log.fatal(err)) : Bot.telegram.setWebhook("127.0.0.1")
