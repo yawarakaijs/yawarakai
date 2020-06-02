@@ -131,14 +131,52 @@ let Bot = {
     async sceneDistributor(context) {
         let sce = Component.Compo.scene.find(scene => {
             if (scene.name === SceneControl.scene(context.ctx.message.from.id))
-            return scene.name === SceneControl.scene(context.ctx.message.from.id)
+                return scene.name === SceneControl.scene(context.ctx.message.from.id)
         })
         if (!sce) { return undefined }
         return await sce.function.call(this, context)
     }
 }
 
-// Cencel Scene
+
+// Message Log
+
+Telegram.Bot.use(async (ctx, next) => {
+
+    if (ctx.updateSubTypes[0] != "text") {
+        await next()
+        return
+    }
+
+    Message.messagectl.log(ctx)
+
+    await next()
+})
+
+// Cancel Scene
+
+Telegram.Bot.use(async (ctx, next) => {
+    if (ctx.updateSubTypes[0] != 'text') {
+        await next()
+    }
+    else if (Bot.commandParse(ctx).cmd == "cancel") {
+        if (SceneControl.has(ctx.from.id)) {
+            SceneControl.exit(ctx)
+            Telegram.Bot.telegram.sendMessage(ctx.from.id, "所有在进行的进程都取消了呢。")
+        }
+        else {
+            Telegram.Bot.telegram.sendMessage(ctx.from.id, "没有任何在进行的活动可以取消了哦。")
+        }
+    }
+    else if (Bot.commandParse(ctx).cmd == "help") {
+        let basics = Lang.bot.command.help + "\n\n" + Lang.bot.command.start + "\n" + Lang.bot.command.info + "\n" + Lang.bot.command.settings + "\n" + Lang.bot.command.cancel + "\n"
+        basics = basics + "\n" + Component.compoHelp.join("\n")
+        Telegram.Bot.telegram.sendMessage(ctx.from.id, basics)
+    }
+    else {
+        await next()
+    }
+})
 
 // Component Management
 
@@ -157,7 +195,7 @@ Telegram.Bot.use(async (ctx, next) => {
         let action = packageCommandMatches[1]
         let package = packageCommandMatches[2]
         Log.debug(`admin ${ctx.from.username}[${ctx.from.id}] wants to ${action} ${package}`)
-        
+
         let actionFunc = Composer.add
         if (action === 'remove') {
             actionFunc = Composer.remove
@@ -182,20 +220,6 @@ Telegram.Bot.use(async (ctx, next) => {
 
         return
     }
-
-    await next()
-})
-
-// Message Log
-
-Telegram.Bot.use(async (ctx, next) => {
-
-    if (ctx.updateSubTypes[0] != "text") {
-        await next()
-        return
-    }
-
-    Message.messagectl.log(ctx)
 
     await next()
 })
@@ -327,12 +351,10 @@ Telegram.Bot.use(async (ctx, next) => {
     }
 
     let admins = await getAdmin()
-    if (!admins.includes(ctx.from.id))
-    {
+    if (!admins.includes(ctx.from.id)) {
         await next()
     }
-    else
-    {
+    else {
         let message = ctx.message.text.trim()
         let packageCommandMatches = message.match(/^\/(add|remove)[\s]+([^\s]+)$/i)
         let resultMessage = undefined
