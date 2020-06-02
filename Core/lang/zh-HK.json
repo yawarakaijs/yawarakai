@@ -32,7 +32,7 @@
             "help": "/help 可用於顯示所有現有指令的幫助資訊\n這邊是所有的可用指令列表，如果想要查詢每個指令與插件相關的信息，請使用 /info 指令",
             "info": "/info 可用於獲取當前 Bot 運行的基本資訊和聊天數據情況",
             "settings": "/settings 設定您與 Bot 之間的基礎可設定內容 [目前暫時不可用-正在施工]",
-            "cancel": "/cancel Suspend all running progress or scenes" 
+            "cancel": "/cancel Suspend all running progress or scenes, if you stuck in rare situation, try use /cancel" 
         },
         "telegram": {
             "commandParameterInvalid": "無效的參數",
