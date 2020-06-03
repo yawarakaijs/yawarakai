@@ -234,7 +234,7 @@ Telegram.Bot.use(async (ctx, next) => {
     }
 
     let me = await Telegram.Bot.telegram.getMe()
-    let botname = config.botname != "" ? config.botname : me.first_name
+    let botname = config.telegram.botname != "" ? config.telegram.botname : me.first_name
 
     let isFirst = await Session.User.isFirst(ctx.message.from.id)
     if (isFirst) {

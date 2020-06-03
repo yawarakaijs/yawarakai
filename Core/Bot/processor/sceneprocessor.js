@@ -3,6 +3,7 @@
 let Store = require('../../storage')
 
 let SceneData = new Array()
+let SceneTrigger = new Map()
 let SceneDictionaryData = new Array()
 
 /**
@@ -68,6 +69,21 @@ class Scene {
         }
         SceneDictionaryData.push(this.merge)
         this.now = { key: "scene", scene: tag, id: 0, stage: 0, last: '' }
+    }
+
+    on(trigger, cb) {
+        SceneTrigger.set(trigger, cb)
+    }
+
+    text(trigger, cb) {
+
+    }
+
+    emit(trigger, ...args) {
+        if (SceneTrigger.has(trigger)) {
+            let cb = SceneTrigger.get(trigger)
+            cb(...args)
+        }
     }
 
     /**
