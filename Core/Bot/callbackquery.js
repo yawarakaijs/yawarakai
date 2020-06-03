@@ -1,7 +1,9 @@
 // Local Files
 
+let Store = require('../storage')
 let Session = require('../session')
 let CbqProcessor = require('./processor/cbqprocessor')
+let SceneContrtol = require('./processor/sceneprocessor').SceneControl
 
 let Control = {
     switcher(context) {
@@ -21,6 +23,12 @@ let Control = {
             case "ppdisagree":
                 pp.disagree(context)
                 return false
+            case "broadcastMsgConfirm":
+                broadcast.confirm(context)
+                return true
+            case "broadcastMsgEdit":
+                broadcast.edit(context)
+                return true
         }
     },
     count: 0
@@ -105,7 +113,7 @@ let pp = {
             context.telegram.deleteMessage(
                 context.ctx.update.callback_query.message.chat.id,
                 context.ctx.update.callback_query.message.message_id
-            )
+            ).catch(err => {})
             context.telegram.sendMessage(id, "好的呢，所有的数据都存储好了")
         })
 
@@ -124,15 +132,31 @@ let pp = {
             context.telegram.deleteMessage(
                 context.ctx.update.callback_query.message.chat.id,
                 context.ctx.update.callback_query.message.message_id
-            )
+            ).catch(err => {})
             context.telegram.sendMessage(id, "好的，我们除去正常的日志以外不会记录任何你的数据")
         })
     }
 }
 
 let broadcast = {
-    start(context) {
+    confirm(context) {
+        context.telegram.sendMessage(context.ctx.update.callback_query.from.id, "好的哦，那么我会发送给所有使用过这个 Bot 的所有用户。")
+        Store.session.find({ key: "activeUser" }, (err, docs) => {
+            if (err) throw err
 
+            console.log(docs)
+            let users = docs.pop().users
+            let textToBeSent = context.ctx.update.callback_query.message.reply_to_message.text
+
+            console.log("message would be sent to: ", users)
+            users.forEach(id => {
+                context.telegram.sendMessage(id, textToBeSent)
+            })
+        })
+        
+    },
+    edit(context) {
+        context.telegram.sendMessage(context.ctx.update.callback_query.from.id, "把修改好的发给我吧！")
     }
 }
 

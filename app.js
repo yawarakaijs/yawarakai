@@ -37,9 +37,9 @@ let AnonymousLog = require('./Core/log').AnonymousLog
 // Core Runtime
 
 try {
-    if(!Lang.app.startTime) {
+    if (!Lang.app.startTime) {
         throw new Error("Application Initialization Error: Invalid locale file")
-    }   
+    }
 }
 catch (err) {
     Log.fatal(err)
@@ -70,52 +70,76 @@ let mode = {
         Store.find({ key: "nlpAnalyzeIds" }).then(res => {
             Log.trace(`NLP Analyzer List: ${res[0].nlpAnalyzeIds}`)
         }).catch(err => {
-            Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
+            Store.insert({ nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds" })
         })
     },
-    
+
     base() {
 
         this.init()
 
-        Store.find({key: "nlpAnalyzeIds"}).catch(err => {
-            Store.insert({nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds"})
+        Store.find({ key: "nlpAnalyzeIds" }).catch(err => {
+            Store.insert({ nlpAnalyzeIds: "[]", key: "nlpAnalyzeIds" })
         })
     },
 
     init() {
 
         // init nlpfeedback
-        Store.find({key: "nlpfeedback"}).then(res => {
-            Log.debug(`NLP set to ${res[0].nlpfeedback}`)
-        }).catch(err => {
-            Store.insert({nlpfeedback: false, key: "nlpfeedback"})
-        })
+        let initNlpfeedback = () => {
+            return new Promise((resolve, reject) => {
+                Store.find({ key: "nlpfeedback" }).then(res => {
+                    Log.debug(`NLP set to ${res[0].nlpfeedback}`)
+                    resolve(true)
+                }).catch(err => {
+                    Store.insert({ nlpfeedback: false, key: "nlpfeedback" })
+                    resolve(true)
+                })
+            })
+        }
 
         // init users array
-        Store.session.find({ key: "activeUser" }, (err, doc) => {
-            if (doc.length === 0) {
-                Log.info("First run, init database for user session")
-                Store.session.insert({ key: "activeUser", users: new Array() })
-            }
-        })
+        let initUserArray = () => {
+            return new Promise((resolve, reject) => {
+                Store.session.find({ key: "activeUser" }, (err, doc) => {
+                    if (err) console.log(err)
+                    if (doc.length === 0) {
+                        Log.info("First run, init database for user session")
+                        Store.session.insert({ key: "activeUser", users: new Array() })
+                    }
+                    resolve(true)
+                })
+            })
+        }
 
         // init admin users array
-        Store.yawarakai.find({ key: "admins" }, (err, docs) => {
-            if (err) {
-                Log.fatal(err)
-                return
-            }
-            if (docs.length === 0) Store.yawarakai.insert({ key: "admins", users: [] }, (err, newDocs) => {
-                Log.info("Creating new admins user list sheet...")
-                if (err) Log.fatal(err)
+        let initAdminUsersArray = () => {
+            return new Promise((resolve, reject) => {
+                Store.yawarakai.find({ key: "admins" }, (err, docs) => {
+                    if (err) {
+                        Log.fatal(err)
+                        reject(err)
+                    }
+                    if (docs.length === 0) Store.yawarakai.insert({ key: "admins", users: [] }, (err, newDocs) => {
+                        Log.info("Creating new admins user list sheet...")
+                        if (err) {
+                            Log.fatal(err)
+                            reject(err)
+                        }
+                    })
+                    resolve(true)
+                })
             })
+        }
+
+        Promise.all([initNlpfeedback(), initUserArray(), initAdminUsersArray()]).then(resArray => {
+            Log.info("Init complete")
         })
     }
 }
 
-if(args.length != 0) {
-    switch(args[0]) {
+if (args.length != 0) {
+    switch (args[0]) {
         case "start":
             if (args.length > 1 && (args[1] == "--debug" || args[1] == "--d")) {
                 Core.command("/telegram debug")
@@ -138,7 +162,7 @@ else {
 
 // offline
 
-function commandParse (input) {
+function commandParse(input) {
     let commandArgs = input.split(" ")
     let command = commandArgs[0].substring(1)
     command = command.replace(/@\w+/g, "")
@@ -175,7 +199,7 @@ Core.cliInput('> ', input => {
                 break
             case '/unload':
                 let unloadArgs = commandParse(input).args
-                
+
                 break
             case '/compo':
                 let compoArgs = commandParse(input).args
