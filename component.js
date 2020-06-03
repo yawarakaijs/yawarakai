@@ -99,7 +99,7 @@ let Register = {
 
                     compoPair.push(`\n*${compoDisplayName}*`)
                     compoPair.push(`${compoDescription}`)
-                    compoPair.push(`${value}/${compoName}@${compoVersion}`)
+                    compoPair.push(`${compoName}@${compoVersion}`)
 
                     // Get index
                     let compoPath = extensionDir + value + "/" + compoEntry
@@ -181,7 +181,7 @@ let Register = {
                             compos.entry.push(path.resolve(compoPath))
                             compos.list.push(`${value} \x1b[34m${compoVersion}\x1b[0m from \x1b[33m${value}\x1b[0m`)
                             compos.name.push(compoName)
-                            compoInfo.push(`${compoGroup}/${compoName}@${compoVersion}`)
+                            compoInfo.push(`${compoName}@${compoVersion}`)
                             Log.Log.debug(`${Lang.component.loaded[0]} ${value}\x1b[34m@${compoVersion}\x1b[0m ${Lang.component.loaded[1]} \x1b[33m${value}\x1b[0m`)
                         }
                     }
