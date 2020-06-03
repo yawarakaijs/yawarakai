@@ -11,7 +11,7 @@ let logTime = SysTime.getFullYear() + "-" + ("0" + (SysTime.getMonth() + 1)).sli
 
 let coreLogFileName =
     "./logs/" +
-    config.botname +
+    config.telegram.botname +
     "-" +
     "Core-Log" +
     "-" +
@@ -19,7 +19,7 @@ let coreLogFileName =
     ".log"
 let messageLogFileName =
     "./logs/" +
-    config.botname +
+    config.telegram.botname +
     "-" +
     "Message-Log" +
     "-" +
