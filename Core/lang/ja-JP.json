@@ -32,7 +32,7 @@
             "help": "/help 使用可能なすべてのヘルプコンテキストとコマンドを表示します\n詳細情報は以下のとおりです。コンポーネントを使用したコマンドに関する詳細情報を読みたい場合は、代わりに使用してください /info ",
             "info": "/info ボットとチャットの基本情報を取得する",
             "settings": "/settings ボットで利用可能な設定を設定する [一時的に利用不可-工事中]",
-            "cancel": "/cancel Suspend all running progress or scenes, /cancel Suspend all running progress or scenes, if you stuck in rare situation, try use /cancel" 
+            "cancel": "/cancel 実行中の進行状況またはシーンをすべて一時停止します、どこかに行き詰まったら、使ってみる、代わりに使用してください /cancel" 
         },
         "telegram": {
             "commandParameterInvalid": "無効なパラメーター",
@@ -50,7 +50,7 @@
         "loaded": ["搭載部品 ", " から "],
         "enabled": "有効化 ",
         "disabled": "無効 ",
-        "reloaded": "過負荷 ",
+        "reloaded": "リロード ",
         "component": "部品",
         "noComponentFound": ["一部のコンポーネントがロードされていません","コンポーネントがインストールされている場合は、ルートディレクトリに node_modules フォルダーが存在するかどうかを確認します。"],
         "noValidConfigFound": ["一部のコンポーネントがロードされていません", "コンポーネントディレクトリが見つかりました。コンポーネントがインストールされている場合は、コンポーネントに config.json ファイルがあるかどうかを確認してください"],
