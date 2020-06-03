@@ -1,6 +1,6 @@
 // Local Packages
 
-let Store = require('../storage')
+let Store = require('../../storage')
 
 let SceneData = new Array()
 let SceneDictionaryData = new Array()

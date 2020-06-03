@@ -11,7 +11,7 @@ npm install # or yarn install
 
 ## Configuration
 ```
-cp config.js.example config.json
+cp config.json.example config.json
 # Edit the info inside config.json
 ```
 
@@ -30,11 +30,24 @@ Yawarakai provides a dynamical and powerful API for users to control the message
 
 ## Credits
 
-Translation by [KagurazakaIzumi](https://github.com/KagurazakaIzumi)
+Query feature of Wiki and Component loader by [BlueCocoa](https://github.com/BlueCocoa)
+zh-CN, zh-TW, zh-HK, jp-JP Translation by [KagurazakaIzumi](https://github.com/KagurazakaIzumi)
 
 ## Change log
 
+### 1.4.3
+Mood Update
+1. Code organization according to Codacy
+2. Code reform as a new directory for processor script
+3. Added a new API feature as Session
+4. Added a new handler as callbackquery for System
+5. Added many new command for admin
+6. Added a new feature for admin as Broadcast to broadcast message to all users
+7. Fixed several typos and prompts for commands
+8. Optimized the inlineQuery functions
+
 ### 1.4.2
+Scene Update
 1. Code organization according to Codacy
 2. Database seperated into different groups
 3. Feature: Scene added and component API adapted   
@@ -52,6 +65,7 @@ This made a great experience where you need to make a wizard or make a short or
 5. Two of the official component updated with Scene feature   
 
 ### 1.4.1
+Data Update
 **Discontinued the Redis server support of this project.**
 We now use NeDB for the local database storage.   
 1. Redis is now not used in this project and has been removed and related localization and config settings
@@ -62,6 +76,7 @@ We now use NeDB for the local database storage.
 6. Fixed the NLP display error after using NeDB
 
 ### 1.4.0
+Wonderful Update
 1. Added base command `/info`, `/help`, `/start`
 2. Diagnostic log updated with new component feature
 3. Message log format has been changed

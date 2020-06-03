@@ -5,8 +5,8 @@
 let Log = require('../log')
 let Lang = require('../lang')
 let NlpControl = require('./nlp').NlpControl
-let MessageDictionary = require('./msgprocessor').MessageDictionary
-let MessageDictionaryControl = require('./msgprocessor').MessageDictionaryControl
+let MessageDictionary = require('./processor/msgprocessor').MessageDictionary
+let MessageDictionaryControl = require('./processor/msgprocessor').MessageDictionaryControl
 
 let messagectl = {
 
@@ -123,7 +123,7 @@ let Message = {
                         ctx.reply(i).then(res => {
                             Log.Log.debug(`${Lang.bot.message.replyto}: ${ctx.message.from.id} - ${Lang.bot.message.success}`)
                         }).catch(err => {
-                            Log.DiagnosticLog.fatal(err)
+                            DiagnosticLog.fatal(err)
                         })
                         //this.todo(ctx, i.length)
                     }, i.length * 200)

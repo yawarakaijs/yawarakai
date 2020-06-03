@@ -31,14 +31,15 @@
             "start": "/start ボットとの対話を開始",
             "help": "/help 使用可能なすべてのヘルプコンテキストとコマンドを表示します\n詳細情報は以下のとおりです。コンポーネントを使用したコマンドに関する詳細情報を読みたい場合は、代わりに使用してください /info ",
             "info": "/info ボットとチャットの基本情報を取得する",
-            "settings": "/settings ボットで利用可能な設定を設定する [一時的に利用不可-工事中]"
+            "settings": "/settings ボットで利用可能な設定を設定する [一時的に利用不可-工事中]",
+            "cancel": "/cancel 実行中の進行状況またはシーンをすべて一時停止します、どこかに行き詰まったら、使ってみる、代わりに使用してください /cancel" 
         },
         "telegram": {
             "commandParameterInvalid": "無効なパラメーター",
             "commandParameterMissing": ["無効なパラメーター：","，必要なパラメーターが欠落していないか確認してください："],
             "commandInvalid": "パラメータコマンドが正しくありません \nエグゼクティブ /telegram h または /telegram help ヘルプを得るには",
             "helpCommand": "telegram コマンドは、開始および管理に使用されます Telegram Bot そして Telegram Client \n start     開始する Telegram Bot \n stop      やめて Telegram Bot",
-            "webhookSettingsWarning": "外部サーバーのコマンドラインモードを使用してWebhookを設定する場合、ここに表示されるWebhookは、Telegramサーバーに登録されたWebhookアドレスではない場合があります。"
+            "webhookSettingsWarning": "外部サーバーのコマンドラインモードを使用して Webhook を設定する場合、ここに表示される Webhook は、Telegram サーバーに登録された Webhook アドレスではない場合があります。"
         }
     },
     "core": {
@@ -49,10 +50,10 @@
         "loaded": ["搭載部品 ", " から "],
         "enabled": "有効化 ",
         "disabled": "無効 ",
-        "reloaded": "過負荷 ",
+        "reloaded": "リロード ",
         "component": "部品",
-        "noComponentFound": ["一部のコンポーネントがロードされていません","コンポーネントがインストールされている場合は、ルートディレクトリにComponentsフォルダーが存在するかどうかを確認します。"],
-        "noValidConfigFound": ["一部のコンポーネントがロードされていません", "コンポーネントディレクトリが見つかりました。コンポーネントがインストールされている場合は、コンポーネントにconfig.jsonファイルがあるかどうかを確認してください"],
+        "noComponentFound": ["一部のコンポーネントがロードされていません","コンポーネントがインストールされている場合は、ルートディレクトリに node_modules フォルダーが存在するかどうかを確認します。"],
+        "noValidConfigFound": ["一部のコンポーネントがロードされていません", "コンポーネントディレクトリが見つかりました。コンポーネントがインストールされている場合は、コンポーネントに config.json ファイルがあるかどうかを確認してください"],
         "configFileInvalid": ["ConfigFileInvalidError: \n", " プロファイルが正しくないか無効です"]
     }
 }

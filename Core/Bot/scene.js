@@ -4,27 +4,32 @@
 
 // Local Package
 
-let Scene = require('./sceneprocessor').Scene
-let SceneControl = require('./sceneprocessor').SceneControl
+let Scene = require('./processor/sceneprocessor').Scene
+let SceneControl = require('./processor/sceneprocessor').SceneControl
 
-let basicScene = new Scene("basic", [basic])
-
-function basic(context) {
-    context.telegram.sendMessage(context.ctx.message.chat.id, `Welcome, ${context.ctx.message.from.username}!`)
-}
+/**
+ * 
+ * let basicScene = new Scene("basic", [basic])
+ * 
+ * function basic(context) {
+ *    // todo
+ * }
+ */
 
 function switcher(context, tag) {
     // match the set for each scene
     switch(tag) {
-        case "nlpmatch":
+        // case "nlpmatch":
             // call the scene name
-            return standBy(context, 'basic')
+            // return standBy(context, 'basic')
+        case "broadcast":
+            return dispatach(context, 'broadcast')
         default:
             return false
     }
 }
 
-function standBy(context, tag) {
+function dispatach(context, tag) {
     let ctx = context.ctx
     // check if has
     if (SceneControl.has(ctx.message.from.id)) {
@@ -36,7 +41,6 @@ function standBy(context, tag) {
     }
     else {
         SceneControl.enter(ctx, tag)
-        context.telegram.sendMessage(ctx.message.chat.id, `First time to see you, ${ctx.message.from.username}`)
     }
 }
 
