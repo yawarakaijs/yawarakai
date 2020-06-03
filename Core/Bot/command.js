@@ -55,7 +55,7 @@ let Command = {
         let hasName = ctx.message.from.first_name != undefined || ctx.message.from.first_name != ""
         let hasLast = ctx.message.from.last_name != undefined || ctx.message.from.last_name != ""
         let user = hasName ? hasLast ? `${ctx.message.from.first_name} ${ctx.message.from.last_name}` : `${ctx.message.from.first_name}` : ""
-        let string = `Current\n${config.botname} v${packageInfo.version}\n`
+        let string = `Current\n${config.telegram.botname} v${packageInfo.version}\n`
         let pairs = Component.compoPair.join("\n")
         let chat = ctx.message.chat.type != "private" ? `\nChat ${ctx.message.chat.title} [${ctx.message.chat.id}]\n` : "\n"
         string = string + `User ${user} <${ctx.message.from.id}>${chat}`
