@@ -22,7 +22,7 @@ let Command = {
                 let basics = Lang.bot.command.help + "\n\n" + Lang.bot.command.start + "\n" + Lang.bot.command.info + "\n" + Lang.bot.command.settings + "\n" + Lang.bot.command.cancel + "\n"
                 return basics + "\n" + Component.compoHelp.join("\n")
             case "start":
-                return `你好哦，感谢使用${config.botname}呢。\n如果不知道怎么使用的话，可以使用 /help 查阅相关的帮助信息`
+                return `你好哦，感谢使用${config.telegram.botname}呢。\n如果不知道怎么使用的话，可以使用 /help 查阅相关的帮助信息`
             case "info":
                 let info = this.info(context)
                 return info
@@ -33,8 +33,9 @@ let Command = {
             case "hug":
                 return "抱抱"
             case "broadcast":
-                // Broadcast.start(context)
-                return true
+                Broadcast.start(context)
+                Scene.switcher(context, "broadcast")
+                return undefined
             case "cancel":
                 SceneControl.exit(context.ctx)
                 return undefined
