@@ -31,6 +31,8 @@ async function scene(context) {
                     ]]
 
                 }
+            }).catch(err => {
+                Log.Log.fatal(err)
             })
             break
         case 1:
@@ -44,11 +46,15 @@ let Control = {
         let incomingUserId = context.ctx.message.from.id
         let isAdmin = await Store.isAdmin(context.ctx.message.from.id)
         if (isAdmin) {
-            context.telegram.sendMessage(incomingUserId, "想要发送什么呢？\n如果不想发送了就点击 /cancel 就好", { reply_to_message_id: context.ctx.message.message_id })
+            context.telegram.sendMessage(incomingUserId, "想要发送什么呢？\n如果不想发送了就点击 /cancel 就好", { reply_to_message_id: context.ctx.message.message_id }).catch(err => {
+                Log.Log.fatal(err)
+            })
         }
         else {
-            context.telegram.sendMessage(incomingUserId, "不是管理员是不可以发送广播的哦。", { reply_to_message_id: context.ctx.message.message_id })
-            SceneControl.exit(context.ctx, "broadcast")
+            context.telegram.sendMessage(incomingUserId, "不是管理员是不可以发送广播的哦。", { reply_to_message_id: context.ctx.message.message_id }).catch(err => {
+                Log.Log.fatal(err)
+            })
+            SceneControl.exit(context.ctx)
         }
     }
 }
