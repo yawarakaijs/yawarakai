@@ -300,7 +300,7 @@ let SceneControl = {
      * @param {Telegrf Context Object} ctx  - The context from telegraf
      */
     exit(ctx) {
-        let res = SceneData.filter(item => item.id != ctx.message.from.id)
+        let res = SceneData.filter(item => item.id != ctx.from.id)
         SceneData = new Array()
         res.forEach(item => {
             SceneData.push(item)

@@ -45,6 +45,9 @@ Mood Update
 6. Added a new feature for admin as Broadcast to broadcast message to all users
 7. Fixed several typos and prompts for commands
 8. Optimized the inlineQuery functions
+9. Fixed MusicShare command /netease function returning message while still WIP
+10. Fixed the broadcast function is not working propertly
+11. Fixed the tos message might try to send to group but permission is not exist
 
 ### 1.4.2
 Scene Update
