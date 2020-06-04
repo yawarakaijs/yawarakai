@@ -204,6 +204,8 @@ Telegram.Bot.use(async (ctx, next) => {
         Telegram.Bot.telegram.sendMessage(ctx.message.from.id, `${action}ing ${package}...`, {
             reply_to_message_id: ctx.message.message_id,
             parse_mode: "Markdown"
+        }).catch(err => {
+            Log.fatal(err)
         })
         let code = await actionFunc(package)
         if (code == 0) {
@@ -216,6 +218,8 @@ Telegram.Bot.use(async (ctx, next) => {
         Telegram.Bot.telegram.sendMessage(ctx.message.from.id, resultMessage, {
             reply_to_message_id: ctx.message.message_id,
             parse_mode: "Markdown"
+        }).catch(err => {
+            Log.fatal(err)
         })
 
         return
@@ -237,7 +241,7 @@ Telegram.Bot.use(async (ctx, next) => {
     let botname = config.telegram.botname != "" ? config.telegram.botname : me.first_name
 
     let isFirst = await Session.User.isFirst(ctx.message.from.id)
-    if (isFirst) {
+    if (isFirst && ctx.message.chat.type !== "supergroup") {
 
         let tos = `感谢你选择使用${botname}！` + "\n\n" +
             "真的很抱歉打扰你的使用，为了你的数据安全和我的法律责任，必须声明一" +
@@ -258,7 +262,6 @@ Telegram.Bot.use(async (ctx, next) => {
 
         Telegram.Bot.telegram.sendMessage(ctx.message.from.id, tos,
             {
-                reply_to_message_id: ctx.message.message_id,
                 parse_mode: "Markdown",
                 reply_markup: {
                     inline_keyboard: [[
@@ -269,6 +272,9 @@ Telegram.Bot.use(async (ctx, next) => {
                     ]]
                 },
                 disable_web_page_preview: true
+            }).catch(err => {
+                Log.fatal(ctx)
+                Log.fatal(err)
             })
     }
     else {
@@ -318,7 +324,9 @@ Telegram.Bot.use(async (ctx, next) => {
         }
         else {
             ctx.replyWithChatAction("typing")
-            ctx.reply(data, { reply_to_message_id: ctx.message.message_id })
+            ctx.reply(data, { reply_to_message_id: ctx.message.message_id }).catch(err => {
+                Log.fatal(err)
+            })
         }
     }
 
@@ -371,6 +379,8 @@ Telegram.Bot.use(async (ctx, next) => {
             Telegram.Bot.telegram.sendMessage(ctx.message.from.id, `${action}ing ${package}...`, {
                 reply_to_message_id: ctx.message.message_id,
                 parse_mode: "Markdown"
+            }).catch(err => {
+                Log.fatal(err)
             })
             let code = await actionFunc(package)
             if (code == 0) {
@@ -383,6 +393,8 @@ Telegram.Bot.use(async (ctx, next) => {
             Telegram.Bot.telegram.sendMessage(ctx.message.from.id, resultMessage, {
                 reply_to_message_id: ctx.message.message_id,
                 parse_mode: "Markdown"
+            }).catch(err => {
+                Log.fatal(err)
             })
 
             return
@@ -409,7 +421,9 @@ Telegram.Bot.use(async (ctx, next) => {
             data = await Bot.commandDistributor(ctx)
         }
         if (data != undefined) {
-            ctx.reply(data, { reply_to_message_id: ctx.message.message_id, parse_mode: "Markdown" })
+            ctx.reply(data, { reply_to_message_id: ctx.message.message_id, parse_mode: "Markdown" }).catch(err => {
+            Log.fatal(err)
+            })
         }
     }
 
